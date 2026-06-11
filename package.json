@@ -2,6 +2,9 @@
   "name": "rasiga",
   "version": "1.0.0",
   "description": "Rasiga Indian Music Discovery Platform",
+  "scripts": {
+    "build": "echo \"No build step required\""
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.43.0"
   }
