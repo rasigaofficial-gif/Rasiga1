@@ -24,6 +24,23 @@
   --ease: cubic-bezier(.4,0,.2,1);
 }
 
+html.light {
+  --bg: #F8F9FA;
+  --bg2: #FFFFFF;
+  --bg3: #FFFFFF;
+  --txt: #111827;
+  --txt2: #4B5563;
+  --txt3: #9CA3AF;
+  --glass: rgba(0,0,0,0.03);
+  --glass2: rgba(0,0,0,0.06);
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.15);
+  --gold: #EAB308;
+  --teal: #0F766E;
+  --saffron: #EA580C;
+  --rose: #E11D48;
+}
+
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:80px}
 body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
@@ -60,6 +77,15 @@ button{cursor:pointer;font-family:inherit}
 #auth-buttons{display:flex;gap:.6rem;align-items:center}
 .avatar-chip{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--saffron),var(--rose));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;cursor:pointer;transition:transform .25s;border:2px solid transparent}
 .avatar-chip:hover{transform:scale(1.12);border-color:var(--saffron)}
+
+/* Theme Toggle */
+.theme-toggle{background:var(--glass);border:1px solid var(--border);color:var(--txt2);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .3s var(--ease);position:relative;overflow:hidden;cursor:pointer}
+.theme-toggle:hover{color:var(--txt);background:var(--glass2);border-color:var(--border2);transform:scale(1.05)}
+.theme-toggle svg{position:absolute;transition:all .4s var(--ease)}
+.theme-toggle .icon-sun{transform:translateY(0);opacity:1}
+.theme-toggle .icon-moon{transform:translateY(24px);opacity:0}
+html.light .theme-toggle .icon-sun{transform:translateY(-24px);opacity:0}
+html.light .theme-toggle .icon-moon{transform:translateY(0);opacity:1}
 
 /* ── Hero ── */
 .hero{position:relative;min-height:92vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:7rem 2rem 4rem;overflow:hidden}

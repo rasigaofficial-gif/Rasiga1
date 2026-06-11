@@ -189,6 +189,14 @@
   // EVENTS
   // ══════════════════════════════════════════
   function wire() {
+    var themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', function() {
+        var isLight = document.documentElement.classList.toggle('light');
+        localStorage.setItem('rasiga-theme', isLight ? 'light' : 'dark');
+      });
+    }
+
     document.getElementById('search-input').addEventListener('input',applyFilters);
 
     document.getElementById('lang-pills').addEventListener('click',function(e){
@@ -372,6 +380,9 @@
   // ══════════════════════════════════════════
   // BOOT — runs immediately, no async needed
   // ══════════════════════════════════════════
+  if (localStorage.getItem('rasiga-theme') === 'light' || (!localStorage.getItem('rasiga-theme') && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+    document.documentElement.classList.add('light');
+  }
   startCanvas();
   renderAll();      // ← 22 songs render INSTANTLY
   renderReviews();
