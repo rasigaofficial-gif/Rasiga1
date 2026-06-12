@@ -1,6 +1,14 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-const SUPABASE_URL = 'REPLACE_WITH_YOUR_URL'
-const SUPABASE_ANON_KEY = 'REPLACE_WITH_YOUR_ANON_KEY'
-
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+// ══════════════════════════════════════════════
+// Supabase Configuration
+// ══════════════════════════════════════════════
+// This file is kept for reference only.
+// The Supabase client is initialized directly in app.js using the
+// UMD bundle loaded via <script> tag in index.html.
+//
+// If you want to switch to ES Modules in the future:
+//   1. Add type="module" to the <script> tag in index.html
+//   2. Use: import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+//   3. Replace the inline initialization in app.js
+//
+// Current Supabase URL: https://jtqrwtynipzjybjvprdt.supabase.co
+// The anon key is embedded in app.js for the demo.
