@@ -2,10 +2,15 @@
   'use strict';
 
   function handleRoute() {
-    var hash = location.hash;
+    var hash = location.hash || '#discover';
     var main = document.querySelector('.main');
     var chartsPage = document.getElementById('charts-page');
     var artistPage = document.getElementById('artist-page');
+
+    var navLinks = document.querySelectorAll('.nav-links a.nav-item');
+    for (var i = 0; i < navLinks.length; i++) {
+      navLinks[i].classList.toggle('active', navLinks[i].getAttribute('data-hash') === hash || (hash==='' && navLinks[i].getAttribute('data-hash')==='#discover') || (hash==='#/' && navLinks[i].getAttribute('data-hash')==='#discover'));
+    }
 
     if (!hash.startsWith('#/')) {
       // Plain anchor or empty. Ensure normal visibility.

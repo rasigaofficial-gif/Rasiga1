@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#070612">
   <title>Rasiga — Rate, Review & Discover Indian Music</title>
   <meta name="description" content="Rasiga is the Letterboxd for Indian music. Rate, review and discover the greatest songs across Hindi, Tamil, Telugu, Malayalam, Kannada, Bengali and more.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
@@ -26,24 +27,24 @@
   <nav class="navbar">
     <div class="nav-inner">
       <div class="nav-left">
-        <a href="#"><h1 class="logo">RASIGA</h1></a>
-        <ul class="nav-links">
-          <li><a href="#discover">Discover</a></li>
-          <li><a href="#charts">Charts</a></li>
-          <li><a href="#releases">New</a></li>
-          <li><a href="#reviews">Reviews</a></li>
-          <li><a href="#spotlight">Artists</a></li>
+        <a href="#/"><h1 class="logo">RASIGA</h1></a>
+        <ul class="nav-links" id="nav-links">
+          <li><a href="#discover" class="nav-item" data-hash="#discover">Discover</a></li>
+          <li><a href="#/charts" class="nav-item" data-hash="#/charts">Charts</a></li>
+          <li><a href="#" class="nav-item" onclick="var t=document.createElement('div');t.className='toast';t.textContent='Lists feature coming soon!';document.getElementById('toasts').appendChild(t);setTimeout(function(){t.remove()},3200);return false;">Lists</a></li>
+          <li><a href="#reviews" class="nav-item" data-hash="#reviews">Reviews</a></li>
+          <li><a href="#spotlight" class="nav-item" data-hash="#spotlight">Artists</a></li>
         </ul>
       </div>
       <div class="nav-right">
         <div class="search-wrap">
-          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="search-input" placeholder="Search songs, artists, films..." autocomplete="off">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search-input" placeholder="Search songs, artists, films..." autocomplete="off" aria-label="Search">
         </div>
 
         <div id="auth-btns">
-          <button class="btn btn-ghost" id="login-btn">Log in</button>
-          <button class="btn btn-grd" id="signup-btn">Sign up</button>
+          <button class="btn btn-ghost" id="login-btn" aria-label="Log in">Log in</button>
+          <button class="btn btn-grd" id="signup-btn" aria-label="Sign up">Sign up</button>
         </div>
       </div>
     </div>
@@ -186,9 +187,9 @@
   </div>
 
   <!-- Song Modal -->
-  <div class="modal-bg" id="song-modal">
+  <div class="modal-bg" id="song-modal" role="dialog" aria-modal="true" aria-label="Song Details">
     <div class="modal song-modal">
-      <button class="modal-x">&times;</button>
+      <button class="modal-x" aria-label="Close modal">&times;</button>
       <div id="sm-hero" class="sm-hero"></div>
       <div id="sm-body" class="sm-body"></div>
     </div>

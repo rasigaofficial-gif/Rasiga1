@@ -351,7 +351,17 @@
     var nameEl = document.getElementById('af-name');
     if (action === 'signup') {
       db.auth.signUp({ email: email, password: pwd, options: { data: { display_name: nameEl ? nameEl.value : '' } } }).then(function (r) {
-        if (r.error) { toast(r.error.message); } else { toast('Account created!'); closeModals(); }
+        if (r.error) { toast(r.error.message); } else {
+          var u = r.data.user;
+          if (u) {
+            db.from('users').insert({ id: u.id, username: email.split('@')[0] }).then(function(ur) {
+              if (ur.error) console.warn('User insert skip:', ur.error);
+              toast('Account created!'); closeModals();
+            });
+          } else {
+            toast('Account created!'); closeModals();
+          }
+        }
       });
     } else {
       db.auth.signInWithPassword({ email: email, password: pwd }).then(function (r) {
@@ -423,7 +433,19 @@
     if (!user) { if (db) openAuth('login'); toast('Log in to rate songs'); return; }
     if (!db || !activeSong) return;
     db.from('ratings').upsert({ user_id: user.id, song_id: activeSong.id, score: score }, { onConflict: 'user_id,song_id' }).then(function (r) {
-      if (r.error) toast(r.error.message); else toast('Rated ' + score + '★');
+      if (r.error) { toast(r.error.message); } else {
+        toast('Rated ' + score + '★');
+        db.from('songs').select('avg_rating, total_ratings').eq('id', activeSong.id).single().then(function(sr) {
+          if (sr.data) {
+            activeSong.avg_rating = sr.data.avg_rating;
+            activeSong.total_ratings = sr.data.total_ratings;
+            var bigEl = document.getElementById('sm-big');
+            if (bigEl) bigEl.textContent = Number(sr.data.avg_rating).toFixed(1);
+            var subEl = document.querySelector('.sm-sub');
+            if (subEl) subEl.innerHTML = activeSong.year + ' • ' + (activeSong.composer || 'Unknown') + ' • ' + sr.data.total_ratings + ' ratings';
+          }
+        });
+      }
     });
   }
 
