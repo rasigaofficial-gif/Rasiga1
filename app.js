@@ -148,7 +148,8 @@
         var rc = idx === 0 ? 'g' : idx === 1 ? 's' : idx === 2 ? 'b' : '';
         var d = document.createElement('div'); d.className = 'rcard';
         var tags = (s.genre || []).slice(0, 2).map(function (g) { return '<span class="rtag">' + g + '</span>'; }).join('');
-        d.innerHTML = '<div class="rcard-rank ' + rc + '">' + (idx + 1) + '</div><div class="rcard-art" style="background:' + grad(s) + '">' + mono(s.title) + '</div><div class="rcard-info"><div class="rcard-name" title="' + s.title + '">' + s.title + '</div><div class="rcard-sub">' + s.singer + ' · ' + s.composer + '</div><div class="rcard-tags"><span class="rtag">' + s.language + '</span>' + tags + '</div></div><div class="rcard-score">' + s.avg_rating + '</div>';
+        var comp = s.composer ? '<a href="#/artist/' + encodeURIComponent(s.composer) + '" class="composer-link" onclick="event.stopPropagation()">' + s.composer + '</a>' : '-';
+        d.innerHTML = '<div class="rcard-rank ' + rc + '">' + (idx + 1) + '</div><div class="rcard-art" style="background:' + grad(s) + '">' + mono(s.title) + '</div><div class="rcard-info"><div class="rcard-name" title="' + s.title + '">' + s.title + '</div><div class="rcard-sub">' + (s.singer || '-') + ' · ' + comp + '</div><div class="rcard-tags"><span class="rtag">' + s.language + '</span>' + tags + '</div></div><div class="rcard-score">' + s.avg_rating + '</div>';
         d.onclick = function () { openSong(s); };
         el.appendChild(d);
       })(songs[i], i);
@@ -253,7 +254,20 @@
   }
 
   function closeModals() {
-    var m = document.querySelectorAll('.modal-bg'); for (var i = 0; i < m.length; i++)m[i].classList.remove('on');
+    var m = document.querySelectorAll('.modal-bg'); 
+    var wasOpen = false;
+    for (var i = 0; i < m.length; i++) {
+      if (m[i].classList.contains('on')) wasOpen = true;
+      m[i].classList.remove('on');
+    }
+    if (wasOpen && location.hash.indexOf('#/song/') === 0) {
+      document.title = 'Rasiga — Rate, Review & Discover Indian Music';
+      if (history.state && history.state.fromRouter) {
+        history.back();
+      } else {
+        location.hash = '';
+      }
+    }
   }
 
   // ══════════════════════════════════════════
@@ -319,15 +333,20 @@
   // ══════════════════════════════════════════
   function openSong(song) {
     activeSong = song;
+    if (location.hash !== '#/song/' + song.id) {
+      history.pushState({fromRouter: true}, '', '#/song/' + song.id);
+    }
+    document.title = song.title + ' — Rasiga';
     document.getElementById('song-modal').classList.add('on');
     var hero = document.getElementById('sm-hero');
     hero.style.background = grad(song);
     hero.innerHTML = '<div class="sm-art" style="background:' + grad(song) + '">' + mono(song.title) + '</div>';
     var isL = !!loggedSet[song.id];
     var body = document.getElementById('sm-body');
+    var comp = song.composer ? '<a href="#/artist/' + encodeURIComponent(song.composer) + '" class="composer-link" onclick="event.stopPropagation(); window.Rasiga.closeModals();">' + song.composer + '</a>' : '-';
     body.innerHTML = '<div class="sm-head"><div class="sm-title">' + song.title + '</div><div class="sm-sub">' + (song.film || 'Independent') + ' · ' + song.year + ' · ' + (song.industry || '') + '</div></div>' +
       '<div class="sm-rating-band"><div class="sm-rating-left"><div class="sm-big">' + song.avg_rating + '</div><div><div class="sm-stars-display">★★★★★</div><div class="sm-votes">' + (song.total_ratings || 0).toLocaleString() + ' ratings</div></div></div><div class="sm-istars" id="istars"><span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span></div></div>' +
-      '<div class="sm-grid"><div class="sm-gi"><span class="sm-gl">Singer</span><span class="sm-gv">' + (song.singer || '-') + '</span></div><div class="sm-gi"><span class="sm-gl">Composer</span><span class="sm-gv">' + (song.composer || '-') + '</span></div><div class="sm-gi"><span class="sm-gl">Lyricist</span><span class="sm-gv">' + (song.lyricist || '-') + '</span></div><div class="sm-gi"><span class="sm-gl">Language</span><span class="sm-gv">' + song.language + '</span></div><div class="sm-gi"><span class="sm-gl">Genres</span><span class="sm-gv">' + ((song.genre || []).join(', ') || '-') + '</span></div><div class="sm-gi"><span class="sm-gl">Moods</span><span class="sm-gv">' + ((song.mood || []).join(', ') || '-') + '</span></div>' + (song.raga ? '<div class="sm-gi"><span class="sm-gl">Raga</span><span class="sm-gv">' + song.raga + '</span></div>' : '') + '</div>' +
+      '<div class="sm-grid"><div class="sm-gi"><span class="sm-gl">Singer</span><span class="sm-gv">' + (song.singer || '-') + '</span></div><div class="sm-gi"><span class="sm-gl">Composer</span><span class="sm-gv">' + comp + '</span></div><div class="sm-gi"><span class="sm-gl">Lyricist</span><span class="sm-gv">' + (song.lyricist || '-') + '</span></div><div class="sm-gi"><span class="sm-gl">Language</span><span class="sm-gv">' + song.language + '</span></div><div class="sm-gi"><span class="sm-gl">Genres</span><span class="sm-gv">' + ((song.genre || []).join(', ') || '-') + '</span></div><div class="sm-gi"><span class="sm-gl">Moods</span><span class="sm-gv">' + ((song.mood || []).join(', ') || '-') + '</span></div>' + (song.raga ? '<div class="sm-gi"><span class="sm-gl">Raga</span><span class="sm-gv">' + song.raga + '</span></div>' : '') + '</div>' +
       '<div class="sm-stream"><div class="sm-sp">Spotify</div><div class="sm-sp">YouTube</div><div class="sm-sp">JioSaavn</div><div class="sm-sp">Apple Music</div></div>' +
       '<div class="sm-actions"><button class="sm-abtn' + (isL ? ' logged' : '') + '" id="sm-log">' + (isL ? '✓ Logged' : '+ Log It') + '</button><button class="sm-abtn" id="sm-list">Add to List</button><button class="sm-abtn" id="sm-share">Share</button></div>';
 
@@ -411,6 +430,17 @@
       renderAuthBtns();
     });
   }
+
+  // ══════════════════════════════════════════
+  // EXPORTS
+  // ══════════════════════════════════════════
+  window.Rasiga = {
+    getSongs: function() { return allSongs; },
+    openSong: openSong,
+    closeModals: closeModals,
+    renderRanked: renderRanked,
+    renderScroll: renderScroll
+  };
 
   console.log('Rasiga loaded — ' + allSongs.length + ' songs ready');
 

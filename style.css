@@ -237,6 +237,32 @@ html.light .navbar{background:rgba(248,249,250,.88)}
 .empty{text-align:center;padding:2.5rem 1rem;color:var(--txt3)}
 .empty-i{font-size:2.5rem;margin-bottom:.3rem}
 
+/* ── Routing & Expanded Views ── */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--txt3);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.back-link:hover {
+  color: var(--teal);
+}
+.artist-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+}
+.composer-link {
+  color: inherit;
+  transition: color 0.2s;
+}
+.composer-link:hover {
+  color: var(--teal);
+  text-decoration: underline;
+}
+
 /* ══════════════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════════════ */

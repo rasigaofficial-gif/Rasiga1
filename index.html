@@ -103,7 +103,10 @@
       <div class="hscroll" id="trending-list"></div>
     </section>
     <section class="sec" id="charts">
-      <div class="sec-head"><h3 class="sec-title">Top Rated All Time</h3><p class="sec-sub">The greatest Indian songs ever recorded</p></div>
+      <div class="sec-head" style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <div><h3 class="sec-title">Top Rated All Time</h3><p class="sec-sub">The greatest Indian songs ever recorded</p></div>
+        <a href="#/charts" class="back-link" style="margin-bottom:0.2rem">View Full Chart →</a>
+      </div>
       <div class="ranked-grid" id="toprated-list"></div>
     </section>
     <section class="sec" id="spotlight">
@@ -127,6 +130,28 @@
       <div class="rev-grid" id="reviews-list"></div>
     </section>
   </main>
+
+  <!-- Charts Page -->
+  <section class="page-view" id="charts-page" style="display:none; padding: 6rem 2rem 2rem; max-width: 1280px; margin: 0 auto;">
+    <a href="#" class="back-link">← Back to Discover</a>
+    <div class="sec-head" style="margin-top: 1rem;"><h3 class="sec-title">Top Rated All Time</h3><p class="sec-sub">The 50 greatest Indian songs ever recorded</p></div>
+    <div class="ranked-grid" id="charts-page-grid"></div>
+  </section>
+
+  <!-- Artist Page -->
+  <section class="page-view" id="artist-page" style="display:none; padding: 6rem 2rem 2rem; max-width: 1280px; margin: 0 auto;">
+    <a href="#" class="back-link">← Back to Discover</a>
+    <div class="sec-head" style="margin-top: 1rem; margin-bottom: 2rem;">
+      <h3 class="sec-title" id="ap-name">Artist Name</h3>
+      <div style="display: flex; gap: 1rem; color: var(--txt3); margin-top: 0.5rem; font-weight: 500;">
+        <span id="ap-count">0 songs</span>
+        <span>·</span>
+        <span id="ap-rating">0 avg rating</span>
+      </div>
+    </div>
+    <div class="artist-grid" id="artist-page-grid"></div>
+  </section>
+
 
   <!-- Footer -->
   <footer class="footer">
@@ -169,5 +194,6 @@
 
   <!-- ALL JS — regular script, NOT module -->
   <script src="app.js"></script>
+  <script src="router.js"></script>
 </body>
 </html>
