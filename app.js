@@ -396,8 +396,24 @@
         filtered = allSongs.slice();
         renderAll();
         console.log('Upgraded with ' + result.data.length + ' songs from Supabase');
+        
+        var b = document.createElement('div');
+        b.style = 'background:#22c55e;color:#fff;padding:8px;text-align:center;font-weight:bold;z-index:9999;position:fixed;top:0;width:100%';
+        b.textContent = '🟢 Live data: ' + result.data.length + ' songs from Supabase (top song: ' + result.data[0].title + ')';
+        document.body.appendChild(b);
+      } else if (result.error) {
+        var b = document.createElement('div');
+        b.style = 'background:#ef4444;color:#fff;padding:8px;text-align:center;font-weight:bold;z-index:9999;position:fixed;top:0;width:100%';
+        b.textContent = '🔴 Fallback data: 22 local seed songs — Supabase error: ' + result.error.message;
+        document.body.appendChild(b);
       }
-    }).catch(function(e) { console.warn('Supabase fetch skipped:', e); });
+    }).catch(function(e) { 
+      console.warn('Supabase fetch skipped:', e); 
+      var b = document.createElement('div');
+      b.style = 'background:#ef4444;color:#fff;padding:8px;text-align:center;font-weight:bold;z-index:9999;position:fixed;top:0;width:100%';
+      b.textContent = '🔴 Fallback data: 22 local seed songs — Supabase error: ' + (e.message || e);
+      document.body.appendChild(b);
+    });
 
     db.auth.onAuthStateChange(function(event, session) {
       user = session ? session.user : null;
