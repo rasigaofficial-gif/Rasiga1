@@ -120,9 +120,27 @@
   // RENDER
   // ══════════════════════════════════════════
   function renderAll() {
+    var msgs = document.querySelectorAll('.tuning-in');
+    for (var i = 0; i < msgs.length; i++) msgs[i].parentNode.removeChild(msgs[i]);
+
     renderScroll('trending-list', filtered.slice().sort(function (a, b) { return b.total_ratings - a.total_ratings; }).slice(0, 10));
     renderRanked('toprated-list', filtered.slice().sort(function (a, b) { return b.avg_rating - a.avg_rating || b.total_ratings - a.total_ratings; }).slice(0, 9));
     renderScroll('releases-list', filtered.slice().sort(function (a, b) { return b.year - a.year; }).slice(0, 10));
+  }
+
+  function renderSkeletons() {
+    var skel = '';
+    for (var i = 0; i < 5; i++) skel += '<div class="skeleton-card"><div class="skeleton-art"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>';
+    var t = '<div class="tuning-in"><span class="music-note">♪</span> Tuning in...</div>';
+    
+    var el1 = document.getElementById('trending-list');
+    if (el1 && !el1.previousElementSibling.classList.contains('tuning-in')) { el1.innerHTML = skel; el1.insertAdjacentHTML('beforebegin', t); }
+    
+    var el2 = document.getElementById('toprated-list');
+    if (el2 && !el2.previousElementSibling.classList.contains('tuning-in')) { el2.innerHTML = skel; el2.insertAdjacentHTML('beforebegin', t); }
+    
+    var el3 = document.getElementById('releases-list');
+    if (el3 && !el3.previousElementSibling.classList.contains('tuning-in')) { el3.innerHTML = skel; el3.insertAdjacentHTML('beforebegin', t); }
   }
 
   function renderScroll(id, songs) {
@@ -130,12 +148,14 @@
     if (!songs.length) { el.innerHTML = '<div class="empty">No songs match your filters</div>'; return; }
     el.innerHTML = '';
     for (var i = 0; i < songs.length; i++) {
-      (function (s) {
+      (function (s, idx) {
         var d = document.createElement('div'); d.className = 'scard';
-        d.innerHTML = '<span class="scard-lang">' + s.language + '</span><div class="scard-art" style="background:' + grad(s) + '">' + mono(s.title) + '</div><div class="scard-name" title="' + s.title + '">' + s.title + '</div><div class="scard-meta">' + (s.film || 'Indie') + ' · ' + s.year + '</div><div class="scard-rating">★ ' + s.avg_rating + '</div>';
+        d.style.animationDelay = (idx * 50) + 'ms';
+        var overlay = '<div class="play-overlay"><div class="play-btn">▶</div></div><div class="eq-bars"><div class="eq-bar" style="animation-delay:0s"></div><div class="eq-bar" style="animation-delay:0.15s"></div><div class="eq-bar" style="animation-delay:0.3s"></div><div class="eq-bar" style="animation-delay:0.45s"></div></div>';
+        d.innerHTML = '<span class="scard-lang">' + s.language + '</span><div class="scard-art" style="background:' + grad(s) + '">' + mono(s.title) + overlay + '</div><div class="scard-name" title="' + s.title + '">' + s.title + '</div><div class="scard-meta">' + (s.film || 'Indie') + ' · ' + s.year + '</div><div class="scard-rating">★ ' + s.avg_rating + '</div>';
         d.onclick = function () { openSong(s); };
         el.appendChild(d);
-      })(songs[i]);
+      })(songs[i], i);
     }
   }
 
@@ -147,9 +167,11 @@
       (function (s, idx) {
         var rc = idx === 0 ? 'g' : idx === 1 ? 's' : idx === 2 ? 'b' : '';
         var d = document.createElement('div'); d.className = 'rcard';
+        d.style.animationDelay = (idx * 50) + 'ms';
         var tags = (s.genre || []).slice(0, 2).map(function (g) { return '<span class="rtag">' + g + '</span>'; }).join('');
         var comp = s.composer ? '<a href="#/artist/' + encodeURIComponent(s.composer) + '" class="composer-link" onclick="event.stopPropagation()">' + s.composer + '</a>' : '-';
-        d.innerHTML = '<div class="rcard-rank ' + rc + '">' + (idx + 1) + '</div><div class="rcard-art" style="background:' + grad(s) + '">' + mono(s.title) + '</div><div class="rcard-info"><div class="rcard-name" title="' + s.title + '">' + s.title + '</div><div class="rcard-sub">' + (s.singer || '-') + ' · ' + comp + '</div><div class="rcard-tags"><span class="rtag">' + s.language + '</span>' + tags + '</div></div><div class="rcard-score">' + s.avg_rating + '</div>';
+        var overlay = '<div class="play-overlay"><div class="play-btn">▶</div></div><div class="eq-bars"><div class="eq-bar" style="animation-delay:0s"></div><div class="eq-bar" style="animation-delay:0.15s"></div><div class="eq-bar" style="animation-delay:0.3s"></div><div class="eq-bar" style="animation-delay:0.45s"></div></div>';
+        d.innerHTML = '<div class="rcard-rank ' + rc + '">' + (idx + 1) + '</div><div class="rcard-art" style="background:' + grad(s) + '">' + mono(s.title) + overlay + '</div><div class="rcard-info"><div class="rcard-name" title="' + s.title + '">' + s.title + '</div><div class="rcard-sub">' + (s.singer || '-') + ' · ' + comp + '</div><div class="rcard-tags"><span class="rtag">' + s.language + '</span>' + tags + '</div></div><div class="rcard-score">' + s.avg_rating + '</div>';
         d.onclick = function () { openSong(s); };
         el.appendChild(d);
       })(songs[i], i);
@@ -353,10 +375,18 @@
     // Stars
     var stars = body.querySelectorAll('#istars span');
     var istarsEl = body.querySelector('#istars');
+    
+    function triggerRipple() {
+      istarsEl.classList.remove('ripple');
+      void istarsEl.offsetWidth; // force reflow
+      istarsEl.classList.add('ripple');
+    }
+    istarsEl.addEventListener('mouseenter', triggerRipple);
+
     for (var i = 0; i < stars.length; i++) {
       (function (sp) {
         sp.addEventListener('mouseenter', function () { var v = parseInt(sp.getAttribute('data-v')); for (var j = 0; j < stars.length; j++)stars[j].classList.toggle('lit', parseInt(stars[j].getAttribute('data-v')) <= v); });
-        sp.addEventListener('click', function () { doRate(parseInt(sp.getAttribute('data-v'))); });
+        sp.addEventListener('click', function () { doRate(parseInt(sp.getAttribute('data-v'))); triggerRipple(); });
       })(stars[i]);
     }
     if (istarsEl) istarsEl.addEventListener('mouseleave', function () { for (var j = 0; j < stars.length; j++)stars[j].classList.remove('lit'); });
@@ -394,7 +424,7 @@
   // BOOT — runs immediately, no async needed
   // ══════════════════════════════════════════
   startCanvas();
-  renderAll();      // ← 22 songs render INSTANTLY
+  renderSkeletons();      // ← Tuning in... loading state
   renderReviews();
   wire();
 
@@ -411,14 +441,18 @@
         b.style = 'background:#22c55e;color:#fff;padding:8px;text-align:center;font-weight:bold;z-index:9999;position:fixed;top:0;width:100%';
         b.textContent = '🟢 Live data: ' + result.data.length + ' songs from Supabase (top song: ' + result.data[0].title + ')';
         document.body.appendChild(b);
-      } else if (result.error) {
-        var b = document.createElement('div');
-        b.style = 'background:#ef4444;color:#fff;padding:8px;text-align:center;font-weight:bold;z-index:9999;position:fixed;top:0;width:100%';
-        b.textContent = '🔴 Fallback data: 22 local seed songs — Supabase error: ' + result.error.message;
-        document.body.appendChild(b);
+      } else {
+        renderAll(); // fallback to local SEEDS
+        if (result.error) {
+          var b = document.createElement('div');
+          b.style = 'background:#ef4444;color:#fff;padding:8px;text-align:center;font-weight:bold;z-index:9999;position:fixed;top:0;width:100%';
+          b.textContent = '🔴 Fallback data: 22 local seed songs — Supabase error: ' + result.error.message;
+          document.body.appendChild(b);
+        }
       }
     }).catch(function (e) {
       console.warn('Supabase fetch skipped:', e);
+      renderAll();
       var b = document.createElement('div');
       b.style = 'background:#ef4444;color:#fff;padding:8px;text-align:center;font-weight:bold;z-index:9999;position:fixed;top:0;width:100%';
       b.textContent = '🔴 Fallback data: 22 local seed songs — Supabase error: ' + (e.message || e);
@@ -430,6 +464,26 @@
       renderAuthBtns();
     });
   }
+
+  function observeScroll() {
+    if (!('IntersectionObserver' in window)) {
+      var secs = document.querySelectorAll('.sec, .page-view');
+      for(var i=0; i<secs.length; i++) secs[i].classList.add('in-view');
+      return;
+    }
+    var obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('in-view');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.05 });
+    
+    var secs = document.querySelectorAll('.sec, .page-view');
+    for(var i=0; i<secs.length; i++) obs.observe(secs[i]);
+  }
+  observeScroll();
 
   // ══════════════════════════════════════════
   // EXPORTS

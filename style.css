@@ -237,6 +237,45 @@ html.light .navbar{background:rgba(248,249,250,.88)}
 .empty{text-align:center;padding:2.5rem 1rem;color:var(--txt3)}
 .empty-i{font-size:2.5rem;margin-bottom:.3rem}
 
+/* ── Micro-Animations & Skeletons ── */
+@keyframes vinylSpin { 100% { transform: rotate(360deg); } }
+.scard-art, .rcard-art { animation: vinylSpin 20s linear infinite; animation-play-state: paused; }
+.scard:hover .scard-art, .rcard:hover .rcard-art { animation-play-state: running; }
+.sm-art { animation: vinylSpin 40s linear infinite; }
+
+@keyframes eqBounce { 0%, 100% { transform: scaleY(0.2); } 50% { transform: scaleY(0.9); } }
+.eq-bars { position: absolute; bottom: 0.5rem; right: 0.5rem; display: flex; gap: 2px; align-items: flex-end; height: 16px; z-index: 10; }
+.eq-bar { width: 3px; background: #fff; height: 100%; transform: scaleY(0.2); transform-origin: bottom; border-radius: 2px; }
+.scard:hover .eq-bar, .rcard:hover .eq-bar { animation: eqBounce 0.6s ease-in-out infinite; }
+
+@keyframes playPulse { 0% { box-shadow: 0 0 0 0 rgba(255,142,68,0.4); } 100% { box-shadow: 0 0 0 12px rgba(255,142,68,0); } }
+.play-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s var(--ease); z-index: 5; }
+.play-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--saffron); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1rem; transform: translateY(10px); transition: all 0.3s var(--ease); box-shadow: 0 0 0 0 rgba(255,142,68,0); padding-left: 2px; }
+.scard:hover .play-overlay, .rcard:hover .play-overlay { opacity: 1; }
+.scard:hover .play-btn, .rcard:hover .play-btn { transform: translateY(0); animation: playPulse 1.5s infinite; }
+
+@keyframes starBounce { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1.1); } }
+.sm-istars.ripple span { animation: starBounce 300ms forwards; }
+.sm-istars span:nth-child(1) { animation-delay: 0ms; }
+.sm-istars span:nth-child(2) { animation-delay: 50ms; }
+.sm-istars span:nth-child(3) { animation-delay: 100ms; }
+.sm-istars span:nth-child(4) { animation-delay: 150ms; }
+.sm-istars span:nth-child(5) { animation-delay: 200ms; }
+
+@keyframes revealUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.sec-head, .scard, .rcard, .rev, .spot-card { opacity: 0; }
+.sec.in-view .sec-head, .sec.in-view .scard, .sec.in-view .rcard, .sec.in-view .rev, .sec.in-view .spot-card { animation: revealUp 400ms forwards; }
+
+@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+.skeleton-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 0.7rem; position: relative; overflow: hidden; min-width: 185px; max-width: 185px; aspect-ratio: 0.7; }
+.skeleton-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent); animation: shimmer 1.5s infinite; }
+.skeleton-art { width: 100%; aspect-ratio: 1; border-radius: var(--r); background: var(--glass); margin-bottom: 0.6rem; }
+.skeleton-text { height: 12px; background: var(--glass); border-radius: 4px; margin-bottom: 0.4rem; width: 80%; }
+.skeleton-text.short { width: 50%; }
+
+.tuning-in { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: var(--txt3); font-weight: 500; font-size: 1.1rem; padding: 2rem 0; animation: fadeUp 0.8s ease-in-out infinite alternate; }
+.music-note { color: var(--saffron); display: inline-block; animation: starBounce 0.8s infinite alternate; }
+
 /* ── Routing & Expanded Views ── */
 .back-link {
   display: inline-flex;
