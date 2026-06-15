@@ -41,16 +41,36 @@
     { name: 'Sneha R.', clr: '#FFC040', text: 'Heartbreakingly beautiful. Arijit pours every ounce of pain into this. The lyrics are pure poetry.', quote: '"Aashiqi ka gam aata hai..."', rating: 4.5, song: 'Channa Mereya', likes: 310, time: '1 day ago' }
   ];
 
-  // ── Color palettes per language ──
-  var PAL = {
-    Hindi: [['#FF6B35', '#F7C59F'], ['#E63946', '#F4A261'], ['#D4A574', '#8B5E3C'], ['#FF8E44', '#FF2D7B'], ['#C77DFF', '#7B2FF7']],
-    Tamil: [['#2D6A4F', '#52B788'], ['#1B4332', '#40916C'], ['#006D77', '#83C5BE'], ['#0A9396', '#94D2BD'], ['#2B9348', '#80B918']],
-    Telugu: [['#7B2CBF', '#C77DFF'], ['#5A189A', '#9D4EDD'], ['#E0AAFF', '#7B2CBF'], ['#6930C3', '#80FFDB']],
-    Malayalam: [['#023E8A', '#0077B6'], ['#0096C7', '#48CAE4'], ['#00B4D8', '#90E0EF'], ['#03045E', '#0077B6']],
-    Kannada: [['#BC4749', '#F2E8CF'], ['#A7C957', '#6A994E'], ['#386641', '#A7C957']],
-    Bengali: [['#D4A373', '#FAEDCD'], ['#CDB4DB', '#FFC8DD'], ['#BDE0FE', '#A2D2FF']]
-  };
-  function grad(s) { var p = PAL[s.language] || PAL.Hindi; var h = 0; for (var i = 0; i < s.title.length; i++)h += s.title.charCodeAt(i); var c = p[h % p.length]; return 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')'; }
+  // ── Color palettes ──
+  function grad(s) {
+    var PALETTE = [
+      'linear-gradient(135deg, #FF416C, #FF4B2B)',
+      'linear-gradient(135deg, #4776E6, #8E54E9)',
+      'linear-gradient(135deg, #00B4DB, #0083B0)',
+      'linear-gradient(135deg, #FF8008, #FFC837)',
+      'linear-gradient(135deg, #1D976C, #93F9B9)',
+      'linear-gradient(135deg, #DA22FF, #9733EE)',
+      'linear-gradient(135deg, #11998E, #38EF7D)',
+      'linear-gradient(135deg, #FC466B, #3F5EFB)',
+      'linear-gradient(135deg, #F3904F, #3B4371)',
+      'linear-gradient(135deg, #00C9FF, #92FE9D)',
+      'linear-gradient(135deg, #FDC830, #F37335)',
+      'linear-gradient(135deg, #FF5F6D, #FFC371)',
+      'linear-gradient(135deg, #36D1DC, #5B86E5)',
+      'linear-gradient(135deg, #CB356B, #BD3F32)',
+      'linear-gradient(135deg, #283C86, #45A247)',
+      'linear-gradient(135deg, #EF3B36, #8B0000)',
+      'linear-gradient(135deg, #C04848, #480048)',
+      'linear-gradient(135deg, #5F2C82, #49A09D)',
+      'linear-gradient(135deg, #23074D, #CC5333)',
+      'linear-gradient(135deg, #FF4E50, #F9D423)',
+      'linear-gradient(135deg, #833AB4, #FD1D1D)'
+    ];
+    var c = 0;
+    var str = s.id || s.title;
+    for (var i = 0; i < str.length; i++) c += str.charCodeAt(i);
+    return PALETTE[c % PALETTE.length];
+  }
   function mono(t) { var w = t.split(' '); return w.length >= 2 ? (w[0][0] + w[1][0]).toUpperCase() : t.substring(0, 2).toUpperCase(); }
 
   // ── State ──
