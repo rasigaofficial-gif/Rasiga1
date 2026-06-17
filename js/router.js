@@ -81,7 +81,14 @@ window.RasigaRouter = {
       // Fetch dynamic personal profile stats
       if (routeFn === 'renderProfile') {
         RasigaApp.fetchMyProfileStats();
+        RasigaApp.fetchMySuggestions();
       }
+
+      // Fetch admin suggestions
+      if (routeFn === 'renderAdminPanel') {
+        RasigaApp.fetchAdminSuggestions();
+      }
+
       // Explicitly render Google Sign-In button if it exists (since this is an SPA)
       if (document.getElementById('g_id_onload') && window.google && window.google.accounts && window.google.accounts.id) {
         window.google.accounts.id.initialize({

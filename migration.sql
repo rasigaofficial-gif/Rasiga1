@@ -21,10 +21,14 @@ CREATE POLICY "Anyone can see follows" ON follows FOR SELECT USING (true);
 CREATE POLICY "Users can follow" ON follows FOR INSERT WITH CHECK (auth.uid() = follower_id);
 CREATE POLICY "Users can unfollow" ON follows FOR DELETE USING (auth.uid() = follower_id);
 
+-- Add missing columns to song_suggestions table if it already exists
+ALTER TABLE IF EXISTS song_suggestions ADD COLUMN IF NOT EXISTS target_song_id UUID REFERENCES songs(id) ON DELETE CASCADE;
+
 -- TABLE: song_suggestions
 CREATE TABLE IF NOT EXISTS song_suggestions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    target_song_id UUID REFERENCES songs(id) ON DELETE CASCADE,
     song_name TEXT NOT NULL,
     year INTEGER,
     director TEXT,

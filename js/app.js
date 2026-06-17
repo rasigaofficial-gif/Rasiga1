@@ -154,6 +154,8 @@ window.RasigaApp = {
           if (fData) {
             fData.forEach(f => window.RasigaData.following[f.users.username] = true);
           }
+          const adminLink = document.getElementById('nav-admin-link');
+          if (adminLink) adminLink.style.display = data.is_admin ? 'inline-block' : 'none';
           window.RasigaRouter.handleRoute();
         });
 
@@ -401,7 +403,7 @@ window.RasigaApp = {
     if (modal) modal.style.display = 'none';
   },
 
-  openSuggestSongModal: function () {
+  openSuggestSongModal: function (songId = null) {
     let modal = document.getElementById('suggest-modal');
     if (!modal) {
       modal = document.createElement('div');
@@ -415,35 +417,42 @@ window.RasigaApp = {
       modal.style.background = 'var(--bg-color)';
       document.body.appendChild(modal);
     }
+
+    let songData = null;
+    if (songId) {
+      songData = RasigaSeeds.find(s => s.id === songId);
+    }
+
     modal.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; max-width: 600px; margin: 0 auto; width: 100%;">
-        <h2 style="font-family:'DM Serif Display',serif; font-size:2rem; margin:0;">Suggest a Song</h2>
-        <button class="icon-btn" onclick="RasigaApp.closeSuggestSongModal()" style="color:var(--text-main);">${Icons.get('close')}</button>
+        <h2 style="font-family:'DM Serif Display',serif; font-size:2rem; margin:0;">${songData ? 'Suggest an Edit' : 'Suggest a Song'}</h2>
+        <button class="icon-btn" onclick="RasigaApp.closeSuggestSongModal()" style="color:var(--text-main);">${window.Icons ? window.Icons.get('close') : 'X'}</button>
       </div>
       <div style="overflow-y:auto; flex:1; max-width: 600px; margin: 0 auto; width: 100%;">
-        <p style="color:var(--text-muted); margin-bottom:1.5rem;">Help us expand our musical diary! Fill out the details below.</p>
+        <p style="color:var(--text-muted); margin-bottom:1.5rem;">${songData ? 'Help us fix any incorrect details below.' : 'Help us expand our musical diary! Fill out the details below.'}</p>
         <form onsubmit="event.preventDefault(); RasigaApp.submitSongSuggestion(this);" style="display:flex; flex-direction:column; gap:1rem;">
+          ${songData ? `<input type="hidden" name="target_song_id" value="${songData.id}" />` : ''}
           <div>
             <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Song Name</label>
-            <input name="song" type="text" required style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+            <input name="song" type="text" required value="${songData ? songData.title : ''}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
           </div>
           <div>
             <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Year</label>
-            <input name="year" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="e.g. 2026" required style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+            <input name="year" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="e.g. 2026" required value="${songData ? songData.year : ''}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
           </div>
           <div>
             <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Music Director</label>
-            <input name="director" type="text" required style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+            <input name="director" type="text" required value="${songData ? songData.director : ''}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
           </div>
           <div>
             <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Singer(s)</label>
-            <input name="singer" type="text" required style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+            <input name="singer" type="text" required value="${songData ? songData.singers.join(', ') : ''}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
           </div>
           <div>
             <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Lyricist</label>
-            <input name="lyricist" type="text" required style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+            <input name="lyricist" type="text" required value="${songData ? songData.lyricist : ''}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
           </div>
-          <button type="submit" class="btn btn-primary" style="margin-top:1rem; padding:1rem; font-size:1.1rem; justify-content:center;">Submit Suggestion</button>
+          <button type="submit" class="btn btn-primary" style="margin-top:1rem; padding:1rem; font-size:1.1rem; justify-content:center;" id="submit-suggestion-btn">Submit Suggestion</button>
         </form>
       </div>
     `;
@@ -455,32 +464,64 @@ window.RasigaApp = {
     if (modal) modal.style.display = 'none';
   },
 
-  submitSongSuggestion: function (form) {
-    const newSug = {
-      id: 'sug' + Date.now(),
-      song: form.song.value,
+  submitSongSuggestion: async function (form) {
+    const me = RasigaData.demoUser;
+    if (!me || !me.id || !this.supabase) {
+      alert("Please log in to submit suggestions.");
+      return;
+    }
+
+    const btn = document.getElementById('submit-suggestion-btn');
+    if (btn) btn.innerHTML = 'Submitting...';
+
+    const targetSongId = form.target_song_id ? form.target_song_id.value : null;
+
+    const payload = {
+      user_id: me.id,
+      song_name: form.song.value,
       year: parseInt(form.year.value) || 0,
       director: form.director.value,
       singer: form.singer.value,
       lyricist: form.lyricist.value,
-      status: 'Pending',
-      timestamp: Date.now()
+      status: 'Pending'
     };
-    window.RasigaSuggestions.unshift(newSug);
-    this.closeSuggestSongModal();
-    alert('Thank you! Your song suggestion has been sent for review. You can track its status in your Profile.');
-    
-    // Refresh profile page if it's currently open
-    if (location.hash === '#/profile' && window.RasigaRouter) {
-      window.RasigaRouter.handleRoute();
+
+    if (targetSongId) {
+      payload.target_song_id = targetSongId;
+    }
+
+    try {
+      const { error } = await this.supabase.from('song_suggestions').insert(payload);
+      if (error) throw error;
+      
+      this.closeSuggestSongModal();
+      alert(targetSongId ? 'Thank you! Your edit suggestion has been sent for review.' : 'Thank you! Your song suggestion has been sent for review.');
+      
+      // Refresh profile page if it's currently open
+      if (location.hash === '#/profile' && window.RasigaRouter) {
+        window.RasigaRouter.handleRoute();
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to submit suggestion.");
+      if (btn) btn.innerHTML = 'Submit Suggestion';
     }
   },
 
-  deleteSuggestion: function (id) {
+  deleteSuggestion: async function (id) {
     if (confirm('Do you want to delete this suggestion?')) {
-      window.RasigaSuggestions = window.RasigaSuggestions.filter(s => s.id !== id);
-      if (location.hash === '#/profile' && window.RasigaRouter) {
-        window.RasigaRouter.handleRoute();
+      if (!this.supabase) return;
+      try {
+        const { error } = await this.supabase.from('song_suggestions').delete().eq('id', id);
+        if (error) throw error;
+        
+        // Refresh profile page
+        if (location.hash === '#/profile' && window.RasigaRouter) {
+          window.RasigaRouter.handleRoute();
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Failed to delete suggestion.");
       }
     }
   },
@@ -614,15 +655,22 @@ window.RasigaApp = {
   },
 
   logout: function () {
+    const hideAdminLink = () => {
+      const adminLink = document.getElementById('nav-admin-link');
+      if (adminLink) adminLink.style.display = 'none';
+    };
+
     if (this.supabase) {
       this.supabase.auth.signOut().then(() => {
         localStorage.removeItem('rasiga_user');
         window.RasigaData.demoUser = null;
+        hideAdminLink();
         window.RasigaRouter.handleRoute();
       });
     } else {
       localStorage.removeItem('rasiga_user');
       window.RasigaData.demoUser = null;
+      hideAdminLink();
       window.RasigaRouter.handleRoute();
     }
   },
@@ -831,6 +879,269 @@ window.RasigaApp = {
       if (followersElement) followersElement.textContent = followersCount || 0;
     } catch(err) {
       console.error(err);
+    }
+  },
+
+  fetchMySuggestions: async function() {
+    const me = RasigaData.demoUser;
+    if (!me || !me.id || !this.supabase) return;
+
+    const container = document.getElementById('my-suggestions-container');
+    if (!container) return;
+
+    try {
+      const { data, error } = await this.supabase.from('song_suggestions').select('*').eq('user_id', me.id).order('created_at', { ascending: false });
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        container.innerHTML = `<p style="color:var(--text-muted);">You haven't suggested any songs yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = data.map(sug => {
+        let statusColor = 'var(--text-muted)';
+        let xpBadge = '';
+        if (sug.status === 'Approved') { statusColor = 'var(--accent-teal)'; xpBadge = '<span style="background:var(--gradient-brand); color:#fff; padding:0.2rem 0.6rem; border-radius:12px; font-size:0.75rem; font-weight:bold; margin-left:0.5rem;">+50 XP</span>'; }
+        if (sug.status.startsWith('Rejected')) statusColor = 'var(--accent-rose)';
+        
+        const typeLabel = sug.target_song_id ? '<span style="font-size:0.75rem; background:rgba(255,255,255,0.1); padding:0.2rem 0.5rem; border-radius:4px; margin-left:0.5rem;">Edit Request</span>' : '';
+
+        return `
+          <div class="glass" style="padding:1rem; border-radius:var(--radius-md); display:flex; justify-content:space-between; align-items:center;"
+               oncontextmenu="event.preventDefault(); RasigaApp.deleteSuggestion('${sug.id}');"
+               onpointerdown="this._longPressTimer = setTimeout(() => RasigaApp.deleteSuggestion('${sug.id}'), 800);"
+               onpointerup="clearTimeout(this._longPressTimer);"
+               onpointerleave="clearTimeout(this._longPressTimer);"
+               onpointercancel="clearTimeout(this._longPressTimer);">
+            <div style="flex:1;">
+              <h4 style="font-size:1.1rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif;">${sug.song_name} <span style="font-size:0.8rem; color:var(--text-muted); font-family:'Inter',sans-serif;">(${sug.year})</span>${typeLabel}</h4>
+              <p style="font-size:0.85rem; color:var(--text-muted);">${sug.director} • ${sug.singer}</p>
+            </div>
+            <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
+              <button class="icon-btn" onclick="RasigaApp.deleteSuggestion('${sug.id}')" style="color:var(--text-muted); padding:0.2rem;" aria-label="Delete" title="Delete Suggestion">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+              <div>
+                <span style="color:${statusColor}; font-weight:bold; font-size:0.9rem;">${sug.status}</span>
+                ${xpBadge}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch(err) {
+      console.error(err);
+      container.innerHTML = '<p style="color:var(--accent-rose);">Failed to load suggestions.</p>';
+    }
+  },
+
+  fetchAdminSuggestions: async function() {
+    const me = RasigaData.demoUser;
+    if (!me || !me.id || !me.is_admin || !this.supabase) return;
+
+    const container = document.getElementById('admin-suggestions-container');
+    if (!container) return;
+
+    try {
+      const { data, error } = await this.supabase.from('song_suggestions').select('*, users(display_name)').order('created_at', { ascending: false });
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        container.innerHTML = `<p style="color:var(--text-muted); text-align:center;">No suggestions found.</p>`;
+        return;
+      }
+
+      container.innerHTML = data.map(sug => {
+        let statusColor = 'var(--text-muted)';
+        if (sug.status === 'Approved') statusColor = 'var(--accent-teal)';
+        if (sug.status.startsWith('Rejected')) statusColor = 'var(--accent-rose)';
+        
+        const typeLabel = sug.target_song_id ? '<span style="font-size:0.75rem; background:rgba(255,255,255,0.1); padding:0.2rem 0.5rem; border-radius:4px; margin-left:0.5rem; color:var(--text-main);">Edit Request</span>' : '<span style="font-size:0.75rem; background:rgba(255,255,255,0.1); padding:0.2rem 0.5rem; border-radius:4px; margin-left:0.5rem; color:var(--text-main);">New Song</span>';
+        
+        const userName = sug.users?.display_name || 'Unknown User';
+
+        let actionButtons = '';
+        if (sug.status === 'Pending') {
+          actionButtons = `
+            <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+              <button class="btn btn-primary" onclick="RasigaApp.updateSuggestionStatus('${sug.id}', 'Approved')" style="padding:0.4rem 0.8rem; font-size:0.8rem;">Approve</button>
+              <button class="btn" onclick="RasigaApp.openAdminEditModal('${sug.id}')" style="padding:0.4rem 0.8rem; font-size:0.8rem; background:var(--accent-gold); border-color:var(--accent-gold); color:#000;">Edit More</button>
+              <button class="btn" onclick="RasigaApp.updateSuggestionStatus('${sug.id}', 'Rejected - Duplicate')" style="padding:0.4rem 0.8rem; font-size:0.8rem; background:var(--accent-rose); border-color:var(--accent-rose);">Duplicate</button>
+              <button class="btn" onclick="RasigaApp.updateSuggestionStatus('${sug.id}', 'Rejected - Incorrect')" style="padding:0.4rem 0.8rem; font-size:0.8rem; background:var(--accent-rose); border-color:var(--accent-rose);">Incorrect</button>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="glass" style="padding:1.5rem; border-radius:var(--radius-md); margin-bottom:1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
+              <div>
+                <h4 style="font-size:1.2rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif;">${sug.song_name} <span style="font-size:0.9rem; color:var(--text-muted); font-family:'Inter',sans-serif;">(${sug.year})</span>${typeLabel}</h4>
+                <p style="font-size:0.9rem; color:var(--text-muted);">${sug.director} • ${sug.singer}</p>
+                <p style="font-size:0.9rem; color:var(--text-muted);">Lyricist: ${sug.lyricist}</p>
+              </div>
+              <div style="text-align:right;">
+                <span style="color:${statusColor}; font-weight:bold; font-size:0.9rem;">${sug.status}</span>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.2rem;">By: ${userName}</p>
+                <p style="font-size:0.75rem; color:var(--text-muted);">ID: ${sug.id.substring(0,8)}</p>
+              </div>
+            </div>
+            ${actionButtons}
+          </div>
+        `;
+      }).join('');
+    } catch(err) {
+      console.error(err);
+      container.innerHTML = '<p style="color:var(--accent-rose); text-align:center;">Failed to load suggestions.</p>';
+    }
+  },
+
+  updateSuggestionStatus: async function(id, newStatus) {
+    const me = RasigaData.demoUser;
+    if (!me || !me.id || !me.is_admin || !this.supabase) return;
+
+    if (!confirm('Are you sure you want to mark this as ' + newStatus + '?')) return;
+
+    try {
+      // First fetch the suggestion details
+      const { data: sugData, error: fetchError } = await this.supabase.from('song_suggestions').select('*').eq('id', id).single();
+      if (fetchError) throw fetchError;
+
+      // Update the suggestion status
+      const { error: updateError } = await this.supabase.from('song_suggestions').update({ status: newStatus }).eq('id', id);
+      if (updateError) throw updateError;
+
+      // If approved, add or update the song in the songs table
+      if (newStatus === 'Approved') {
+        const songPayload = {
+          title: sugData.song_name,
+          year: sugData.year,
+          director: sugData.director,
+          singer: sugData.singer,
+          composer: sugData.director, // Using director as composer for now
+          lyricist: sugData.lyricist,
+          tags: ['Suggested']
+        };
+
+        if (sugData.target_song_id) {
+          // Update existing song
+          const { error: songUpdateError } = await this.supabase.from('songs').update(songPayload).eq('id', sugData.target_song_id);
+          if (songUpdateError) throw songUpdateError;
+        } else {
+          // Insert new song
+          const { error: songInsertError } = await this.supabase.from('songs').insert({
+            id: 'song-' + Date.now(),
+            ...songPayload,
+            total_ratings: 0,
+            avg_rating: 0,
+            film: 'Indie'
+          });
+          if (songInsertError) throw songInsertError;
+        }
+      }
+
+      alert('Successfully marked as ' + newStatus);
+      
+      // Refresh admin page
+      if (location.hash === '#/admin' && window.RasigaRouter) {
+        window.RasigaRouter.handleRoute();
+      }
+    } catch(err) {
+      console.error(err);
+      alert('Failed to update suggestion status.');
+    }
+  },
+
+  openAdminEditModal: async function(sugId) {
+    const me = RasigaData.demoUser;
+    if (!me || !me.id || !me.is_admin || !this.supabase) return;
+
+    try {
+      const { data: sug, error } = await this.supabase.from('song_suggestions').select('*').eq('id', sugId).single();
+      if (error) throw error;
+
+      let modal = document.getElementById('admin-edit-modal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'admin-edit-modal';
+        modal.className = 'glass page-enter';
+        modal.style.position = 'fixed';
+        modal.style.top = '0'; modal.style.left = '0'; modal.style.width = '100%'; modal.style.height = '100%';
+        modal.style.zIndex = '1000';
+        modal.style.display = 'flex'; modal.style.flexDirection = 'column';
+        modal.style.padding = '2rem 1rem';
+        modal.style.background = 'var(--bg-color)';
+        document.body.appendChild(modal);
+      }
+
+      modal.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; max-width: 600px; margin: 0 auto; width: 100%;">
+          <h2 style="font-family:'DM Serif Display',serif; font-size:2rem; margin:0;">Edit Suggestion</h2>
+          <button class="icon-btn" onclick="document.getElementById('admin-edit-modal').style.display='none'" style="color:var(--text-main);">${window.Icons ? window.Icons.get('close') : 'X'}</button>
+        </div>
+        <div style="overflow-y:auto; flex:1; max-width: 600px; margin: 0 auto; width: 100%;">
+          <form onsubmit="event.preventDefault(); RasigaApp.submitAdminEdit(this);" style="display:flex; flex-direction:column; gap:1rem;">
+            <input type="hidden" name="sug_id" value="${sug.id}" />
+            <div>
+              <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Song Name</label>
+              <input name="song" type="text" required value="${sug.song_name}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+            </div>
+            <div>
+              <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Year</label>
+              <input name="year" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" required value="${sug.year}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+            </div>
+            <div>
+              <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Music Director</label>
+              <input name="director" type="text" required value="${sug.director}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+            </div>
+            <div>
+              <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Singer(s)</label>
+              <input name="singer" type="text" required value="${sug.singer}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+            </div>
+            <div>
+              <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Lyricist</label>
+              <input name="lyricist" type="text" required value="${sug.lyricist}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:1rem; padding:1rem; font-size:1.1rem; justify-content:center; background:var(--accent-teal); border-color:var(--accent-teal);" id="admin-edit-submit-btn">Approve and Save</button>
+          </form>
+        </div>
+      `;
+      modal.style.display = 'flex';
+    } catch(err) {
+      console.error(err);
+      alert('Failed to load suggestion details.');
+    }
+  },
+
+  submitAdminEdit: async function(form) {
+    const me = RasigaData.demoUser;
+    if (!me || !me.id || !me.is_admin || !this.supabase) return;
+
+    const btn = document.getElementById('admin-edit-submit-btn');
+    if (btn) btn.innerHTML = 'Saving...';
+
+    const sugId = form.sug_id.value;
+    const payload = {
+      song_name: form.song.value,
+      year: parseInt(form.year.value) || 0,
+      director: form.director.value,
+      singer: form.singer.value,
+      lyricist: form.lyricist.value
+    };
+
+    try {
+      // First update the suggestion with new values
+      const { error: updateError } = await this.supabase.from('song_suggestions').update(payload).eq('id', sugId);
+      if (updateError) throw updateError;
+
+      // Then approve it, which will trigger the normal approval flow (updating/inserting song)
+      document.getElementById('admin-edit-modal').style.display = 'none';
+      await this.updateSuggestionStatus(sugId, 'Approved');
+      
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save and approve suggestion.");
+      if (btn) btn.innerHTML = 'Approve and Save';
     }
   },
 

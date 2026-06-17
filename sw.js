@@ -33,20 +33,18 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  // Stale-while-revalidate strategy for the app shell
+  // Network First, falling back to cache strategy
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      const fetchPromise = fetch(e.request).then((networkResponse) => {
-        // Cache the fresh response if it's successful
-        if (networkResponse && networkResponse.status === 200) {
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(e.request, networkResponse.clone());
-          });
-        }
-        return networkResponse;
-      });
-
-      return cachedResponse || fetchPromise;
+    fetch(e.request).then((networkResponse) => {
+      // If we got a successful response from the network, cache it and return it.
+      if (networkResponse && networkResponse.status === 200) {
+        const clonedResponse = networkResponse.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clonedResponse));
+      }
+      return networkResponse;
+    }).catch(() => {
+      // If the network request fails (offline), fall back to the cache.
+      return caches.match(e.request);
     })
   );
 });

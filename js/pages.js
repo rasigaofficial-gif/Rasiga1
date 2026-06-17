@@ -208,6 +208,9 @@ window.RasigaPages = {
                Singer: <span style="color:var(--text-main)">${song.singer}</span><br>
                Music: <span style="color:var(--text-main)">${song.composer}</span>
             </div>
+            <button onclick="RasigaApp.openSuggestSongModal('${song.id}')" class="btn" style="margin-top:0.8rem; background:rgba(255,255,255,0.1); border:1px solid var(--glass-border); font-size:0.8rem; padding:0.4rem 0.8rem;">
+              Suggest Edit
+            </button>
           </div>
           <div style="text-align:right;">
              <div style="font-size:2rem; font-weight:bold; color:var(--accent-gold);">${song.avg_rating}</div>
@@ -301,35 +304,8 @@ window.RasigaPages = {
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
             <h2 class="section-title" style="margin:0;">My Suggestions</h2>
           </div>
-          <div style="display:flex; flex-direction:column; gap:1rem;">
-            ${(window.RasigaSuggestions || []).map(sug => {
-      let statusColor = 'var(--text-muted)';
-      let xpBadge = '';
-      if (sug.status === 'Approved') { statusColor = 'var(--accent-teal)'; xpBadge = '<span style="background:var(--gradient-brand); color:#fff; padding:0.2rem 0.6rem; border-radius:12px; font-size:0.75rem; font-weight:bold; margin-left:0.5rem;">+50 XP</span>'; }
-      if (sug.status === 'Rejected' || sug.status === 'Duplicate') statusColor = 'var(--accent-rose)';
-      return `
-                <div class="glass" style="padding:1rem; border-radius:var(--radius-md); display:flex; justify-content:space-between; align-items:center;"
-                     oncontextmenu="event.preventDefault(); RasigaApp.deleteSuggestion('${sug.id}');"
-                     onpointerdown="this._longPressTimer = setTimeout(() => RasigaApp.deleteSuggestion('${sug.id}'), 800);"
-                     onpointerup="clearTimeout(this._longPressTimer);"
-                     onpointerleave="clearTimeout(this._longPressTimer);"
-                     onpointercancel="clearTimeout(this._longPressTimer);">
-                  <div style="flex:1;">
-                    <h4 style="font-size:1.1rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif;">${sug.song} <span style="font-size:0.8rem; color:var(--text-muted); font-family:'Inter',sans-serif;">(${sug.year})</span></h4>
-                    <p style="font-size:0.85rem; color:var(--text-muted);">${sug.director} • ${sug.singer}</p>
-                  </div>
-                  <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
-                    <button class="icon-btn" onclick="RasigaApp.deleteSuggestion('${sug.id}')" style="color:var(--text-muted); padding:0.2rem;" aria-label="Delete" title="Delete Suggestion">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                    <div>
-                      <span style="color:${statusColor}; font-weight:bold; font-size:0.9rem;">${sug.status}</span>
-                      ${xpBadge}
-                    </div>
-                  </div>
-                </div>
-              `;
-    }).join('') || `<p style="color:var(--text-muted);">You haven't suggested any songs yet.</p>`}
+          <div id="my-suggestions-container" style="display:flex; flex-direction:column; gap:1rem;">
+            <p style="color:var(--text-muted); text-align:center;">Loading suggestions...</p>
           </div>
         </section>
 
@@ -337,6 +313,25 @@ window.RasigaPages = {
           <h2 class="section-title">Badges & Achievements</h2>
           <div class="badges-grid">${badgesHTML}</div>
         </section>
+      </div>
+    `;
+  },
+
+  renderAdminPanel: function () {
+    const user = RasigaData.demoUser;
+    if (!user || !user.is_admin) {
+      return `<div class="page-placeholder glass page-enter"><h2 class="section-title">Unauthorized</h2><p>You do not have permission to view this page.</p></div>`;
+    }
+
+    return `
+      <div class="page-discover page-enter">
+        <h2 class="section-title">Admin Panel</h2>
+        <div class="glass" style="padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
+          <h3 style="margin-bottom: 1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Song Suggestions</h3>
+          <div id="admin-suggestions-container" style="display:flex; flex-direction:column; gap:1rem;">
+            <p style="color:var(--text-muted); text-align:center;">Loading suggestions...</p>
+          </div>
+        </div>
       </div>
     `;
   },
