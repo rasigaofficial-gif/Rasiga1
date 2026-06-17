@@ -241,37 +241,37 @@ window.RasigaApp = {
           if (reaction) RasigaData.userReactions[r.id] = reaction;
         }
 
-        reviewsHTML += \`
+        reviewsHTML += `
           <div class="glass" style="padding: 1.2rem; margin-bottom: 1rem;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
               <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom: 0.8rem;">
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: \${clr}; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">\${name[0]}</div>
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: ${clr}; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">${name[0]}</div>
                 <div>
-                  <a href="#/user/\${name.toLowerCase().replace(/[^a-z0-9]/g, '')}" style="font-weight:600; font-size:0.95rem; text-decoration:none; color:inherit;">\${name}</a>
-                  <div style="font-size:0.8rem; color:var(--text-muted);">\${time}</div>
+                  <a href="#/user/${name.toLowerCase().replace(/[^a-z0-9]/g, '')}" style="font-weight:600; font-size:0.95rem; text-decoration:none; color:inherit;">${name}</a>
+                  <div style="font-size:0.8rem; color:var(--text-muted);">${time}</div>
                 </div>
               </div>
               <div style="display:flex; align-items:center; gap:0.2rem; color:var(--accent-gold); font-size:0.9rem; font-weight:600;">
-                \${window.Icons ? window.Icons.get('star', { width: 14, height: 14, fill: 'currentColor' }) : ''} \${score}
+                ${window.Icons ? window.Icons.get('star', { width: 14, height: 14, fill: 'currentColor' }) : ''} ${score}
               </div>
             </div>
-            <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">\${r.body}</p>
+            <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">${r.body}</p>
             <div style="display:flex; align-items:center; gap: 1rem; margin-top: 1rem;">
-              <button class="btn-react btn-like \${reaction === 'like' ? 'anim-heart-fill' : ''}" onclick="RasigaApp.toggleLike(this, \${likes - (reaction==='like'?1:0)}, '\${r.id}')">
-                \${window.Icons ? window.Icons.get('heart', { width: 16, height: 16 }) : ''}
-                <span class="like-count" data-base="\${likes - (reaction==='like'?1:0)}" style="font-size:0.8rem;">\${likes}</span>
+              <button class="btn-react btn-like ${reaction === 'like' ? 'anim-heart-fill' : ''}" onclick="RasigaApp.toggleLike(this, ${likes - (reaction==='like'?1:0)}, '${r.id}')">
+                ${window.Icons ? window.Icons.get('heart', { width: 16, height: 16 }) : ''}
+                <span class="like-count" data-base="${likes - (reaction==='like'?1:0)}" style="font-size:0.8rem;">${likes}</span>
               </button>
-              <button class="btn-react btn-poop \${reaction === 'poop' ? 'anim-poop-fill' : ''}" onclick="RasigaApp.togglePoop(this, \${poops - (reaction==='poop'?1:0)}, '\${r.id}')">
-                \${window.Icons ? window.Icons.get('poop', { width: 16, height: 16 }) : ''}
-                <span class="poop-count" data-base="\${poops - (reaction==='poop'?1:0)}" style="font-size:0.8rem;">\${poops}</span>
+              <button class="btn-react btn-poop ${reaction === 'poop' ? 'anim-poop-fill' : ''}" onclick="RasigaApp.togglePoop(this, ${poops - (reaction==='poop'?1:0)}, '${r.id}')">
+                ${window.Icons ? window.Icons.get('poop', { width: 16, height: 16 }) : ''}
+                <span class="poop-count" data-base="${poops - (reaction==='poop'?1:0)}" style="font-size:0.8rem;">${poops}</span>
               </button>
-              <button class="btn-react" onclick="RasigaApp.shareComment('\${songId}')">
+              <button class="btn-react" onclick="RasigaApp.shareComment('${songId}')">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
                 <span style="font-size:0.8rem;">Share</span>
               </button>
             </div>
           </div>
-        \`;
+        `;
       });
       reviewsContainer.innerHTML = reviewsHTML;
 
@@ -281,23 +281,23 @@ window.RasigaApp = {
         if (RasigaData.userComments[songId]) {
           const urSection = document.getElementById('user-review-section');
           if (urSection) {
-            urSection.innerHTML = \`
+            urSection.innerHTML = `
               <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
                 <div style="display:flex; align-items:center;">
                   <div style="position:relative; display:inline-block; width:140px; height:28px;">
                     <div style="display:flex; position:absolute; top:0; left:0; pointer-events:none;">
-                      \${Array(5).fill(0).map(() => \`<span style="color:var(--text-muted); opacity:0.5; flex-shrink:0; display:flex;">\${window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'none', color: 'currentColor' }) : ''}</span>\`).join('')}
+                      ${Array(5).fill(0).map(() => `<span style="color:var(--text-muted); opacity:0.5; flex-shrink:0; display:flex;">${window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'none', color: 'currentColor' }) : ''}</span>`).join('')}
                     </div>
-                    <div id="stars-fg-\${songId}" style="display:flex; position:absolute; top:0; left:0; width:\${(RasigaData.userRatings[songId] / 5) * 100}%; overflow:hidden; pointer-events:none; white-space:nowrap;">
-                      \${Array(5).fill(0).map(() => \`<span style="color:var(--accent-gold); flex-shrink:0; display:flex;">\${window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'var(--accent-gold)', color: 'var(--accent-gold)' }) : ''}</span>\`).join('')}
+                    <div id="stars-fg-${songId}" style="display:flex; position:absolute; top:0; left:0; width:${(RasigaData.userRatings[songId] / 5) * 100}%; overflow:hidden; pointer-events:none; white-space:nowrap;">
+                      ${Array(5).fill(0).map(() => `<span style="color:var(--accent-gold); flex-shrink:0; display:flex;">${window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'var(--accent-gold)', color: 'var(--accent-gold)' }) : ''}</span>`).join('')}
                     </div>
                   </div>
                 </div>
-                <span style="font-size: 0.9rem; color: var(--text-muted);" id="user-rating-text-\${songId}">\${RasigaData.userRatings[songId]} Stars</span>
+                <span style="font-size: 0.9rem; color: var(--text-muted);" id="user-rating-text-${songId}">${RasigaData.userRatings[songId]} Stars</span>
               </div>
-              <p style="font-size:1rem; margin-bottom:1rem;">\${RasigaData.userComments[songId]}</p>
-              <button onclick="RasigaApp.editComment('\${songId}')" class="btn" style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Edit</button>
-            \`;
+              <p style="font-size:1rem; margin-bottom:1rem;">${RasigaData.userComments[songId]}</p>
+              <button onclick="RasigaApp.editComment('${songId}')" class="btn" style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Edit</button>
+            `;
           }
         }
       }
