@@ -91,7 +91,7 @@ window.RasigaPages = {
 
   renderSongPage: function (id) {
     const song = RasigaSeeds.find(s => s.id === id);
-    if (!song) return '<p>Song not found.</p>';
+    if (!song) return '<div class="page-entity page-enter"><div style="padding: 2rem; text-align: center; color: var(--text-muted);">Song not found.</div></div>';
 
     const grad = RasigaComponents.getGradient(song.title);
     const ini = RasigaComponents.getInitials(song.title);
@@ -109,9 +109,9 @@ window.RasigaPages = {
         <div class="glass" style="padding: 1.2rem; margin-bottom: 1rem; border: 1px solid var(--accent-saffron);">
           <div style="display:flex; justify-content:space-between; align-items:flex-start;">
             <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom: 0.8rem;">
-              <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--gradient-brand); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">${RasigaData.demoUser.displayName[0]}</div>
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--gradient-brand); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">${(RasigaData.demoUser.displayName || 'U')[0].toUpperCase()}</div>
               <div>
-                <div style="font-weight:600; font-size:0.95rem;">${RasigaData.demoUser.displayName} (You)</div>
+                <div style="font-weight:600; font-size:0.95rem;">${RasigaData.demoUser.displayName || 'User'} (You)</div>
                 <div style="font-size:0.8rem; color:var(--text-muted);">Just now</div>
               </div>
             </div>
