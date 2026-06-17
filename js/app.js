@@ -190,11 +190,22 @@ window.RasigaApp = {
       // Fetch all reviews for this song
       const { data: reviews, error } = await this.supabase
         .from('reviews')
-        .select('*, users(display_name), ratings(score), review_likes(reaction_type, user_id)')
+        .select('*, users(display_name), review_likes(reaction_type, user_id)')
         .eq('song_id', songId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+
+      // Fetch all ratings for this song separately since there's no FK between reviews and ratings
+      const { data: ratingsData, error: ratingsError } = await this.supabase
+        .from('ratings')
+        .select('user_id, score')
+        .eq('song_id', songId);
+      
+      if (ratingsError) throw ratingsError;
+      
+      const ratingsMap = {};
+      (ratingsData || []).forEach(rt => { ratingsMap[rt.user_id] = rt.score; });
 
       let reviewsHTML = '';
       const user = RasigaData.demoUser;
@@ -207,13 +218,12 @@ window.RasigaApp = {
         // Check if current user has a rating/review
         const myReview = reviews.find(r => r.user_id === user.id);
         if (myReview) {
-          RasigaData.userRatings[songId] = myReview.ratings?.score;
+          RasigaData.userRatings[songId] = ratingsMap[user.id];
           RasigaData.userComments[songId] = myReview.body;
         } else {
           // If no review, check if they just have a rating
-          const { data: myRating } = await this.supabase.from('ratings').select('score').eq('user_id', user.id).eq('song_id', songId).single();
-          if (myRating) {
-            RasigaData.userRatings[songId] = myRating.score;
+          if (ratingsMap[user.id]) {
+            RasigaData.userRatings[songId] = ratingsMap[user.id];
           }
         }
       }
@@ -229,7 +239,7 @@ window.RasigaApp = {
       otherReviews.forEach(r => {
         const clr = '#14b8a6'; // placeholder
         const time = new Date(r.created_at).toLocaleDateString();
-        const score = r.ratings?.score || '?';
+        const score = ratingsMap[r.user_id] || '?';
         const name = r.users?.display_name || 'Anonymous';
         
         // Count likes/poops
@@ -446,7 +456,7 @@ window.RasigaApp = {
           </div>
           <div>
             <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Singer(s)</label>
-            <input name="singer" type="text" required value="${songData ? songData.singers.join(', ') : ''}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+            <input name="singer" type="text" required value="${songData ? songData.singer : ''}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
           </div>
           <div>
             <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Lyricist</label>

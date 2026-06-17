@@ -11,7 +11,9 @@ window.RasigaRouter = {
     '#/contact': 'renderContact',
     '#/donate': 'renderDonate',
     '#/privacy': 'renderPrivacy',
-    '#/analytics': 'renderAnalytics'
+    '#/analytics': 'renderAnalytics',
+    '#/admin': 'renderAdminPanel',
+    '#/login': 'renderLogin'
   },
 
   init: function() {
