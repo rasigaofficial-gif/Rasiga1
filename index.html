@@ -1,205 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#070612">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#f97316">
   <title>Rasiga — Rate, Review & Discover Indian Music</title>
-  <meta name="description" content="Rasiga is the Letterboxd for Indian music. Rate, review and discover the greatest songs across Hindi, Tamil, Telugu, Malayalam, Kannada, Bengali and more.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' x='0.1em' font-size='80'>🎵</text></svg>">
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=DM+Serif+Display&family=Dancing+Script:wght@700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
 
-  <!-- Ambient Orbs -->
-  <div class="ambient-orbs">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-  </div>  <!-- Floating Music Notes -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- Startup Loading Screen -->
+  <div id="startup-loader"
+    style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-color); z-index:9999; display:flex; align-items:center; justify-content:center; transition:opacity 0.5s ease-out;">
+    <div class="logo-loader"
+      style="width:120px; height:120px; display:flex; align-items:center; justify-content:center; animation:pulse 1.5s infinite alternate;">
+    </div>
+  </div>
+
+  <!-- Background Notes Animation -->
   <canvas id="music-canvas"></canvas>
 
-  <!-- Navbar -->
-  <nav class="navbar">
+  <!-- Desktop/Tablet Top Navigation -->
+  <nav class="top-nav">
     <div class="nav-inner">
-      <div class="nav-left">
-        <a href="#/"><h1 class="logo">RASIGA</h1></a>
-        <ul class="nav-links" id="nav-links">
-          <li><a href="#discover" class="nav-item" data-hash="#discover">Discover</a></li>
-          <li><a href="#/charts" class="nav-item" data-hash="#/charts">Charts</a></li>
-          <li><a href="#" class="nav-item" onclick="var t=document.createElement('div');t.className='toast';t.textContent='Lists feature coming soon!';document.getElementById('toasts').appendChild(t);setTimeout(function(){t.remove()},3200);return false;">Lists</a></li>
-          <li><a href="#reviews" class="nav-item" data-hash="#reviews">Reviews</a></li>
-          <li><a href="#spotlight" class="nav-item" data-hash="#spotlight">Artists</a></li>
-        </ul>
+      <a href="#/" class="logo" style="display:flex; align-items:center; gap:0.5rem; text-decoration:none;">
+        <div id="nav-logo" style="width: 44px; height: 44px; display:flex; align-items:center; justify-content:center;">
+        </div>
+        <span style="font-size: 2rem;">RASIGA</span>
+      </a>
+      <div class="nav-links">
+        <a href="#/discover" class="nav-link">Discover</a>
+        <a href="#/charts" class="nav-link">Charts</a>
+        <a href="#/my-reviews" class="nav-link">My Reviews</a>
+        <a href="#/profile" class="nav-link">Profile</a>
       </div>
-      <div class="nav-right">
-        <div class="search-wrap">
-          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="search-input" placeholder="Search songs, artists, films..." autocomplete="off" aria-label="Search">
-        </div>
-
-        <div id="auth-btns">
-          <button class="btn btn-ghost" id="login-btn" aria-label="Log in">Log in</button>
-          <button class="btn btn-grd" id="signup-btn" aria-label="Sign up">Sign up</button>
-        </div>
+      <div style="display:flex; gap:0.5rem; align-items:center;">
+        <a href="#/discover" class="icon-btn hide-on-mobile" id="search-btn" aria-label="Search" title="Search"
+          onclick="setTimeout(()=>document.getElementById('search-input')?.focus(), 50)"></a>
+        <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme" title="Toggle Theme"></button>
       </div>
     </div>
   </nav>
 
-  <!-- Hero -->
-  <header class="hero">
-    <div class="hero-glow"></div>
-    <div class="hero-inner">
-      <p class="hero-eyebrow">The Letterboxd for Indian Music</p>
-      <h2 class="hero-title">
-        <span class="hline" style="--d:0">Every <em>Raga.</em></span>
-        <span class="hline" style="--d:1">Every <em>Film.</em></span>
-        <span class="hline" style="--d:2">Every <em>Voice.</em></span>
-      </h2>
-      <p class="hero-sub">Track what you listen to. Rate and review songs. Build your musical diary across Hindi, Tamil, Telugu, Malayalam, Kannada, Bengali and more.</p>
-      <button class="btn btn-grd btn-lg" id="cta-btn">Start Exploring <span class="arrow">→</span></button>
-      <div class="hero-stats">
-        <div class="hstat"><span class="hstat-n">847K</span><span class="hstat-l">Ratings</span></div>
-        <div class="hstat"><span class="hstat-n">120K</span><span class="hstat-l">Reviews</span></div>
-        <div class="hstat"><span class="hstat-n">7</span><span class="hstat-l">Languages</span></div>
-        <div class="hstat"><span class="hstat-n">52K</span><span class="hstat-l">Members</span></div>
-      </div>
-    </div>
-  </header>
+  <!-- Dynamic Page Content Container -->
+  <main id="page-container"></main>
 
-  <!-- Filters -->
-  <section class="filters" id="discover">
-    <div class="filter-row">
-      <span class="filter-lbl">Language</span>
-      <div class="pills" id="lang-pills">
-        <button class="pill on" data-v="All">All</button>
-        <button class="pill" data-v="Hindi">Hindi</button>
-        <button class="pill" data-v="Tamil">Tamil</button>
-        <button class="pill" data-v="Telugu">Telugu</button>
-        <button class="pill" data-v="Malayalam">Malayalam</button>
-        <button class="pill" data-v="Kannada">Kannada</button>
-        <button class="pill" data-v="Bengali">Bengali</button>
+  <!-- Global Desktop Footer -->
+  <footer class="desktop-footer">
+    <div class="footer-inner">
+      <div class="footer-copy">
+        &copy; 2026 Rasiga. All rights reserved.
       </div>
-    </div>
-    <div class="filter-row">
-      <span class="filter-lbl">Mood</span>
-      <div class="pills" id="mood-pills">
-        <button class="pill on" data-v="All">All Moods</button>
-        <button class="pill" data-v="Romantic">Romantic</button>
-        <button class="pill" data-v="Nostalgic">Nostalgic</button>
-        <button class="pill" data-v="Soulful">Soulful</button>
-        <button class="pill" data-v="Energetic">Energetic</button>
-        <button class="pill" data-v="Melancholic">Melancholic</button>
-        <button class="pill" data-v="Motivational">Motivational</button>
-        <button class="pill" data-v="Spiritual">Spiritual</button>
-        <button class="pill" data-v="Joyful">Joyful</button>
-        <button class="pill" data-v="Dreamy">Dreamy</button>
+      <div class="footer-links">
+        <a href="#/contact">Contact Us</a>
+        <a href="#/donate">Donate</a>
+        <a href="#/privacy">Privacy Policy</a>
       </div>
-    </div>
-  </section>
-
-  <!-- Main -->
-  <main class="main">
-    <section class="sec" id="trending">
-      <div class="sec-head"><h3 class="sec-title">Trending This Week</h3><p class="sec-sub">Most rated songs right now</p></div>
-      <div class="hscroll" id="trending-list"></div>
-    </section>
-    <section class="sec" id="charts">
-      <div class="sec-head" style="display: flex; justify-content: space-between; align-items: flex-end;">
-        <div><h3 class="sec-title">Top Rated All Time</h3><p class="sec-sub">The greatest Indian songs ever recorded</p></div>
-        <a href="#/charts" class="back-link" style="margin-bottom:0.2rem">View Full Chart →</a>
-      </div>
-      <div class="ranked-grid" id="toprated-list"></div>
-    </section>
-    <section class="sec" id="spotlight">
-      <div class="sec-head"><h3 class="sec-title">Composer Spotlight</h3></div>
-      <div class="spot-card">
-        <div class="spot-art"><span>AR</span></div>
-        <div class="spot-info">
-          <h4>A.R. Rahman</h4>
-          <p>The "Mozart of Madras". Academy Award winner who fused Carnatic classical with electronic, Sufi, and orchestral elements — forever transforming Indian film music.</p>
-          <div class="spot-tags"><span>Fusion</span><span>Classical</span><span>Orchestral</span><span>Electronic</span></div>
-          <div class="spot-nums"><div><b>200+</b> Films</div><div><b>4.7</b> Avg Rating</div><div><b>6</b> Languages</div></div>
-        </div>
-      </div>
-    </section>
-    <section class="sec" id="releases">
-      <div class="sec-head"><h3 class="sec-title">Recently Added</h3><p class="sec-sub">Latest additions to the catalog</p></div>
-      <div class="hscroll" id="releases-list"></div>
-    </section>
-    <section class="sec" id="reviews">
-      <div class="sec-head"><h3 class="sec-title">Community Reviews</h3><p class="sec-sub">What listeners are saying</p></div>
-      <div class="rev-grid" id="reviews-list"></div>
-    </section>
-  </main>
-
-  <!-- Charts Page -->
-  <section class="page-view" id="charts-page" style="display:none; padding: 6rem 2rem 2rem; max-width: 1280px; margin: 0 auto;">
-    <a href="#" class="back-link">← Back to Discover</a>
-    <div class="sec-head" style="margin-top: 1rem;"><h3 class="sec-title">Top Rated All Time</h3><p class="sec-sub">The 50 greatest Indian songs ever recorded</p></div>
-    <div class="ranked-grid" id="charts-page-grid"></div>
-  </section>
-
-  <!-- Artist Page -->
-  <section class="page-view" id="artist-page" style="display:none; padding: 6rem 2rem 2rem; max-width: 1280px; margin: 0 auto;">
-    <a href="#" class="back-link">← Back to Discover</a>
-    <div class="sec-head" style="margin-top: 1rem; margin-bottom: 2rem;">
-      <h3 class="sec-title" id="ap-name">Artist Name</h3>
-      <div style="display: flex; gap: 1rem; color: var(--txt3); margin-top: 0.5rem; font-weight: 500;">
-        <span id="ap-count">0 songs</span>
-        <span>·</span>
-        <span id="ap-rating">0 avg rating</span>
-      </div>
-    </div>
-    <div class="artist-grid" id="artist-page-grid"></div>
-  </section>
-
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-top">
-      <div class="footer-brand"><h2 class="logo">RASIGA</h2><p>Your musical diary.</p></div>
-      <div class="footer-cols">
-        <div><h5>Explore</h5><a href="#trending">Songs</a><a href="#charts">Charts</a><a href="#spotlight">Artists</a></div>
-        <div><h5>Community</h5><a href="#reviews">Reviews</a><a href="#discover">Discover</a><a href="#">Lists</a></div>
-        <div><h5>Company</h5><a href="#">About</a><a href="#">Pro</a><a href="#">Terms</a></div>
-      </div>
-    </div>
-    <div class="footer-bot">
-      <div class="lang-scripts">हिंदी · தமிழ் · తెలుగు · മലയാളം · ಕನ್ನಡ · বাংলা</div>
-      <p>&copy; 2026 Rasiga. All rights reserved.</p>
     </div>
   </footer>
 
-  <!-- Auth Modal -->
-  <div class="modal-bg" id="auth-modal">
-    <div class="modal auth-modal">
-      <button class="modal-x">&times;</button>
-      <h2 class="logo tc">RASIGA</h2>
-      <p class="tc auth-tagline">Rate, review & discover Indian music</p>
-      <div class="auth-tabs"><button class="atab on" data-t="login">Log In</button><button class="atab" data-t="signup">Sign Up</button></div>
-      <div id="auth-form"></div>
+  <!-- Mobile Bottom Navigation -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner" id="mobile-nav-container">
+      <!-- Icons injected by JS or hardcoded inline -->
     </div>
-  </div>
+  </nav>
 
-  <!-- Song Modal -->
-  <div class="modal-bg" id="song-modal" role="dialog" aria-modal="true" aria-label="Song Details">
-    <div class="modal song-modal">
-      <button class="modal-x" aria-label="Close modal">&times;</button>
-      <div id="sm-hero" class="sm-hero"></div>
-      <div id="sm-body" class="sm-body"></div>
-    </div>
-  </div>
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
-  <!-- Toasts -->
-  <div id="toasts"></div>
+  <!-- JS Modules loaded synchronously for this no-build SPA -->
+  <script src="js/icons.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/badges.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/pages.js"></script>
+  <script src="copy.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/logo-svg.js"></script>
 
-  <!-- ALL JS — regular script, NOT module -->
-  <script src="app.js"></script>
-  <script src="router.js"></script>
+  <script>
+    // Inject mobile nav icons dynamically since we have the Icons module
+    document.addEventListener('DOMContentLoaded', () => {
+      const mn = document.getElementById('mobile-nav-container');
+      mn.innerHTML = `
+        <a href="#/" class="bnav-item active">${Icons.get('home')}<span>Home</span></a>
+        <a href="#/discover" class="bnav-item">${Icons.get('search')}<span>Discover</span></a>
+        <a href="#/charts" class="bnav-item">${Icons.get('barChart')}<span>Charts</span></a>
+        <a href="#/profile" class="bnav-item">${Icons.get('user')}<span>Profile</span></a>
+      `;
+      // Call router link update right away
+      if (window.RasigaRouter) window.RasigaRouter.updateNavLinks(location.hash || '#/');
+    });
+  </script>
 </body>
+
 </html>
