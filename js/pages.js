@@ -607,7 +607,7 @@ window.RasigaPages = {
                     <div style="font-size:0.85rem; color:var(--text-muted);">${s.film}</div>
                   </div>
                   <div style="font-weight:bold; color:var(--text-main); font-size:0.9rem;">
-                    ${(s.total_ratings / 1000).toFixed(1)}k ratings
+                    ${s.total_ratings >= 100 ? (s.total_ratings / 1000).toFixed(1) + 'k' : s.total_ratings || 0} ratings
                   </div>
                 </div>
               `).join('')}
@@ -649,7 +649,7 @@ window.RasigaPages = {
                     <div style="font-size:0.85rem; color:var(--text-muted);">${a.song_count} song${a.song_count > 1 ? 's' : ''}</div>
                   </div>
                   <div style="font-weight:bold; color:var(--text-main); font-size:0.9rem;">
-                    ${(a.total_ratings / 1000).toFixed(1)}k ratings
+                    ${a.total_ratings >= 100 ? (a.total_ratings / 1000).toFixed(1) + 'k' : a.total_ratings || 0} ratings
                   </div>
                 </div>
               `).join('')}
@@ -691,7 +691,7 @@ window.RasigaPages = {
                     <div style="font-size:0.85rem; color:var(--text-muted);">${a.song_count} song${a.song_count > 1 ? 's' : ''}</div>
                   </div>
                   <div style="font-weight:bold; color:var(--text-main); font-size:0.9rem;">
-                    ${(a.total_ratings / 1000).toFixed(1)}k ratings
+                    ${a.total_ratings >= 100 ? (a.total_ratings / 1000).toFixed(1) + 'k' : a.total_ratings || 0} ratings
                   </div>
                 </div>
               `).join('')}
