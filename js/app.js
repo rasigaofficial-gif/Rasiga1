@@ -52,6 +52,77 @@ window.RasigaApp = {
 
     const searchBtn = document.getElementById('search-btn');
     if (searchBtn) searchBtn.innerHTML = Icons.get('search');
+    
+    // Setup Native Google Sign In Callback
+    window.handleGoogleLogin = (response) => {
+      if (!this.supabase) return;
+      if (response.credential) {
+        this.supabase.auth.signInWithIdToken({
+          provider: 'google',
+          token: response.credential
+        }).then(({ data, error }) => {
+          if (error) {
+            alert('Google Login failed: ' + error.message);
+          } else {
+            console.log('Google login successful natively!');
+          }
+        });
+      }
+    };
+
+    // Fetch initial data from Supabase
+    this.fetchInitialData();
+  },
+
+  fetchInitialData: function () {
+    if (!this.supabase) return;
+    
+    // Fetch songs
+    this.supabase.from('songs').select('*').order('total_ratings', { ascending: false }).then(({ data, error }) => {
+      if (error) {
+        console.error('Error fetching songs:', error);
+        alert('Failed to load songs from database! Please check your connection.');
+        return;
+      }
+      if (data) {
+        window.RasigaSeeds = data;
+        // Re-render if we are on a page that needs songs (like home or discover)
+        if (window.RasigaRouter) window.RasigaRouter.handleRoute();
+      }
+    });
+
+    // Fetch recent reviews for community pulse
+    this.supabase.from('reviews').select('*, users(display_name, avatar_url), songs(title)').order('created_at', { ascending: false }).limit(6).then(({ data, error }) => {
+      if (data) {
+        window.RasigaReviews = data.map(r => ({
+          id: r.id,
+          name: r.users?.display_name || 'User',
+          clr: '#f97316', // Placeholder color, could be generated from name
+          text: r.body,
+          rating: r.rating_id ? 5 : null, // Would need a join on ratings
+          song: r.songs?.title || 'Unknown Song',
+          likes: r.likes_count || 0,
+          time: new Date(r.created_at).toLocaleDateString()
+        }));
+        if (window.RasigaRouter && location.hash === '#/') window.RasigaRouter.handleRoute();
+      }
+    });
+
+    // Fetch suggestions (for admin)
+    this.supabase.from('song_suggestions').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+      if (data) {
+        window.RasigaSuggestions = data.map(s => ({
+          id: s.id,
+          song: s.song_name,
+          year: s.year,
+          director: s.director,
+          singer: s.singer,
+          lyricist: s.lyricist,
+          status: s.status,
+          timestamp: new Date(s.created_at).getTime()
+        }));
+      }
+    });
   },
 
   // Sync Supabase auth user with our local RasigaData.demoUser
