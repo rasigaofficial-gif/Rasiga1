@@ -163,7 +163,7 @@ window.RasigaPages = {
       </div>
     `;
 
-    let reviewsHTML = '<div id="song-reviews-container"><div style="padding:2rem; text-align:center; color:var(--text-muted);">Loading reviews...</div></div>';
+    reviewsHTML = '<div id="song-reviews-container"><div style="padding:2rem; text-align:center; color:var(--text-muted);">Loading reviews...</div></div>';
 
     let userReviewSectionHTML = '';
     if (!RasigaData.demoUser || !RasigaData.demoUser.onboarded) {
