@@ -277,7 +277,7 @@ window.RasigaApp = {
                 ${window.Icons ? window.Icons.get('poop', { width: 16, height: 16 }) : ''}
                 <span class="poop-count" data-base="${poops - (reaction==='poop'?1:0)}" style="font-size:0.8rem;">${poops}</span>
               </button>
-              <button class="btn-react" onclick="RasigaApp.shareComment('${songId}')">
+              <button class="btn-react" onclick="RasigaApp.shareComment('${songId}', '${r.id}')">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
                 <span style="font-size:0.8rem;">Share</span>
               </button>
@@ -1155,6 +1155,41 @@ window.RasigaApp = {
     }
   },
 
+  fetchHomeStats: async function() {
+    if (!this.supabase) return;
+
+    try {
+      // Fetch total ratings
+      const { count: ratingsCount } = await this.supabase.from('ratings').select('*', { count: 'exact', head: true });
+      
+      // Fetch total users
+      const { count: usersCount } = await this.supabase.from('users').select('*', { count: 'exact', head: true });
+
+      // Languages: we already know the unique languages from RasigaSeeds
+      const uniqueLanguages = new Set(window.RasigaSeeds.map(s => s.language)).size;
+
+      const formatStat = (num) => {
+        if (!num) return '0';
+        if (num >= 1000000) return Math.floor(num / 1000000) + 'M+';
+        if (num >= 1000) return Math.floor(num / 1000) + 'K+';
+        if (num >= 100) return Math.floor(num / 100) * 100 + '+';
+        if (num >= 10) return Math.floor(num / 10) * 10 + '+';
+        return num;
+      };
+
+      const rEl = document.getElementById('home-stat-ratings');
+      const uEl = document.getElementById('home-stat-users');
+      const lEl = document.getElementById('home-stat-languages');
+
+      if (rEl) rEl.textContent = formatStat(ratingsCount);
+      if (uEl) uEl.textContent = formatStat(usersCount);
+      if (lEl) lEl.textContent = uniqueLanguages;
+
+    } catch (err) {
+      console.error("Error fetching home stats:", err);
+    }
+  },
+
   setupMusicCanvas: function () {
     const canvas = document.getElementById('music-canvas');
     if (!canvas) return;
@@ -1328,15 +1363,113 @@ window.RasigaApp = {
       if (match && !matches.find(m => m.id === s.id)) matches.push(s);
     });
 
-    const grid = document.getElementById('discover-grid');
-    if (!grid) return;
+    const c = document.getElementById('discover-results-container');
+    if (c) {
+      if (matches.length > 0) {
+        c.innerHTML = '<div class="song-grid mt-4">' + matches.map((m, i) => window.RasigaComponents.SongCard(m, i)).join('') + '</div>';
+      } else {
+        c.innerHTML = '<div style="padding: 2rem; text-align:center; color:var(--text-muted);">No songs found matching your search.</div>';
+      }
+    }
+  },
 
-    if (matches.length === 0) {
-      grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 2rem; color:var(--text-muted);">No results found.</div>';
-    } else {
+  searchUsers: async function (query) {
+    const sug = document.getElementById('user-search-suggestions');
+    if (!sug) return;
+    const q = query.trim();
+    if (q.length < 2) {
+      sug.style.display = 'none';
+      return;
+    }
+
+    if (!this.supabase) return;
+
+    try {
+      const { data, error } = await this.supabase
+        .from('users')
+        .select('username, display_name, avatar_url')
+        .or(`username.ilike.%${q}%,display_name.ilike.%${q}%`)
+        .limit(5);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        sug.innerHTML = data.map(u => `
+          <div style="padding: 0.8rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); cursor:pointer; display:flex; align-items:center; gap:0.8rem;" onclick="location.hash='#/user/${u.username}'">
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-saffron); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:1rem;">
+              ${(u.display_name || u.username)[0].toUpperCase()}
+            </div>
+            <div>
+              <div style="font-weight:bold; font-size:0.95rem;">${u.display_name || u.username}</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">@${u.username}</div>
+            </div>
+          </div>
+        `).join('');
+        sug.style.display = 'flex';
+      } else {
+        sug.innerHTML = '<div style="padding: 0.8rem 1rem; color:var(--text-muted); font-size:0.9rem;">No users found.</div>';
+        sug.style.display = 'flex';
+      }
+    } catch (err) {
+      console.error('User search error:', err);
+    }
+  },
+
+  fetchLeaderboards: async function() {
+    const container = document.getElementById('leaderboards-container');
+    if (!container || !this.supabase) return;
+
+    try {
+      // Fetch top users by XP
+      const { data: topUsers, error } = await this.supabase
+        .from('users')
+        .select('username, display_name, xp')
+        .order('xp', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+
       let html = '';
-      matches.forEach((s, i) => html += window.RasigaComponents.SongCard(s, i));
-      grid.innerHTML = html;
+
+      if (topUsers && topUsers.length > 0) {
+        html += `
+          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
+            <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Top Rasigans (XP)</h3>
+            <div style="display:flex; flex-direction:column; gap:1.25rem;">
+              ${topUsers.map((u, i) => {
+                const isTop3 = i < 3;
+                let rankColor = 'var(--text-light)';
+                if (i === 0) rankColor = 'var(--accent-gold)';
+                if (i === 1) rankColor = '#C0C0C0'; // Silver
+                if (i === 2) rankColor = '#CD7F32'; // Bronze
+                
+                return \`
+                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer;" onclick="location.hash='#/user/${u.username}'">
+                  <div style="font-weight:bold; font-size:1.5rem; color:${rankColor}; width:30px; text-align:center;">\${i + 1}</div>
+                  <div style="width: 40px; height: 40px; border-radius: 50%; background: ${rankColor}; display:flex; align-items:center; justify-content:center; color:\${i<3?'#000':'#fff'}; font-weight:bold; font-size:1.2rem;">
+                    \${(u.display_name || u.username)[0].toUpperCase()}
+                  </div>
+                  <div style="flex:1;">
+                    <div style="font-weight:600; font-size:1.1rem; \${isTop3 ? \`color:\${rankColor}\` : ''}">\${u.display_name || u.username}</div>
+                    <div style="font-size:0.85rem; color:var(--text-muted);">@\${u.username}</div>
+                  </div>
+                  <div style="font-weight:bold; color:var(--accent-teal); font-size:1.1rem;">
+                    \${u.xp || 0} XP
+                  </div>
+                </div>
+              \`}).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+         html = '<p>No users found on leaderboard yet.</p>';
+      }
+
+      container.innerHTML = html;
+
+    } catch(err) {
+      console.error('Error fetching leaderboards:', err);
+      container.innerHTML = '<p>Failed to load leaderboards.</p>';
     }
   },
 

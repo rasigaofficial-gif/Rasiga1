@@ -12,6 +12,7 @@ window.RasigaRouter = {
     '#/donate': 'renderDonate',
     '#/privacy': 'renderPrivacy',
     '#/analytics': 'renderAnalytics',
+    '#/leaderboards': 'renderLeaderboards',
     '#/admin': 'renderAdminPanel',
     '#/login': 'renderLogin'
   },
@@ -63,6 +64,9 @@ window.RasigaRouter = {
       // Inject dynamic hero copy on Home page load
       if ((hash === '#/' || hash === '') && typeof applyHeroCopy === 'function') {
         applyHeroCopy(getRandomCopy());
+        if (window.RasigaApp && typeof RasigaApp.fetchHomeStats === 'function') {
+          RasigaApp.fetchHomeStats();
+        }
       }
 
       // Fetch dynamic reviews for song page
@@ -83,6 +87,9 @@ window.RasigaRouter = {
       // Fetch dynamic personal profile stats
       if (routeFn === 'renderProfile') {
         RasigaApp.fetchMyProfileStats();
+      }
+
+      if (routeFn === 'renderProfile' || routeFn === 'renderMyReviews') {
         RasigaApp.fetchMySuggestions();
       }
 

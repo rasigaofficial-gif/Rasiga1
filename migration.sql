@@ -45,8 +45,8 @@ CREATE POLICY "Users can read own suggestions" ON song_suggestions FOR SELECT
   USING (auth.uid() = user_id OR EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND is_admin = true));
 CREATE POLICY "Users can insert suggestions" ON song_suggestions FOR INSERT 
   WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can delete own pending suggestions" ON song_suggestions FOR DELETE 
-  USING (auth.uid() = user_id AND status = 'Pending');
+CREATE POLICY "Users can delete own suggestions" ON song_suggestions FOR DELETE 
+  USING (auth.uid() = user_id);
 CREATE POLICY "Admins can update suggestions" ON song_suggestions FOR UPDATE 
   USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND is_admin = true));
 

@@ -24,9 +24,9 @@ window.RasigaPages = {
             <button id="cta-btn" class="btn btn-primary" onclick="location.hash='#/discover'">Start Exploring ${Icons.get('compass', { width: 18, height: 18 })}</button>
           </div>
           <div class="hero-stats">
-            <div class="hs-item"><h2>847K</h2><span>Ratings</span></div>
-            <div class="hs-item"><h2>7</h2><span>Languages</span></div>
-            <div class="hs-item"><h2>52K</h2><span>Rasigans</span></div>
+            <div class="hs-item"><h2 id="home-stat-ratings">--</h2><span>Ratings</span></div>
+            <div class="hs-item"><h2 id="home-stat-languages">--</h2><span>Languages</span></div>
+            <div class="hs-item"><h2 id="home-stat-users">--</h2><span>Rasigans</span></div>
           </div>
         </header>
 
@@ -300,13 +300,6 @@ window.RasigaPages = {
           </button>
         </div>
 
-        <section class="section mt-4 page-enter" style="animation-delay: 0.18s">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-            <h2 class="section-title" style="margin:0;">My Suggestions</h2>
-          </div>
-          <div id="my-suggestions-container" style="display:flex; flex-direction:column; gap:1rem;">
-            <p style="color:var(--text-muted); text-align:center;">Loading suggestions...</p>
-          </div>
         </section>
 
         <section class="section mt-4 page-enter" style="animation-delay: 0.2s">
@@ -455,6 +448,15 @@ window.RasigaPages = {
         <div class="song-grid mt-4">
           ${gridHTML}
         </div>
+
+        <section class="section mt-4" style="margin-top: 3rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+            <h2 class="section-title" style="margin:0;">My Suggestions</h2>
+          </div>
+          <div id="my-suggestions-container" style="display:flex; flex-direction:column; gap:1rem;">
+            <p style="color:var(--text-muted); text-align:center;">Loading suggestions...</p>
+          </div>
+        </section>
       </div>
     `;
   },
@@ -698,6 +700,37 @@ window.RasigaPages = {
     `;
     return html;
   },
+
+  renderLeaderboards: function () {
+    // We will render a shell and fetch the data dynamically
+    setTimeout(() => {
+      if (window.RasigaApp && RasigaApp.fetchLeaderboards) {
+        RasigaApp.fetchLeaderboards();
+      }
+    }, 50);
+
+    return `
+      <div class="page-leaderboards page-enter">
+        <h2 class="section-title">Leaderboards & Community</h2>
+        
+        <div class="glass" style="padding: 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-lg); z-index: 100; position:relative;">
+          <h3 style="margin-bottom: 1rem;">Find Rasigans</h3>
+          <div style="display:flex; gap:0.5rem; position:relative;">
+            <input type="text" id="user-search-input" placeholder="Search users by name or username..." autocomplete="off" style="flex:1; padding: 0.8rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1); color: inherit; outline:none; font-size: 1rem;" oninput="RasigaApp.searchUsers(this.value)" />
+            <div id="user-search-suggestions" class="glass" style="display:none; position:absolute; top: 100%; left:0; right:0; max-height: 250px; overflow-y:auto; z-index:999; flex-direction:column; margin-top: 0.5rem; background: color-mix(in srgb, var(--bg-color) 85%, transparent); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+            </div>
+          </div>
+        </div>
+
+        <div id="leaderboards-container" style="display:flex; flex-wrap:wrap; gap:2rem;">
+           <div class="glass" style="flex:1; min-width:300px; padding:2rem; text-align:center;">
+             Loading leaderboards...
+           </div>
+        </div>
+      </div>
+    `;
+  },
+
   renderLists: function () {
     return `<div class="page-placeholder glass page-enter"><h2 class="section-title">Lists</h2><p>Curated playlists coming soon...</p></div>`;
   },
