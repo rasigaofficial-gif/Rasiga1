@@ -62,6 +62,18 @@ window.RasigaRouter = {
       if ((hash === '#/' || hash === '') && typeof applyHeroCopy === 'function') {
         applyHeroCopy(getRandomCopy());
       }
+
+      // Explicitly render Google Sign-In button if it exists (since this is an SPA)
+      if (document.getElementById('g_id_onload') && window.google && window.google.accounts && window.google.accounts.id) {
+        window.google.accounts.id.initialize({
+          client_id: document.getElementById('g_id_onload').getAttribute('data-client_id'),
+          callback: window.handleGoogleLogin
+        });
+        window.google.accounts.id.renderButton(
+          document.querySelector('.g_id_signin'),
+          { theme: 'outline', size: 'large', type: 'standard', shape: 'pill', text: 'continue_with', width: 320 }
+        );
+      }
     }, 150);
   },
 
