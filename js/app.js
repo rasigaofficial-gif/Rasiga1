@@ -147,7 +147,16 @@ window.RasigaApp = {
           stats: { ratings: 0, reviews: 0, languages: 0, daysListened: 1 }
         };
         localStorage.setItem('rasiga_user', JSON.stringify(window.RasigaData.demoUser));
-        window.RasigaRouter.handleRoute();
+        
+        // Fetch following list
+        this.supabase.from('follows').select('users!follows_following_id_fkey(username)').eq('follower_id', data.id).then(({ data: fData }) => {
+          window.RasigaData.following = {};
+          if (fData) {
+            fData.forEach(f => window.RasigaData.following[f.users.username] = true);
+          }
+          window.RasigaRouter.handleRoute();
+        });
+
       } else {
         // User authenticated but NOT in our users table yet — needs onboarding
         window.RasigaData.demoUser = {
@@ -618,23 +627,211 @@ window.RasigaApp = {
     }
   },
 
-  toggleFollow: function(username) {
+  toggleFollow: async function(username) {
     if (!window.RasigaData.demoUser || !window.RasigaData.demoUser.onboarded) {
       if (confirm('Please log in to follow users. Go to Login page?')) {
         location.hash = '#/profile';
       }
       return;
     }
+
+    const me = window.RasigaData.demoUser;
     
-    if (!window.RasigaData.following) window.RasigaData.following = {};
-    if (window.RasigaData.following[username]) {
-      delete window.RasigaData.following[username];
-    } else {
-      window.RasigaData.following[username] = true;
+    try {
+      // Look up target user ID from username
+      const { data: targetUser, error: uErr } = await this.supabase.from('users').select('id').eq('username', username).single();
+      if (uErr || !targetUser) throw new Error("User not found");
+
+      if (!window.RasigaData.following) window.RasigaData.following = {};
+      const isCurrentlyFollowing = window.RasigaData.following[username];
+
+      if (isCurrentlyFollowing) {
+        await this.supabase.from('follows').delete().match({ follower_id: me.id, following_id: targetUser.id });
+        delete window.RasigaData.following[username];
+      } else {
+        await this.supabase.from('follows').insert({ follower_id: me.id, following_id: targetUser.id });
+        window.RasigaData.following[username] = true;
+      }
+
+      // Re-fetch connections to update UI seamlessly if we are on the page
+      if (location.hash.startsWith('#/user/')) {
+        this.fetchPublicProfile(username);
+      } else if (location.hash.startsWith('#/following') || location.hash.startsWith('#/followers')) {
+        this.fetchConnections(location.hash.replace('#/', ''));
+      } else {
+        window.RasigaRouter.handleRoute();
+      }
+    } catch(err) {
+      console.error("Follow error:", err);
+      alert("Failed to update follow status.");
     }
+  },
+
+  fetchPublicProfile: async function(username) {
+    const container = document.getElementById('public-profile-container');
+    if (!container) return;
+
+    if (!this.supabase) {
+      container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Database connection failed.</p>';
+      return;
+    }
+
+    try {
+      const { data: user, error } = await this.supabase.from('users').select('*, follows!follows_following_id_fkey(count)').eq('username', username).single();
+      if (error || !user) {
+        container.innerHTML = '<div style="text-align:center; padding:2rem;"><h2 class="section-title">User Not Found</h2></div>';
+        return;
+      }
+
+      const followersCount = user.follows ? user.follows[0].count : 0;
+      
+      const { data: reviews } = await this.supabase.from('reviews').select('*, songs(title, film, year), ratings(score)').eq('user_id', user.id).order('created_at', { ascending: false });
+
+      const xp = (reviews ? reviews.length * 50 : 0) + (user.xp || 0);
+      const level = window.RasigaData.getLevel ? window.RasigaData.getLevel(xp) : { name: 'Rasigan' };
+      
+      const isFollowing = window.RasigaData.following && window.RasigaData.following[username];
+      const reviewerClr = '#8b5cf6';
+
+      let reviewsHTML = '';
+      (reviews || []).forEach(r => {
+        const time = new Date(r.created_at).toLocaleDateString();
+        const score = r.ratings?.score || '?';
+        const songName = r.songs?.title || 'Unknown Song';
+        const songFilm = r.songs?.film || 'Indie';
+        const songYear = r.songs?.year || '';
+
+        reviewsHTML += \`
+          <div class="glass" style="padding: 1.2rem; margin-bottom: 1rem; border-left: 2px solid \${reviewerClr};">
+            <a href="#/song/\${r.song_id}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem; background:rgba(0,0,0,0.1); padding:0.5rem; border-radius:var(--radius-sm); margin-bottom:0.8rem; border:1px solid var(--glass-border);">
+              \${window.Icons ? window.Icons.get('music', {width:16, height:16}) : ''}
+              <div>
+                <div style="font-size:0.9rem; font-weight:bold;">\${songName}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">\${songFilm} &bull; \${songYear}</div>
+              </div>
+            </a>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <div style="font-size:0.8rem; color:var(--text-muted);">\${time}</div>
+              <div style="color:var(--accent-gold); font-size:0.9rem; font-weight:600;">\${window.Icons ? window.Icons.get('star', {width:14, height:14, fill:'currentColor'}) : ''} \${score}</div>
+            </div>
+            <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">\${r.body}</p>
+          </div>
+        \`;
+      });
+
+      if (!reviewsHTML) reviewsHTML = '<p style="color:var(--text-muted)">No reviews yet.</p>';
+
+      const myUsername = (RasigaData.demoUser || {}).username;
+      
+      container.innerHTML = \`
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom: 2rem;">
+          <button class="icon-btn" onclick="history.back()">\${window.Icons ? window.Icons.get('close') : 'X'}</button>
+          <h2 class="section-title" style="margin:0;">Profile</h2>
+        </div>
+
+        <div class="glass" style="padding: 2rem; margin-bottom: 1rem; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;">
+          <div style="width: 80px; height: 80px; border-radius: 50%; background: \${reviewerClr}; display: flex; align-items:center; justify-content:center; color: #fff; font-size:2rem; box-shadow: var(--glass-shadow); font-family:'DM Serif Display',serif; margin-bottom: 0.8rem;">
+            \${(user.display_name || user.username)[0].toUpperCase()}
+          </div>
+          <div>
+            <h2 style="font-family:'DM Serif Display',serif; font-size: 1.8rem; margin-bottom:0.2rem;">\${user.display_name || user.username}</h2>
+            <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.8rem; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+              @\${username} &bull; <span style="color:var(--text-main); font-weight:600;">\${followersCount} Followers</span>
+            </div>
+            
+            <div style="display:flex; flex-direction:column; align-items:center; margin-bottom: 1.2rem;">
+               <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.5px; font-weight:600; margin-bottom:0.2rem;">Level</div>
+               <div style="background: var(--gradient-brand); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family:'DM Serif Display',serif; font-size:1.3rem; font-weight:bold;">\${level.name}</div>
+            </div>
+            
+            \${myUsername !== username ? \`
+            <button class="btn \${isFollowing ? '' : 'btn-primary'}" onclick="RasigaApp.toggleFollow('\${username}')" style="padding: 0.5rem 1.8rem; display:inline-flex; align-items:center; justify-content:center; gap:0.4rem; \${isFollowing ? 'background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: none;' : ''}">
+              \${isFollowing ? (window.Icons ? window.Icons.get('check', {width:16, height:16}) : '') + ' Following' : (window.Icons ? window.Icons.get('user', {width:16, height:16}) : '') + ' Follow'}
+            </button>\` : ''}
+          </div>
+        </div>
+        
+        <h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom:0.5rem;">Reviews (\${reviews ? reviews.length : 0})</h3>
+        <div>
+          \${reviewsHTML}
+        </div>
+      \`;
+    } catch(err) {
+      console.error(err);
+      container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Failed to load profile.</p>';
+    }
+  },
+
+  fetchConnections: async function(type) {
+    const container = document.getElementById('connections-container');
+    if (!container || !this.supabase) return;
     
-    // Refresh the public profile page to show updated button
-    window.RasigaRouter.handleRoute();
+    const me = RasigaData.demoUser;
+    if (!me || !me.id) {
+      container.innerHTML = '<p style="text-align:center; padding:2rem;">Please log in.</p>';
+      return;
+    }
+
+    try {
+      let query;
+      if (type === 'following') {
+        // Find users I follow
+        query = this.supabase.from('follows').select('following_id, users!follows_following_id_fkey(username, display_name)').eq('follower_id', me.id);
+      } else {
+        // Find users following me
+        query = this.supabase.from('follows').select('follower_id, users!follows_follower_id_fkey(username, display_name)').eq('following_id', me.id);
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        container.innerHTML = \`<div style="text-align:center; padding: 2rem; color:var(--text-muted);">You don't have any \${type} yet.</div>\`;
+        return;
+      }
+
+      let listHTML = data.map(d => {
+        const u = d.users;
+        const clr = '#14b8a6';
+        return \`
+          <a href="#/user/\${u.username}" style="display:flex; align-items:center; gap: 1rem; padding: 1rem; text-decoration:none; color:inherit; border-bottom: 1px solid var(--glass-border); background:rgba(0,0,0,0.05); border-radius: var(--radius-sm); margin-bottom: 0.5rem; transition: transform 0.2s;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: \${clr}; display: flex; align-items:center; justify-content:center; color: #fff; font-size:1.2rem; font-family:'DM Serif Display',serif;">
+              \${(u.display_name || u.username)[0].toUpperCase()}
+            </div>
+            <div style="flex: 1;">
+              <div style="font-weight:bold; font-size:1.1rem; font-family:'DM Serif Display',serif;">\${u.display_name || u.username}</div>
+              <div style="font-size:0.85rem; color:var(--text-muted);">@\${u.username}</div>
+            </div>
+            <div style="color:var(--text-muted);">
+              \${window.Icons ? window.Icons.get('chevron-right', {width:20, height:20}) : '&rarr;'}
+            </div>
+          </a>
+        \`;
+      }).join('');
+      
+      container.innerHTML = listHTML;
+    } catch(err) {
+      console.error(err);
+      container.innerHTML = '<p style="text-align:center; padding:2rem; color:var(--text-muted);">Failed to load connections.</p>';
+    }
+  },
+
+  fetchMyProfileStats: async function() {
+    const me = RasigaData.demoUser;
+    if (!me || !me.id || !this.supabase) return;
+
+    try {
+      const { count: followingCount } = await this.supabase.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', me.id);
+      const { count: followersCount } = await this.supabase.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', me.id);
+
+      const fElement = document.getElementById('profile-following-count');
+      const followersElement = document.getElementById('profile-followers-count');
+      
+      if (fElement) fElement.textContent = followingCount || 0;
+      if (followersElement) followersElement.textContent = followersCount || 0;
+    } catch(err) {
+      console.error(err);
+    }
   },
 
   setupMusicCanvas: function () {

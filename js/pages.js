@@ -268,8 +268,8 @@ window.RasigaPages = {
             <h2>${user.displayName}</h2>
             <p>@${user.username} &bull; Joined ${joinedStr}</p>
             <div style="display:flex; justify-content:center; gap: 1.5rem; margin-top: 0.8rem; font-weight:600; color:var(--text-main);">
-              <a href="#/following" style="text-decoration:none; color:inherit;">${Object.keys(window.RasigaData.following || {}).length} <span style="color:var(--text-muted); font-weight:normal; font-size:0.85rem;">Following</span></a>
-              <a href="#/followers" style="text-decoration:none; color:inherit;">12 <span style="color:var(--text-muted); font-weight:normal; font-size:0.85rem;">Followers</span></a>
+              <a href="#/following" style="text-decoration:none; color:inherit;"><span id="profile-following-count">...</span> <span style="color:var(--text-muted); font-weight:normal; font-size:0.85rem;">Following</span></a>
+              <a href="#/followers" style="text-decoration:none; color:inherit;"><span id="profile-followers-count">...</span> <span style="color:var(--text-muted); font-weight:normal; font-size:0.85rem;">Followers</span></a>
             </div>
             <div class="ph-level mt-2">
               <div class="phl-top">
@@ -465,172 +465,29 @@ window.RasigaPages = {
   },
 
   renderPublicProfile: function(username) {
-    // Find reviewer details from RasigaReviews by matching generated username
-    const allReviews = window.RasigaReviews || [];
-    const userReviews = allReviews.filter(r => r.name.toLowerCase().replace(/[^a-z0-9]/g, '') === username);
-    
-    if (userReviews.length === 0) {
-      return `<div class="page-placeholder glass page-enter"><h2 class="section-title">User Not Found</h2><p>This user hasn't posted any reviews yet.</p><button class="btn btn-primary mt-4" onclick="history.back()">Go Back</button></div>`;
-    }
-    
-    const reviewerName = userReviews[0].name;
-    const reviewerClr = userReviews[0].clr;
-    
-    // Check mock follow state
-    if (!window.RasigaData.following) window.RasigaData.following = {};
-    const isFollowing = !!window.RasigaData.following[username];
-
-    // Mock stats
-    const mockFollowers = (username.length * 42) + (isFollowing ? 1 : 0);
-    const mockXP = (userReviews.length * 50) + (username.length * 150);
-    const level = window.RasigaData.getLevel ? window.RasigaData.getLevel(mockXP) : { name: 'Rasigan' };
-    
-    // Mock Badges
-    const numBadges = Math.max(1, username.length % 5);
-    const mockBadgesList = (window.RasigaData.BADGES || []).slice(0, numBadges);
-    const mockBadgesHTML = mockBadgesList.map(b => `
-      <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding: 0.5rem; background:rgba(0,0,0,0.05); border-radius: var(--radius-sm); border: 1px solid var(--glass-border);">
-        <div style="width:36px; height:36px; border-radius:50%; background:var(--gradient-brand); color:#fff; display:flex; align-items:center; justify-content:center; margin-bottom:0.3rem;">
-          ${window.Icons && window.Icons.get(b.icon, {width: 18, height: 18}) ? window.Icons.get(b.icon, {width: 18, height: 18}) : ''}
-        </div>
-        <div style="font-size:0.75rem; font-weight:600;">${b.name}</div>
-      </div>
-    `).join('');
-
-    let reviewsHTML = '';
-    userReviews.forEach(r => {
-      // Find song details for rendering the song card mini
-      const song = (window.RasigaSeeds || []).find(s => s.title === r.song);
-      let songContext = `<b>${r.song}</b>`;
-      if (song) {
-        songContext = `<a href="#/song/${song.id}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem; background:rgba(0,0,0,0.1); padding:0.5rem; border-radius:var(--radius-sm); margin-bottom:0.8rem; border:1px solid var(--glass-border);">
-          ${Icons.get('music', {width:16, height:16})}
-          <div>
-            <div style="font-size:0.9rem; font-weight:bold;">${song.title}</div>
-            <div style="font-size:0.75rem; color:var(--text-muted);">${song.film || 'Indie'} &bull; ${song.year}</div>
-          </div>
-        </a>`;
-      }
-
-      reviewsHTML += `
-        <div class="glass" style="padding: 1.2rem; margin-bottom: 1rem; border-left: 2px solid ${reviewerClr};">
-          ${songContext}
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-            <div style="font-size:0.8rem; color:var(--text-muted);">${r.time}</div>
-            <div style="color:var(--accent-gold); font-size:0.9rem; font-weight:600;">${Icons.get('star', {width:14, height:14, fill:'currentColor'})} ${r.rating}</div>
-          </div>
-          <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">${r.text}</p>
-          ${r.quote ? `<blockquote style="border-left: 3px solid var(--accent-saffron); padding-left: 1rem; margin-top:0.8rem; font-style:italic; color:var(--text-muted);">${r.quote}</blockquote>` : ''}
-        </div>
-      `;
-    });
-
-    return `
-      <div class="page-entity page-enter">
+    return \`
+      <div class="page-entity page-enter" id="public-profile-container">
         <div style="display:flex; align-items:center; gap:1rem; margin-bottom: 2rem;">
-          <button class="icon-btn" onclick="history.back()">${Icons.get('close')}</button>
+          <button class="icon-btn" onclick="history.back()">\${window.Icons ? window.Icons.get('close') : 'X'}</button>
           <h2 class="section-title" style="margin:0;">Profile</h2>
         </div>
-
-        <div class="glass" style="padding: 2rem; margin-bottom: 1rem; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;">
-          <div style="width: 80px; height: 80px; border-radius: 50%; background: ${reviewerClr}; display: flex; align-items:center; justify-content:center; color: #fff; font-size:2rem; box-shadow: var(--glass-shadow); font-family:'DM Serif Display',serif; margin-bottom: 0.8rem;">
-            ${reviewerName[0]}
-          </div>
-          <div>
-            <h2 style="font-family:'DM Serif Display',serif; font-size: 1.8rem; margin-bottom:0.2rem;">${reviewerName}</h2>
-            <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.8rem; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
-              @${username} &bull; <span style="color:var(--text-main); font-weight:600;">${mockFollowers} Followers</span>
-            </div>
-            
-            <div style="display:flex; flex-direction:column; align-items:center; margin-bottom: 1.2rem;">
-               <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.5px; font-weight:600; margin-bottom:0.2rem;">Level</div>
-               <div style="background: var(--gradient-brand); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family:'DM Serif Display',serif; font-size:1.3rem; font-weight:bold;">${level.name}</div>
-            </div>
-            
-            <button class="btn ${isFollowing ? '' : 'btn-primary'}" onclick="RasigaApp.toggleFollow('${username}')" style="padding: 0.5rem 1.8rem; display:inline-flex; align-items:center; justify-content:center; gap:0.4rem; ${isFollowing ? 'background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: none;' : ''}">
-              ${isFollowing ? Icons.get('check', {width:16, height:16}) + ' Following' : Icons.get('user', {width:16, height:16}) + ' Follow'}
-            </button>
-          </div>
-        </div>
-        
-        ${mockBadgesHTML ? `
-        <div class="glass" style="padding: 1.5rem; margin-bottom: 2rem;">
-          <h3 style="margin-bottom: 1rem; font-size:1.1rem;">Earned Badges</h3>
-          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 1rem;">
-            ${mockBadgesHTML}
-          </div>
-        </div>
-        ` : ''}
-        
-        <h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom:0.5rem;">Reviews (${userReviews.length})</h3>
-        <div>
-          ${reviewsHTML}
-        </div>
+        <div style="text-align:center; padding: 2rem; color:var(--text-muted);">Loading profile...</div>
       </div>
-    `;
+    \`;
   },
 
   renderConnections: function(type) {
-    let users = [];
-    if (type === 'following') {
-      const followingNames = Object.keys(window.RasigaData.following || {});
-      // Find details from RasigaReviews
-      followingNames.forEach(uname => {
-        const review = (window.RasigaReviews || []).find(r => r.name.toLowerCase().replace(/[^a-z0-9]/g, '') === uname);
-        if (review) {
-          users.push({
-            username: uname,
-            displayName: review.name,
-            clr: review.clr
-          });
-        }
-      });
-    } else {
-      // Mock some followers
-      const mockNames = [
-        {name: 'Meera T.', clr: '#8b5cf6'},
-        {name: 'Arjun S.', clr: '#0d9488'},
-        {name: 'Priya K.', clr: '#ec4899'}
-      ];
-      users = mockNames.map(m => ({
-        username: m.name.toLowerCase().replace(/[^a-z0-9]/g, ''),
-        displayName: m.name,
-        clr: m.clr
-      }));
-    }
-
-    let listHTML = '';
-    if (users.length === 0) {
-      listHTML = `<div style="text-align:center; padding: 2rem; color:var(--text-muted);">You don't have any ${type} yet.</div>`;
-    } else {
-      listHTML = users.map(u => `
-        <a href="#/user/${u.username}" style="display:flex; align-items:center; gap: 1rem; padding: 1rem; text-decoration:none; color:inherit; border-bottom: 1px solid var(--glass-border); background:rgba(0,0,0,0.05); border-radius: var(--radius-sm); margin-bottom: 0.5rem; transition: transform 0.2s;">
-          <div style="width: 48px; height: 48px; border-radius: 50%; background: ${u.clr}; display: flex; align-items:center; justify-content:center; color: #fff; font-size:1.2rem; font-family:'DM Serif Display',serif;">
-            ${u.displayName[0]}
-          </div>
-          <div style="flex: 1;">
-            <div style="font-weight:bold; font-size:1.1rem; font-family:'DM Serif Display',serif;">${u.displayName}</div>
-            <div style="font-size:0.85rem; color:var(--text-muted);">@${u.username}</div>
-          </div>
-          <div style="color:var(--text-muted);">
-            ${window.Icons ? window.Icons.get('chevron-right', {width:20, height:20}) : '&rarr;'}
-          </div>
-        </a>
-      `).join('');
-    }
-
-    return `
+    return \`
       <div class="page-entity page-enter">
         <div style="display:flex; align-items:center; gap:1rem; margin-bottom: 2rem;">
-          <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
-          <h2 class="section-title" style="margin:0; text-transform:capitalize;">${type}</h2>
+          <button class="icon-btn" onclick="history.back()">\${window.Icons ? window.Icons.get('close') : 'X'}</button>
+          <h2 class="section-title" style="margin:0; text-transform:capitalize;">\${type}</h2>
         </div>
-        
-        <div class="glass" style="padding: 1.5rem;">
-          ${listHTML}
+        <div class="glass" style="padding: 1.5rem;" id="connections-container">
+          <div style="text-align:center; padding: 2rem; color:var(--text-muted);">Loading connections...</div>
         </div>
       </div>
-    `;
+    \`;
   },
 
   renderCharts: function (langFilter = 'All') {

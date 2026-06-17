@@ -68,6 +68,20 @@ window.RasigaRouter = {
         RasigaApp.fetchSongReviews(params);
       }
 
+      // Fetch dynamic public profile
+      if (routeFn === 'renderPublicProfile' && params) {
+        RasigaApp.fetchPublicProfile(params);
+      }
+
+      // Fetch dynamic connections
+      if (routeFn === 'renderConnections' && params) {
+        RasigaApp.fetchConnections(params);
+      }
+
+      // Fetch dynamic personal profile stats
+      if (routeFn === 'renderProfile') {
+        RasigaApp.fetchMyProfileStats();
+      }
       // Explicitly render Google Sign-In button if it exists (since this is an SPA)
       if (document.getElementById('g_id_onload') && window.google && window.google.accounts && window.google.accounts.id) {
         window.google.accounts.id.initialize({
