@@ -701,61 +701,61 @@ window.RasigaApp = {
         const songFilm = r.songs?.film || 'Indie';
         const songYear = r.songs?.year || '';
 
-        reviewsHTML += \`
-          <div class="glass" style="padding: 1.2rem; margin-bottom: 1rem; border-left: 2px solid \${reviewerClr};">
-            <a href="#/song/\${r.song_id}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem; background:rgba(0,0,0,0.1); padding:0.5rem; border-radius:var(--radius-sm); margin-bottom:0.8rem; border:1px solid var(--glass-border);">
-              \${window.Icons ? window.Icons.get('music', {width:16, height:16}) : ''}
+        reviewsHTML += `
+          <div class="glass" style="padding: 1.2rem; margin-bottom: 1rem; border-left: 2px solid ${reviewerClr};">
+            <a href="#/song/${r.song_id}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem; background:rgba(0,0,0,0.1); padding:0.5rem; border-radius:var(--radius-sm); margin-bottom:0.8rem; border:1px solid var(--glass-border);">
+              ${window.Icons ? window.Icons.get('music', {width:16, height:16}) : ''}
               <div>
-                <div style="font-size:0.9rem; font-weight:bold;">\${songName}</div>
-                <div style="font-size:0.75rem; color:var(--text-muted);">\${songFilm} &bull; \${songYear}</div>
+                <div style="font-size:0.9rem; font-weight:bold;">${songName}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">${songFilm} &bull; ${songYear}</div>
               </div>
             </a>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-              <div style="font-size:0.8rem; color:var(--text-muted);">\${time}</div>
-              <div style="color:var(--accent-gold); font-size:0.9rem; font-weight:600;">\${window.Icons ? window.Icons.get('star', {width:14, height:14, fill:'currentColor'}) : ''} \${score}</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">${time}</div>
+              <div style="color:var(--accent-gold); font-size:0.9rem; font-weight:600;">${window.Icons ? window.Icons.get('star', {width:14, height:14, fill:'currentColor'}) : ''} ${score}</div>
             </div>
-            <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">\${r.body}</p>
+            <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">${r.body}</p>
           </div>
-        \`;
+        `;
       });
 
       if (!reviewsHTML) reviewsHTML = '<p style="color:var(--text-muted)">No reviews yet.</p>';
 
       const myUsername = (RasigaData.demoUser || {}).username;
       
-      container.innerHTML = \`
+      container.innerHTML = `
         <div style="display:flex; align-items:center; gap:1rem; margin-bottom: 2rem;">
-          <button class="icon-btn" onclick="history.back()">\${window.Icons ? window.Icons.get('close') : 'X'}</button>
+          <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
           <h2 class="section-title" style="margin:0;">Profile</h2>
         </div>
 
         <div class="glass" style="padding: 2rem; margin-bottom: 1rem; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;">
-          <div style="width: 80px; height: 80px; border-radius: 50%; background: \${reviewerClr}; display: flex; align-items:center; justify-content:center; color: #fff; font-size:2rem; box-shadow: var(--glass-shadow); font-family:'DM Serif Display',serif; margin-bottom: 0.8rem;">
-            \${(user.display_name || user.username)[0].toUpperCase()}
+          <div style="width: 80px; height: 80px; border-radius: 50%; background: ${reviewerClr}; display: flex; align-items:center; justify-content:center; color: #fff; font-size:2rem; box-shadow: var(--glass-shadow); font-family:'DM Serif Display',serif; margin-bottom: 0.8rem;">
+            ${(user.display_name || user.username)[0].toUpperCase()}
           </div>
           <div>
-            <h2 style="font-family:'DM Serif Display',serif; font-size: 1.8rem; margin-bottom:0.2rem;">\${user.display_name || user.username}</h2>
+            <h2 style="font-family:'DM Serif Display',serif; font-size: 1.8rem; margin-bottom:0.2rem;">${user.display_name || user.username}</h2>
             <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.8rem; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
-              @\${username} &bull; <span style="color:var(--text-main); font-weight:600;">\${followersCount} Followers</span>
+              @${username} &bull; <span style="color:var(--text-main); font-weight:600;">${followersCount} Followers</span>
             </div>
             
             <div style="display:flex; flex-direction:column; align-items:center; margin-bottom: 1.2rem;">
                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.5px; font-weight:600; margin-bottom:0.2rem;">Level</div>
-               <div style="background: var(--gradient-brand); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family:'DM Serif Display',serif; font-size:1.3rem; font-weight:bold;">\${level.name}</div>
+               <div style="background: var(--gradient-brand); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family:'DM Serif Display',serif; font-size:1.3rem; font-weight:bold;">${level.name}</div>
             </div>
             
-            \${myUsername !== username ? \`
-            <button class="btn \${isFollowing ? '' : 'btn-primary'}" onclick="RasigaApp.toggleFollow('\${username}')" style="padding: 0.5rem 1.8rem; display:inline-flex; align-items:center; justify-content:center; gap:0.4rem; \${isFollowing ? 'background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: none;' : ''}">
-              \${isFollowing ? (window.Icons ? window.Icons.get('check', {width:16, height:16}) : '') + ' Following' : (window.Icons ? window.Icons.get('user', {width:16, height:16}) : '') + ' Follow'}
-            </button>\` : ''}
+            ${myUsername !== username ? `
+            <button class="btn ${isFollowing ? '' : 'btn-primary'}" onclick="RasigaApp.toggleFollow('${username}')" style="padding: 0.5rem 1.8rem; display:inline-flex; align-items:center; justify-content:center; gap:0.4rem; ${isFollowing ? 'background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: none;' : ''}">
+              ${isFollowing ? (window.Icons ? window.Icons.get('check', {width:16, height:16}) : '') + ' Following' : (window.Icons ? window.Icons.get('user', {width:16, height:16}) : '') + ' Follow'}
+            </button>` : ''}
           </div>
         </div>
         
-        <h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom:0.5rem;">Reviews (\${reviews ? reviews.length : 0})</h3>
+        <h3 style="margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom:0.5rem;">Reviews (${reviews ? reviews.length : 0})</h3>
         <div>
-          \${reviewsHTML}
+          ${reviewsHTML}
         </div>
-      \`;
+      `;
     } catch(err) {
       console.error(err);
       container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">Failed to load profile.</p>';
@@ -786,27 +786,27 @@ window.RasigaApp = {
       if (error) throw error;
 
       if (!data || data.length === 0) {
-        container.innerHTML = \`<div style="text-align:center; padding: 2rem; color:var(--text-muted);">You don't have any \${type} yet.</div>\`;
+        container.innerHTML = `<div style="text-align:center; padding: 2rem; color:var(--text-muted);">You don't have any ${type} yet.</div>`;
         return;
       }
 
       let listHTML = data.map(d => {
         const u = d.users;
         const clr = '#14b8a6';
-        return \`
-          <a href="#/user/\${u.username}" style="display:flex; align-items:center; gap: 1rem; padding: 1rem; text-decoration:none; color:inherit; border-bottom: 1px solid var(--glass-border); background:rgba(0,0,0,0.05); border-radius: var(--radius-sm); margin-bottom: 0.5rem; transition: transform 0.2s;">
-            <div style="width: 48px; height: 48px; border-radius: 50%; background: \${clr}; display: flex; align-items:center; justify-content:center; color: #fff; font-size:1.2rem; font-family:'DM Serif Display',serif;">
-              \${(u.display_name || u.username)[0].toUpperCase()}
+        return `
+          <a href="#/user/${u.username}" style="display:flex; align-items:center; gap: 1rem; padding: 1rem; text-decoration:none; color:inherit; border-bottom: 1px solid var(--glass-border); background:rgba(0,0,0,0.05); border-radius: var(--radius-sm); margin-bottom: 0.5rem; transition: transform 0.2s;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: ${clr}; display: flex; align-items:center; justify-content:center; color: #fff; font-size:1.2rem; font-family:'DM Serif Display',serif;">
+              ${(u.display_name || u.username)[0].toUpperCase()}
             </div>
             <div style="flex: 1;">
-              <div style="font-weight:bold; font-size:1.1rem; font-family:'DM Serif Display',serif;">\${u.display_name || u.username}</div>
-              <div style="font-size:0.85rem; color:var(--text-muted);">@\${u.username}</div>
+              <div style="font-weight:bold; font-size:1.1rem; font-family:'DM Serif Display',serif;">${u.display_name || u.username}</div>
+              <div style="font-size:0.85rem; color:var(--text-muted);">@${u.username}</div>
             </div>
             <div style="color:var(--text-muted);">
-              \${window.Icons ? window.Icons.get('chevron-right', {width:20, height:20}) : '&rarr;'}
+              ${window.Icons ? window.Icons.get('chevron-right', {width:20, height:20}) : '&rarr;'}
             </div>
           </a>
-        \`;
+        `;
       }).join('');
       
       container.innerHTML = listHTML;

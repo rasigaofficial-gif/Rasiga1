@@ -465,29 +465,29 @@ window.RasigaPages = {
   },
 
   renderPublicProfile: function(username) {
-    return \`
+    return `
       <div class="page-entity page-enter" id="public-profile-container">
         <div style="display:flex; align-items:center; gap:1rem; margin-bottom: 2rem;">
-          <button class="icon-btn" onclick="history.back()">\${window.Icons ? window.Icons.get('close') : 'X'}</button>
+          <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
           <h2 class="section-title" style="margin:0;">Profile</h2>
         </div>
         <div style="text-align:center; padding: 2rem; color:var(--text-muted);">Loading profile...</div>
       </div>
-    \`;
+    `;
   },
 
   renderConnections: function(type) {
-    return \`
+    return `
       <div class="page-entity page-enter">
         <div style="display:flex; align-items:center; gap:1rem; margin-bottom: 2rem;">
-          <button class="icon-btn" onclick="history.back()">\${window.Icons ? window.Icons.get('close') : 'X'}</button>
-          <h2 class="section-title" style="margin:0; text-transform:capitalize;">\${type}</h2>
+          <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
+          <h2 class="section-title" style="margin:0; text-transform:capitalize;">${type}</h2>
         </div>
         <div class="glass" style="padding: 1.5rem;" id="connections-container">
           <div style="text-align:center; padding: 2rem; color:var(--text-muted);">Loading connections...</div>
         </div>
       </div>
-    \`;
+    `;
   },
 
   renderCharts: function (langFilter = 'All') {
