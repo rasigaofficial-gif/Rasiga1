@@ -1443,21 +1443,21 @@ window.RasigaApp = {
                 if (i === 1) rankColor = '#C0C0C0'; // Silver
                 if (i === 2) rankColor = '#CD7F32'; // Bronze
                 
-                return \`
+                return `
                 <div style="display:flex; align-items:center; gap:1rem; cursor:pointer;" onclick="location.hash='#/user/${u.username}'">
-                  <div style="font-weight:bold; font-size:1.5rem; color:${rankColor}; width:30px; text-align:center;">\${i + 1}</div>
-                  <div style="width: 40px; height: 40px; border-radius: 50%; background: ${rankColor}; display:flex; align-items:center; justify-content:center; color:\${i<3?'#000':'#fff'}; font-weight:bold; font-size:1.2rem;">
-                    \${(u.display_name || u.username)[0].toUpperCase()}
+                  <div style="font-weight:bold; font-size:1.5rem; color:${rankColor}; width:30px; text-align:center;">${i + 1}</div>
+                  <div style="width: 40px; height: 40px; border-radius: 50%; background: ${rankColor}; display:flex; align-items:center; justify-content:center; color:${i<3?'#000':'#fff'}; font-weight:bold; font-size:1.2rem;">
+                    ${(u.display_name || u.username)[0].toUpperCase()}
                   </div>
                   <div style="flex:1;">
-                    <div style="font-weight:600; font-size:1.1rem; \${isTop3 ? \`color:\${rankColor}\` : ''}">\${u.display_name || u.username}</div>
-                    <div style="font-size:0.85rem; color:var(--text-muted);">@\${u.username}</div>
+                    <div style="font-weight:600; font-size:1.1rem; ${isTop3 ? `color:${rankColor}` : ''}">${u.display_name || u.username}</div>
+                    <div style="font-size:0.85rem; color:var(--text-muted);">@${u.username}</div>
                   </div>
                   <div style="font-weight:bold; color:var(--accent-teal); font-size:1.1rem;">
-                    \${u.xp || 0} XP
+                    ${u.xp || 0} XP
                   </div>
                 </div>
-              \`}).join('')}
+              `}).join('')}
             </div>
           </div>
         `;
