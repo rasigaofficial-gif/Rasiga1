@@ -35,7 +35,7 @@ window.RasigaComponents = {
           <div class="sc-title">${song.title}</div>
           <div class="sc-meta">${song.film || 'Indie'} &bull; ${song.year}</div>
           <div class="sc-rating" style="display:flex; gap:0.6rem; align-items:center;">
-            <span style="display:flex; align-items:center; gap:0.2rem;">${Icons.get('star', {width: 14, height: 14, fill: 'currentColor', color: 'var(--accent-gold)'})} ${userRating !== null && userRating !== undefined ? userRating + ' (You)' : song.avg_rating}</span>
+            <span style="display:flex; align-items:center; gap:0.2rem;">${Icons.get('star', {width: 14, height: 14, fill: 'currentColor', color: 'var(--accent-gold)'})} ${userRating !== null && userRating !== undefined ? userRating + ' (You)' : (song.total_ratings === 0 ? 'New' : song.avg_rating)}</span>
             ${reactionsObj && reactionsObj.likes > 0 ? `<span style="color:var(--accent-rose); display:flex; align-items:center; gap:0.2rem;" title="You liked ${reactionsObj.likes} review(s)">${Icons.get('heart', {width:14, height:14, fill:'currentColor'})} ${reactionsObj.likes}</span>` : ''}
             ${reactionsObj && reactionsObj.poops > 0 ? `<span style="color:#8b4513; display:flex; align-items:center; gap:0.2rem;" title="You disliked ${reactionsObj.poops} review(s)">${Icons.get('poop', {width:14, height:14, fill:'currentColor'})} ${reactionsObj.poops}</span>` : ''}
           </div>

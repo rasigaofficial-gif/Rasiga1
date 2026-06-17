@@ -63,6 +63,11 @@ window.RasigaRouter = {
         applyHeroCopy(getRandomCopy());
       }
 
+      // Fetch dynamic reviews for song page
+      if (routeFn === 'renderSongPage' && params) {
+        RasigaApp.fetchSongReviews(params);
+      }
+
       // Explicitly render Google Sign-In button if it exists (since this is an SPA)
       if (document.getElementById('g_id_onload') && window.google && window.google.accounts && window.google.accounts.id) {
         window.google.accounts.id.initialize({

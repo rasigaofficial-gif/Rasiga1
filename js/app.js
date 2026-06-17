@@ -134,9 +134,10 @@ window.RasigaApp = {
         // User exists in our users table — fully onboarded
         window.RasigaData.demoUser = {
           id: data.id,
+          email: authUser.email,
           displayName: data.display_name || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'User',
           username: data.username,
-          avatar: (data.display_name || 'U')[0].toUpperCase(),
+          avatar: data.display_name ? data.display_name[0].toUpperCase() : '?',
           onboarded: true,
           xp: data.xp || 0,
           joinedAt: data.joined_at,
@@ -163,6 +164,138 @@ window.RasigaApp = {
         window.RasigaRouter.handleRoute();
       }
     });
+  },
+
+  fetchSongReviews: async function (songId) {
+    const reviewsContainer = document.getElementById('song-reviews-container');
+    if (!reviewsContainer) return;
+
+    if (!this.supabase) {
+      reviewsContainer.innerHTML = '<p style="color:var(--text-muted)">Unable to load reviews.</p>';
+      return;
+    }
+
+    try {
+      // Fetch all reviews for this song
+      const { data: reviews, error } = await this.supabase
+        .from('reviews')
+        .select('*, users(display_name), ratings(score), review_likes(reaction_type, user_id)')
+        .eq('song_id', songId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      let reviewsHTML = '';
+      const user = RasigaData.demoUser;
+
+      if (!RasigaData.userRatings) RasigaData.userRatings = {};
+      if (!RasigaData.userComments) RasigaData.userComments = {};
+      if (!RasigaData.userReactions) RasigaData.userReactions = {};
+
+      if (user && user.onboarded) {
+        // Check if current user has a rating/review
+        const myReview = reviews.find(r => r.user_id === user.id);
+        if (myReview) {
+          RasigaData.userRatings[songId] = myReview.ratings?.score;
+          RasigaData.userComments[songId] = myReview.body;
+        } else {
+          // If no review, check if they just have a rating
+          const { data: myRating } = await this.supabase.from('ratings').select('score').eq('user_id', user.id).eq('song_id', songId).single();
+          if (myRating) {
+            RasigaData.userRatings[songId] = myRating.score;
+          }
+        }
+      }
+
+      const otherReviews = reviews.filter(r => !user || r.user_id !== user.id);
+
+      if (reviews.length === 0) {
+        reviewsContainer.innerHTML = '<p style="color:var(--text-muted)">No reviews yet.</p>';
+        return;
+      }
+
+      // Generate HTML for other reviews
+      otherReviews.forEach(r => {
+        const clr = '#14b8a6'; // placeholder
+        const time = new Date(r.created_at).toLocaleDateString();
+        const score = r.ratings?.score || '?';
+        const name = r.users?.display_name || 'Anonymous';
+        
+        // Count likes/poops
+        const likes = (r.review_likes || []).filter(l => l.reaction_type === 'like').length;
+        const poops = (r.review_likes || []).filter(l => l.reaction_type === 'poop').length;
+        
+        let reaction = null;
+        if (user && r.review_likes) {
+          const myReaction = r.review_likes.find(l => l.user_id === user.id);
+          if (myReaction) reaction = myReaction.reaction_type;
+          if (reaction) RasigaData.userReactions[r.id] = reaction;
+        }
+
+        reviewsHTML += \`
+          <div class="glass" style="padding: 1.2rem; margin-bottom: 1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom: 0.8rem;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: \${clr}; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">\${name[0]}</div>
+                <div>
+                  <a href="#/user/\${name.toLowerCase().replace(/[^a-z0-9]/g, '')}" style="font-weight:600; font-size:0.95rem; text-decoration:none; color:inherit;">\${name}</a>
+                  <div style="font-size:0.8rem; color:var(--text-muted);">\${time}</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.2rem; color:var(--accent-gold); font-size:0.9rem; font-weight:600;">
+                \${window.Icons ? window.Icons.get('star', { width: 14, height: 14, fill: 'currentColor' }) : ''} \${score}
+              </div>
+            </div>
+            <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">\${r.body}</p>
+            <div style="display:flex; align-items:center; gap: 1rem; margin-top: 1rem;">
+              <button class="btn-react btn-like \${reaction === 'like' ? 'anim-heart-fill' : ''}" onclick="RasigaApp.toggleLike(this, \${likes - (reaction==='like'?1:0)}, '\${r.id}')">
+                \${window.Icons ? window.Icons.get('heart', { width: 16, height: 16 }) : ''}
+                <span class="like-count" data-base="\${likes - (reaction==='like'?1:0)}" style="font-size:0.8rem;">\${likes}</span>
+              </button>
+              <button class="btn-react btn-poop \${reaction === 'poop' ? 'anim-poop-fill' : ''}" onclick="RasigaApp.togglePoop(this, \${poops - (reaction==='poop'?1:0)}, '\${r.id}')">
+                \${window.Icons ? window.Icons.get('poop', { width: 16, height: 16 }) : ''}
+                <span class="poop-count" data-base="\${poops - (reaction==='poop'?1:0)}" style="font-size:0.8rem;">\${poops}</span>
+              </button>
+              <button class="btn-react" onclick="RasigaApp.shareComment('\${songId}')">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                <span style="font-size:0.8rem;">Share</span>
+              </button>
+            </div>
+          </div>
+        \`;
+      });
+      reviewsContainer.innerHTML = reviewsHTML;
+
+      // Update the user's rating section if needed
+      if (user && user.onboarded && RasigaData.userRatings[songId]) {
+        RasigaApp.setRatingInput(songId, RasigaData.userRatings[songId]);
+        if (RasigaData.userComments[songId]) {
+          const urSection = document.getElementById('user-review-section');
+          if (urSection) {
+            urSection.innerHTML = \`
+              <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                <div style="display:flex; align-items:center;">
+                  <div style="position:relative; display:inline-block; width:140px; height:28px;">
+                    <div style="display:flex; position:absolute; top:0; left:0; pointer-events:none;">
+                      \${Array(5).fill(0).map(() => \`<span style="color:var(--text-muted); opacity:0.5; flex-shrink:0; display:flex;">\${window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'none', color: 'currentColor' }) : ''}</span>\`).join('')}
+                    </div>
+                    <div id="stars-fg-\${songId}" style="display:flex; position:absolute; top:0; left:0; width:\${(RasigaData.userRatings[songId] / 5) * 100}%; overflow:hidden; pointer-events:none; white-space:nowrap;">
+                      \${Array(5).fill(0).map(() => \`<span style="color:var(--accent-gold); flex-shrink:0; display:flex;">\${window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'var(--accent-gold)', color: 'var(--accent-gold)' }) : ''}</span>\`).join('')}
+                    </div>
+                  </div>
+                </div>
+                <span style="font-size: 0.9rem; color: var(--text-muted);" id="user-rating-text-\${songId}">\${RasigaData.userRatings[songId]} Stars</span>
+              </div>
+              <p style="font-size:1rem; margin-bottom:1rem;">\${RasigaData.userComments[songId]}</p>
+              <button onclick="RasigaApp.editComment('\${songId}')" class="btn" style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Edit</button>
+            \`;
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      reviewsContainer.innerHTML = '<p style="color:var(--text-muted)">Failed to load reviews.</p>';
+    }
   },
 
   setupTheme: function () {
@@ -705,7 +838,7 @@ window.RasigaApp = {
     if (txt) txt.textContent = rating > 0 ? rating + ' Stars' : 'Tap to rate';
   },
 
-  submitComment: function (id) {
+  submitComment: async function (id) {
     const textEl = document.getElementById('review-textarea-' + id);
     const text = textEl ? textEl.value.trim() : '';
 
@@ -714,10 +847,47 @@ window.RasigaApp = {
       return;
     }
 
-    if (!RasigaData.userComments) RasigaData.userComments = {};
-    RasigaData.userComments[id] = text;
+    const rating = RasigaData.userRatings && RasigaData.userRatings[id];
+    if (!rating) {
+      alert("Please select a star rating before submitting your review.");
+      return;
+    }
 
-    RasigaRouter.handleRoute();
+    const user = RasigaData.demoUser;
+    if (!user || !user.id || !this.supabase) {
+      alert("You must be logged in to review.");
+      return;
+    }
+
+    try {
+      // 1. Upsert rating
+      const { data: ratingData, error: ratingError } = await this.supabase
+        .from('ratings')
+        .upsert({ user_id: user.id, song_id: id, score: rating }, { onConflict: 'user_id, song_id' })
+        .select('id')
+        .single();
+
+      if (ratingError) throw ratingError;
+
+      // 2. Insert review
+      const { error: reviewError } = await this.supabase
+        .from('reviews')
+        .insert({ user_id: user.id, song_id: id, rating_id: ratingData.id, body: text });
+
+      if (reviewError) throw reviewError;
+
+      // 3. Update local state for immediate UI reflection
+      if (!RasigaData.userComments) RasigaData.userComments = {};
+      RasigaData.userComments[id] = text;
+
+      // Re-fetch initial data to get updated community pulse and song stats
+      await this.fetchInitialData();
+
+      RasigaRouter.handleRoute();
+    } catch (err) {
+      console.error(err);
+      alert("Error submitting review: " + err.message);
+    }
   },
 
   editComment: function (id) {
@@ -750,7 +920,7 @@ window.RasigaApp = {
     }, 200);
   },
 
-  toggleLike: function (btn, baseCount, reviewId) {
+  toggleLike: async function (btn, baseCount, reviewId) {
     if (!window.RasigaData || !window.RasigaData.demoUser || !window.RasigaData.demoUser.onboarded) {
       if (confirm('Please log in to react. Go to Login page?')) {
         location.hash = '#/profile';
@@ -758,32 +928,45 @@ window.RasigaApp = {
       return;
     }
 
+    const user = RasigaData.demoUser;
     const isLiked = btn.classList.toggle('anim-heart-fill');
     btn.classList.remove('anim-heart-pop');
 
     void btn.offsetWidth; // trigger reflow
     if (!RasigaData.userReactions) RasigaData.userReactions = {};
 
-    if (isLiked) {
-      btn.classList.add('anim-heart-pop');
-      btn.querySelector('.like-count').textContent = baseCount + 1;
-      if (reviewId) RasigaData.userReactions[reviewId] = 'like';
+    try {
+      if (isLiked) {
+        btn.classList.add('anim-heart-pop');
+        btn.querySelector('.like-count').textContent = baseCount + 1;
+        if (reviewId) RasigaData.userReactions[reviewId] = 'like';
 
-      const poopBtn = btn.parentElement.querySelector('.btn-poop');
-      if (poopBtn && poopBtn.classList.contains('anim-poop-fill')) {
-        const poopBase = parseInt(poopBtn.querySelector('.poop-count').getAttribute('data-base'));
-        poopBtn.classList.remove('anim-poop-fill', 'anim-poop-pop');
-        poopBtn.style.color = '';
-        poopBtn.querySelector('.poop-count').textContent = poopBase;
+        const poopBtn = btn.parentElement.querySelector('.btn-poop');
+        if (poopBtn && poopBtn.classList.contains('anim-poop-fill')) {
+          const poopBase = parseInt(poopBtn.querySelector('.poop-count').getAttribute('data-base'));
+          poopBtn.classList.remove('anim-poop-fill', 'anim-poop-pop');
+          poopBtn.style.color = '';
+          poopBtn.querySelector('.poop-count').textContent = poopBase;
+        }
+
+        if (this.supabase && reviewId && !reviewId.includes('_')) { // avoid dummy ids like uuid_Name
+          await this.supabase.from('review_likes').upsert({ user_id: user.id, review_id: reviewId, reaction_type: 'like' }, { onConflict: 'user_id, review_id' });
+        }
+      } else {
+        btn.querySelector('.like-count').textContent = baseCount;
+        if (reviewId && RasigaData.userReactions[reviewId] === 'like') delete RasigaData.userReactions[reviewId];
+        
+        if (this.supabase && reviewId && !reviewId.includes('_')) {
+          await this.supabase.from('review_likes').delete().match({ user_id: user.id, review_id: reviewId });
+        }
       }
-    } else {
-      btn.querySelector('.like-count').textContent = baseCount;
-      if (reviewId && RasigaData.userReactions[reviewId] === 'like') delete RasigaData.userReactions[reviewId];
+    } catch (err) {
+      console.error('Reaction error:', err);
     }
     btn.blur();
   },
 
-  togglePoop: function (btn, baseCount, reviewId) {
+  togglePoop: async function (btn, baseCount, reviewId) {
     if (!window.RasigaData || !window.RasigaData.demoUser || !window.RasigaData.demoUser.onboarded) {
       if (confirm('Please log in to react. Go to Login page?')) {
         location.hash = '#/profile';
@@ -791,28 +974,41 @@ window.RasigaApp = {
       return;
     }
 
+    const user = RasigaData.demoUser;
     const isPooped = btn.classList.toggle('anim-poop-fill');
     btn.classList.remove('anim-poop-pop');
 
     void btn.offsetWidth;
     if (!RasigaData.userReactions) RasigaData.userReactions = {};
 
-    if (isPooped) {
-      btn.classList.add('anim-poop-pop');
-      btn.querySelector('.poop-count').textContent = baseCount + 1;
-      if (reviewId) RasigaData.userReactions[reviewId] = 'poop';
+    try {
+      if (isPooped) {
+        btn.classList.add('anim-poop-pop');
+        btn.querySelector('.poop-count').textContent = baseCount + 1;
+        if (reviewId) RasigaData.userReactions[reviewId] = 'poop';
 
-      const likeBtn = btn.parentElement.querySelector('.btn-like');
-      if (likeBtn && likeBtn.classList.contains('anim-heart-fill')) {
-        const likeBase = parseInt(likeBtn.querySelector('.like-count').getAttribute('data-base'));
-        likeBtn.classList.remove('anim-heart-fill', 'anim-heart-pop');
-        likeBtn.style.color = '';
-        likeBtn.querySelector('.like-count').textContent = likeBase;
+        const likeBtn = btn.parentElement.querySelector('.btn-like');
+        if (likeBtn && likeBtn.classList.contains('anim-heart-fill')) {
+          const likeBase = parseInt(likeBtn.querySelector('.like-count').getAttribute('data-base'));
+          likeBtn.classList.remove('anim-heart-fill', 'anim-heart-pop');
+          likeBtn.style.color = '';
+          likeBtn.querySelector('.like-count').textContent = likeBase;
+        }
+
+        if (this.supabase && reviewId && !reviewId.includes('_')) {
+          await this.supabase.from('review_likes').upsert({ user_id: user.id, review_id: reviewId, reaction_type: 'poop' }, { onConflict: 'user_id, review_id' });
+        }
+      } else {
+        btn.style.color = '';
+        btn.querySelector('.poop-count').textContent = baseCount;
+        if (reviewId && RasigaData.userReactions[reviewId] === 'poop') delete RasigaData.userReactions[reviewId];
+
+        if (this.supabase && reviewId && !reviewId.includes('_')) {
+          await this.supabase.from('review_likes').delete().match({ user_id: user.id, review_id: reviewId });
+        }
       }
-    } else {
-      btn.style.color = '';
-      btn.querySelector('.poop-count').textContent = baseCount;
-      if (reviewId && RasigaData.userReactions[reviewId] === 'poop') delete RasigaData.userReactions[reviewId];
+    } catch (err) {
+      console.error('Reaction error:', err);
     }
     btn.blur();
   },

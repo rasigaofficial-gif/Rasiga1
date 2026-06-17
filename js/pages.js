@@ -163,45 +163,7 @@ window.RasigaPages = {
       </div>
     `;
 
-    reviews.forEach((r, idx) => {
-      const baseLikes = r.name.length * 3;
-      const basePoops = r.name.length % 3;
-      const reviewId = id + '_' + r.name.replace(/\s+/g, '');
-      const reaction = (RasigaData.userReactions || {})[reviewId];
-
-      reviewsHTML += `
-        <div class="glass" style="padding: 1.2rem; margin-bottom: 1rem;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-            <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom: 0.8rem;">
-              <div style="width: 32px; height: 32px; border-radius: 50%; background: ${r.clr}; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">${r.name[0]}</div>
-              <div>
-                <a href="#/user/${r.name.toLowerCase().replace(/[^a-z0-9]/g, '')}" style="font-weight:600; font-size:0.95rem; text-decoration:none; color:inherit;">${r.name}</a>
-                <div style="font-size:0.8rem; color:var(--text-muted);">${r.time}</div>
-              </div>
-            </div>
-            <div style="display:flex; align-items:center; gap:0.2rem; color:var(--accent-gold); font-size:0.9rem; font-weight:600;">
-              ${Icons.get('star', { width: 14, height: 14, fill: 'currentColor' })} ${r.rating}
-            </div>
-          </div>
-          <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">${r.text}</p>
-          ${r.quote ? `<blockquote style="border-left: 3px solid var(--accent-saffron); padding-left: 1rem; margin-top:0.8rem; font-style:italic; color:var(--text-muted);">${r.quote}</blockquote>` : ''}
-          <div style="display:flex; align-items:center; gap: 1rem; margin-top: 1rem;">
-            <button class="btn-react btn-like ${reaction === 'like' ? 'anim-heart-fill' : ''}" onclick="RasigaApp.toggleLike(this, ${baseLikes}, '${reviewId}')">
-              ${window.Icons ? window.Icons.get('heart', { width: 16, height: 16 }) : ''}
-              <span class="like-count" data-base="${baseLikes}" style="font-size:0.8rem;">${baseLikes + (reaction === 'like' ? 1 : 0)}</span>
-            </button>
-            <button class="btn-react btn-poop ${reaction === 'poop' ? 'anim-poop-fill' : ''}" onclick="RasigaApp.togglePoop(this, ${basePoops}, '${reviewId}')">
-              ${window.Icons ? window.Icons.get('poop', { width: 16, height: 16 }) : ''}
-              <span class="poop-count" data-base="${basePoops}" style="font-size:0.8rem;">${basePoops + (reaction === 'poop' ? 1 : 0)}</span>
-            </button>
-            <button class="btn-react" onclick="RasigaApp.shareComment('${id}')">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-              <span style="font-size:0.8rem;">Share</span>
-            </button>
-          </div>
-        </div>
-      `;
-    });
+    let reviewsHTML = '<div id="song-reviews-container"><div style="padding:2rem; text-align:center; color:var(--text-muted);">Loading reviews...</div></div>';
 
     let userReviewSectionHTML = '';
     if (!RasigaData.demoUser || !RasigaData.demoUser.onboarded) {
