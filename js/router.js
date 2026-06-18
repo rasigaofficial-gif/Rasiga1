@@ -153,12 +153,12 @@ window.RasigaRouter = {
       link.href = hash;
       link.id = 'd-dynamic-nav';
       link.className = 'nav-link';
-      link.innerHTML = `${Icons.get('guitar', {width: 16, height: 16, style: 'margin-right:4px; vertical-align:text-bottom;'})} ${title}`;
+      link.innerHTML = `${Icons.get('guitar', {width: 16, height: 16, style: 'margin-right:4px; vertical-align:text-bottom;'})}`;
       dNav.insertBefore(link, dNav.children[insertIdx]);
     } else if (document.getElementById('d-dynamic-nav')) {
       const link = document.getElementById('d-dynamic-nav');
       link.href = hash;
-      link.innerHTML = `${Icons.get('guitar', {width: 16, height: 16, style: 'margin-right:4px; vertical-align:text-bottom;'})} ${title}`;
+      link.innerHTML = `${Icons.get('guitar', {width: 16, height: 16, style: 'margin-right:4px; vertical-align:text-bottom;'})}`;
     }
   },
 

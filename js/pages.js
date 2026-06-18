@@ -82,14 +82,14 @@ window.RasigaPages = {
         <h2 class="section-title">Explore</h2>
         
         <div id="discover-results-container">
-          <div class="page-enter" style="animation-delay: 0.2s;">
-            <h3 class="section-title" style="color: var(--accent-saffron); font-size:1.8rem; font-family:'Cinzel Decorative', serif;">Browse by Language</h3>
+          <div>
+            <h3 class="section-title page-enter" style="color: var(--accent-saffron); font-size:1.8rem; font-family:'Cinzel Decorative', serif; animation-delay: 0.1s;">Browse by Language</h3>
             ${languageHTML}
 
-            <h3 class="section-title" style="color: var(--accent-teal); font-size:1.8rem; font-family:'Cinzel Decorative', serif;">Highest Rated</h3>
+            <h3 class="section-title page-enter" style="color: var(--accent-teal); font-size:1.8rem; font-family:'Cinzel Decorative', serif; animation-delay: 0.2s;">Highest Rated</h3>
             ${topRatedHTML}
             
-            <h3 class="section-title" style="color: var(--text-main); font-size:1.8rem; font-family:'Cinzel Decorative', serif;">Recently Added</h3>
+            <h3 class="section-title page-enter" style="color: var(--text-main); font-size:1.8rem; font-family:'Cinzel Decorative', serif; animation-delay: 0.3s;">Recently Added</h3>
             ${recentHTML}
           </div>
         </div>
@@ -114,7 +114,7 @@ window.RasigaPages = {
 
     if (userComment && RasigaData.demoUser && RasigaData.demoUser.onboarded) {
       reviewsHTML += `
-        <div class="glass" style="padding: 1.2rem; margin-bottom: 1rem; border: 1px solid var(--accent-saffron);">
+        <div class="glass page-enter" style="padding: 1.2rem; margin-bottom: 1rem; border: 1px solid var(--accent-saffron); animation-delay: 0.2s;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start;">
             <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom: 0.8rem;">
               <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--gradient-brand); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">${(RasigaData.demoUser.displayName || 'U')[0].toUpperCase()}</div>
@@ -176,7 +176,7 @@ window.RasigaPages = {
     let userReviewSectionHTML = '';
     if (!RasigaData.demoUser || !RasigaData.demoUser.onboarded) {
       userReviewSectionHTML = `
-        <div class="glass" style="padding: 1.5rem; margin-bottom: 2rem; text-align:center;" id="user-review-section">
+        <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; text-align:center; animation-delay: 0.1s;" id="user-review-section">
           <p style="color:var(--text-muted); margin-bottom:1rem;">Please log in to leave a rating and review.</p>
           <button class="btn btn-primary" onclick="location.hash='#/profile'" style="display:inline-flex; align-items:center; gap:0.5rem; justify-content:center; padding: 0.8rem 1.5rem;">
             ${window.Icons ? window.Icons.get('user', {width:18, height:18}) : ''} Log In to Rate
@@ -185,7 +185,7 @@ window.RasigaPages = {
       `;
     } else {
       userReviewSectionHTML = `
-        <div class="glass" style="padding: 1.5rem; margin-bottom: 2rem;" id="user-review-section">
+        <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; animation-delay: 0.1s;" id="user-review-section">
           <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
             <div style="display:flex; align-items:center;">
               ${ratingStarsHTML}
@@ -204,8 +204,8 @@ window.RasigaPages = {
     }
 
     return `
-      <div class="page-entity page-enter">
-        <div class="glass song-header">
+      <div class="page-entity">
+        <div class="glass song-header page-enter" style="animation-delay: 0s;">
           <div class="sh-art" style="background: ${grad};">
              ${ini}
           </div>
@@ -292,10 +292,10 @@ window.RasigaPages = {
           </div>
         </div>
 
-        <div class="profile-stats mt-4 page-enter" style="animation-delay: 0.1s">
-          <div class="glass stat-box" style="cursor:pointer;" onclick="location.hash='#/my-reviews'"><h3>${Object.keys(RasigaData.userRatings || {}).length || user.stats?.ratings || 0}</h3><span>Ratings</span></div>
-          <div class="glass stat-box" style="cursor:pointer;" onclick="location.hash='#/my-reviews'"><h3>${Object.keys(RasigaData.userComments || {}).length || user.stats?.reviews || 0}</h3><span>Reviews</span></div>
-          <div class="glass stat-box"><h3>${user.streak || 1}</h3><span>Day Streak &#128293;</span></div>
+        <div class="profile-stats mt-4">
+          <div class="glass stat-box page-enter" style="cursor:pointer; animation-delay: 0.1s;" onclick="location.hash='#/my-reviews'"><h3>${Object.keys(RasigaData.userRatings || {}).length || user.stats?.ratings || 0}</h3><span>Ratings</span></div>
+          <div class="glass stat-box page-enter" style="cursor:pointer; animation-delay: 0.15s;" onclick="location.hash='#/my-reviews'"><h3>${Object.keys(RasigaData.userComments || {}).length || user.stats?.reviews || 0}</h3><span>Reviews</span></div>
+          <div class="glass stat-box page-enter" style="animation-delay: 0.2s;"><h3>${user.streak || 1}</h3><span>Day Streak &#128293;</span></div>
         </div>
 
         <div class="mt-4 page-enter" style="animation-delay: 0.15s">
@@ -310,8 +310,8 @@ window.RasigaPages = {
           </button>
         </div>
 
-        <section class="section mt-4 page-enter" style="animation-delay: 0.2s">
-          <h2 class="section-title">My Public Lists</h2>
+        <section class="section mt-4">
+          <h2 class="section-title page-enter" style="animation-delay: 0.2s">My Public Lists</h2>
           <div style="display:flex; flex-direction:column; gap:1rem;">
             ${window.RasigaLists && window.RasigaLists.filter(l => l.is_public).length > 0 
               ? window.RasigaLists.filter(l => l.is_public).slice(0, 3).map((l, i) => RasigaComponents.ListCard(l, i)).join('')
@@ -319,8 +319,8 @@ window.RasigaPages = {
           </div>
         </section>
 
-        <section class="section mt-4 page-enter" style="animation-delay: 0.25s">
-          <h2 class="section-title">Badges & Achievements</h2>
+        <section class="section mt-4">
+          <h2 class="section-title page-enter" style="animation-delay: 0.25s">Badges & Achievements</h2>
           <div class="badges-grid">${badgesHTML}</div>
         </section>
       </div>
@@ -334,9 +334,9 @@ window.RasigaPages = {
     }
 
     return `
-      <div class="page-discover page-enter">
-        <h2 class="section-title">Admin Panel</h2>
-        <div class="glass" style="padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
+      <div class="page-discover">
+        <h2 class="section-title page-enter" style="animation-delay: 0s;">Admin Panel</h2>
+        <div class="glass page-enter" style="padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem; animation-delay: 0.1s;">
           <h3 style="margin-bottom: 1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Song Suggestions</h3>
           <div id="admin-suggestions-container" style="display:flex; flex-direction:column; gap:1rem;">
             <p style="color:var(--text-muted); text-align:center;">Loading suggestions...</p>
@@ -456,17 +456,17 @@ window.RasigaPages = {
     }
 
     return `
-      <div class="page-my-reviews page-enter">
-        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+      <div class="page-my-reviews">
+        <div class="page-enter" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
           <button class="icon-btn" onclick="history.back()">${Icons.get('close')}</button>
           <h2 class="section-title" style="margin-bottom:0;">My Ratings & Reviews</h2>
         </div>
-        <p style="color:var(--text-muted); margin-bottom:1.5rem;">Click any song to view and edit your review.</p>
-        <div class="song-grid mt-4">
+        <p class="page-enter" style="color:var(--text-muted); margin-bottom:1.5rem; animation-delay:0.1s;">Click any song to view and edit your review.</p>
+        <div class="song-grid mt-4 page-enter" style="animation-delay:0.2s;">
           ${gridHTML}
         </div>
 
-        <section class="section mt-4" style="margin-top: 3rem;">
+        <section class="section mt-4 page-enter" style="margin-top: 3rem; animation-delay:0.3s;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
             <h2 class="section-title" style="margin:0;">My Suggestions</h2>
           </div>
@@ -480,8 +480,8 @@ window.RasigaPages = {
 
   renderPublicProfile: function(username) {
     return `
-      <div class="page-entity page-enter" id="public-profile-container">
-        <div style="display:flex; align-items:center; gap:1rem; margin-bottom: 2rem;">
+      <div class="page-entity" id="public-profile-container">
+        <div class="page-enter" style="display:flex; align-items:center; gap:1rem; margin-bottom: 2rem;">
           <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
           <h2 class="section-title" style="margin:0;">Profile</h2>
         </div>
@@ -492,12 +492,12 @@ window.RasigaPages = {
 
   renderConnections: function(type) {
     return `
-      <div class="page-entity page-enter">
-        <div style="display:flex; align-items:center; gap:1rem; margin-bottom: 2rem;">
+      <div class="page-entity">
+        <div class="page-enter" style="display:flex; align-items:center; gap:1rem; margin-bottom: 2rem;">
           <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
           <h2 class="section-title" style="margin:0; text-transform:capitalize;">${type}</h2>
         </div>
-        <div class="glass" style="padding: 1.5rem;" id="connections-container">
+        <div class="glass page-enter" style="padding: 1.5rem; animation-delay:0.1s;" id="connections-container">
           <div style="text-align:center; padding: 2rem; color:var(--text-muted);">Loading connections...</div>
         </div>
       </div>
@@ -581,10 +581,10 @@ window.RasigaPages = {
       .slice(0, 5);
 
     let html = `
-      <div class="page-discover page-enter" style="padding-bottom:3rem;">
-        <h2 class="section-title" style="margin-bottom:0.5rem;">Charts</h2>
+      <div class="page-discover" style="padding-bottom:3rem;">
+        <h2 class="section-title page-enter" style="margin-bottom:0.5rem; animation-delay:0s;">Charts</h2>
         
-        <div class="filter-pills">
+        <div class="filter-pills page-enter" style="animation-delay:0.1s;">
           ${languages.map(lang => `
             <button class="filter-pill ${langFilter === lang ? 'active' : ''}" onclick="RasigaApp.setChartFilter('${lang}')">${lang}</button>
           `).join('')}
@@ -592,7 +592,7 @@ window.RasigaPages = {
         
         <div style="display:flex; flex-wrap:wrap; gap:2rem; margin-top:1.5rem;">
           
-          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg); transform: translateZ(0);">
+          <div class="glass page-enter" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg); animation-delay:0.2s;">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Highest Rated Songs</h3>
             <div style="display:flex; flex-direction:column; gap:1.25rem;">
               ${topRated.map((s, i) => {
@@ -621,7 +621,7 @@ window.RasigaPages = {
             </div>
           </div>
 
-          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg); transform: translateZ(0);">
+          <div class="glass page-enter" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg); animation-delay:0.3s;">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Most Popular Songs</h3>
             <div style="display:flex; flex-direction:column; gap:1.25rem;">
               ${mostPopular.map((s, i) => {
@@ -744,10 +744,10 @@ window.RasigaPages = {
     }, 50);
 
     return `
-      <div class="page-leaderboards page-enter">
-        <h2 class="section-title">Leaderboards & Community</h2>
+      <div class="page-leaderboards">
+        <h2 class="section-title page-enter">Leaderboards & Community</h2>
         
-        <div class="glass" style="padding: 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-lg); z-index: 100; position:relative;">
+        <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-lg); z-index: 100; position:relative; animation-delay: 0.1s;">
           <h3 style="margin-bottom: 1rem;">Find Rasigans</h3>
           <div style="display:flex; gap:0.5rem; position:relative;">
             <input type="text" id="user-search-input" placeholder="Search users by name or username..." autocomplete="off" style="flex:1; padding: 0.8rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1); color: inherit; outline:none; font-size: 1rem;" oninput="RasigaApp.searchUsers(this.value)" />
@@ -757,7 +757,7 @@ window.RasigaPages = {
         </div>
 
         <div id="leaderboards-container" style="display:flex; flex-wrap:wrap; gap:2rem;">
-           <div class="glass" style="flex:1; min-width:300px; padding:2rem; text-align:center;">
+           <div class="glass page-enter" style="flex:1; min-width:300px; padding:2rem; text-align:center; animation-delay: 0.2s;">
              Loading leaderboards...
            </div>
         </div>
@@ -874,12 +874,12 @@ window.RasigaPages = {
     
     if (songs.length === 0) {
       return `
-        <div class="page-analytics page-enter">
+        <div class="page-analytics">
           <div style="display:flex; align-items:center; gap: 1rem; margin-bottom:1rem;">
             <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
             <h2 class="section-title" style="margin:0;">My Analytics</h2>
           </div>
-          <div class="glass" style="padding: 3rem 1rem; text-align: center; color: var(--text-muted);">
+          <div class="glass page-enter" style="padding: 3rem 1rem; text-align: center; color: var(--text-muted);">
             You haven't rated any songs yet!<br/><br/>Rate some songs to see your personalized listening analytics here.
           </div>
         </div>
@@ -1339,7 +1339,7 @@ window.RasigaPages = {
     }, 300);
 
     return `
-      <div class="page-enter" style="padding-bottom:3rem;">
+      <div style="padding-bottom:3rem;">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
           <button class="icon-btn" onclick="history.back()">${Icons.get('close')}</button>
           <h2 class="section-title" style="margin-bottom:0;">Advanced Analytics</h2>
@@ -1347,23 +1347,23 @@ window.RasigaPages = {
 
         <!-- STAT CARDS ROW -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:1rem; margin-bottom:2rem;">
-          <div class="glass" style="padding:1.2rem; text-align:center;">
+          <div class="glass page-enter" style="padding:1.2rem; text-align:center;">
             <div style="font-size:2rem; font-weight:700; background:linear-gradient(135deg,#f97316,#ec4899); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"><span class="stat-counter" data-target="${totalSongs}">0</span></div>
             <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;">Songs Rated</div>
           </div>
-          <div class="glass" style="padding:1.2rem; text-align:center;">
+          <div class="glass page-enter" style="padding:1.2rem; text-align:center;">
             <div style="font-size:2rem; font-weight:700; background:linear-gradient(135deg,#8b5cf6,#0ea5e9); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"><span class="stat-counter" data-target="${avgRating}">0</span></div>
             <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;">Avg Rating</div>
           </div>
-          <div class="glass" style="padding:1.2rem; text-align:center;">
+          <div class="glass page-enter" style="padding:1.2rem; text-align:center;">
             <div style="font-size:2rem; font-weight:700; background:linear-gradient(135deg,#10b981,#0ea5e9); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"><span class="stat-counter" data-target="${uniqueComposers}">0</span></div>
             <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;">Composers</div>
           </div>
-          <div class="glass" style="padding:1.2rem; text-align:center;">
+          <div class="glass page-enter" style="padding:1.2rem; text-align:center;">
             <div style="font-size:2rem; font-weight:700; background:linear-gradient(135deg,#eab308,#f97316); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"><span class="stat-counter" data-target="${uniqueLangs}">0</span></div>
             <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;">Languages</div>
           </div>
-          <div class="glass" style="padding:1.2rem; text-align:center;">
+          <div class="glass page-enter" style="padding:1.2rem; text-align:center;">
             <div style="font-size:1.6rem; font-weight:700; background:linear-gradient(135deg,#e11d48,#f97316); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${oldestYear}\u2013${newestYear}</div>
             <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;">Era Span</div>
           </div>
@@ -1371,12 +1371,12 @@ window.RasigaPages = {
 
         <!-- ROW 1: Musical DNA + Genre -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:1.5rem; margin-bottom:1.5rem;">
-          <div class="glass" style="padding:1.5rem;">
+          <div class="glass page-enter" style="padding:1.5rem;">
             <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#f97316,#ec4899); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Musical DNA</h3>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Your emotional fingerprint vs. the community.</p>
             <div style="position:relative; height:300px;"><canvas id="moodChart"></canvas></div>
           </div>
-          <div class="glass" style="padding:1.5rem;">
+          <div class="glass page-enter" style="padding:1.5rem;">
             <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#10b981,#0ea5e9); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Genre Universe</h3>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">The sonic territory you explore.</p>
             <div style="position:relative; height:300px;"><canvas id="genreChart"></canvas></div>
@@ -1385,12 +1385,12 @@ window.RasigaPages = {
 
         <!-- ROW 2: Timeline + Regional -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:1.5rem; margin-bottom:1.5rem;">
-          <div class="glass" style="padding:1.5rem;">
+          <div class="glass page-enter" style="padding:1.5rem;">
             <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#f97316,#eab308); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Time Machine</h3>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Songs across the decades.</p>
             <div style="position:relative; height:250px;"><canvas id="decadeChart"></canvas></div>
           </div>
-          <div class="glass" style="padding:1.5rem;">
+          <div class="glass page-enter" style="padding:1.5rem;">
             <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#f43f5e,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Regional Palette</h3>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Languages you gravitate towards.</p>
             <div style="position:relative; height:250px;"><canvas id="langChart"></canvas></div>
@@ -1399,12 +1399,12 @@ window.RasigaPages = {
 
         <!-- ROW 3: Maestros + Voices -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:1.5rem; margin-bottom:1.5rem;">
-          <div class="glass" style="padding:1.5rem;">
+          <div class="glass page-enter" style="padding:1.5rem;">
             <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#ff6b6b,#feca57); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Top Maestros</h3>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">The music directors who shape your taste.</p>
             <div style="position:relative; height:250px;"><canvas id="compChart"></canvas></div>
           </div>
-          <div class="glass" style="padding:1.5rem;">
+          <div class="glass page-enter" style="padding:1.5rem;">
             <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#818cf8,#e879f9); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Favorite Voices</h3>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">The singers who define your sonic identity.</p>
             <div style="position:relative; height:280px;"><canvas id="singerChart"></canvas></div>
@@ -1413,12 +1413,12 @@ window.RasigaPages = {
 
         <!-- ROW 4: Quality Index + Industry -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:1.5rem; margin-bottom:1.5rem;">
-          <div class="glass" style="padding:1.5rem;">
+          <div class="glass page-enter" style="padding:1.5rem;">
             <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#f43f5e,#fbbf24); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Quality Index</h3>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Average rating by language &mdash; who tops your chart?</p>
             <div style="position:relative; height:250px;"><canvas id="ratingLangChart"></canvas></div>
           </div>
-          <div class="glass" style="padding:1.5rem;">
+          <div class="glass page-enter" style="padding:1.5rem;">
             <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#e11d48,#10b981); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Industry Map</h3>
             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Your exploration across film industries.</p>
             <div style="position:relative; height:280px;"><canvas id="industryChart"></canvas></div>
@@ -1471,8 +1471,8 @@ window.RasigaPages = {
         }).join('');
 
     return `
-      <div class="page-list-details page-enter">
-        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:2rem;">
+      <div class="page-list-details">
+        <div class="page-enter" style="display:flex; align-items:center; gap:1rem; margin-bottom:2rem; animation-delay: 0s;">
           <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
           <div style="flex:1;">
             <h2 class="section-title" style="margin:0;">${list.name}</h2>

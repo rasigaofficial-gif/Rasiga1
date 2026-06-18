@@ -72,7 +72,7 @@ window.RasigaComponents = {
   BadgeCard: function(badge, isUnlocked) {
     const cls = isUnlocked ? 'unlocked' : 'locked';
     return `
-      <div class="glass badge-card ${cls}">
+      <div class="glass badge-card page-enter ${cls}">
         <div class="bc-icon">${Icons.get(badge.icon)}</div>
         <div class="bc-info">
           <div class="bc-name">${badge.name}</div>
@@ -86,7 +86,7 @@ window.RasigaComponents = {
     const songObj = window.RasigaSeeds ? window.RasigaSeeds.find(s => s.title === review.song) : null;
     const link = songObj ? '#/song/' + songObj.id : '#/discover';
     return `
-      <div class="glass review-card" onclick="location.hash='${link}'">
+      <div class="glass review-card page-enter" onclick="location.hash='${link}'">
         <div class="rc-header">
           <div class="rc-avatar" style="background: ${review.clr}">${review.name[0]}</div>
           <div class="rc-user-info">

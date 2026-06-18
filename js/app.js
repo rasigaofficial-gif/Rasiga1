@@ -969,7 +969,7 @@ window.RasigaApp = {
         const songYear = r.songs?.year || '';
 
         reviewsHTML += `
-          <div class="glass" style="padding: 1.2rem; margin-bottom: 1rem; border-left: 2px solid ${reviewerClr};">
+          <div class="glass page-enter" style="padding: 1.2rem; margin-bottom: 1rem; border-left: 2px solid ${reviewerClr}; animation-delay:0.2s;">
             <a href="#/song/${r.song_id}" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:0.5rem; background:rgba(0,0,0,0.1); padding:0.5rem; border-radius:var(--radius-sm); margin-bottom:0.8rem; border:1px solid var(--glass-border);">
               ${window.Icons ? window.Icons.get('music', {width:16, height:16}) : ''}
               <div>
@@ -996,7 +996,7 @@ window.RasigaApp = {
           <h2 class="section-title" style="margin:0;">Profile</h2>
         </div>
 
-        <div class="glass" style="padding: 2rem; margin-bottom: 1rem; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative;">
+        <div class="glass page-enter" style="padding: 2rem; margin-bottom: 1rem; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; animation-delay:0.1s;">
           <div style="width: 80px; height: 80px; border-radius: 50%; background: ${reviewerClr}; display: flex; align-items:center; justify-content:center; color: #fff; font-size:2rem; box-shadow: var(--glass-shadow); font-family:'DM Serif Display',serif; margin-bottom: 0.8rem;">
             ${(user.display_name || user.username)[0].toUpperCase()}
           </div>
@@ -1661,7 +1661,7 @@ window.RasigaApp = {
         }
 
         html += `
-          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
+          <div class="glass page-enter" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Top Rasigans (XP)</h3>
             <div style="display:flex; flex-direction:column; gap:1.25rem;">
               ${topUsers.map((u, i) => {
