@@ -48,8 +48,11 @@
         <a href="#/admin" class="nav-link" id="nav-admin-link" style="display:none; color:var(--accent-teal);">Admin</a>
       </div>
       <div style="display:flex; gap:0.5rem; align-items:center;">
-        <a href="#/discover" class="icon-btn hide-on-mobile" id="search-btn" aria-label="Search" title="Search"
-          onclick="setTimeout(()=>document.getElementById('search-input')?.focus(), 50)"></a>
+        <div class="search-container hide-on-mobile">
+          <input type="text" id="global-search-input" placeholder="Search songs..." oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value)">
+          <div class="search-icon">${Icons.get('search', {width: 16, height: 16})}</div>
+          <div id="global-search-results" class="glass"></div>
+        </div>
         <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme" title="Toggle Theme"></button>
       </div>
     </div>
@@ -100,11 +103,11 @@
     document.addEventListener('DOMContentLoaded', () => {
       const mn = document.getElementById('mobile-nav-container');
       mn.innerHTML = `
-        <a href="#/" class="bnav-item active">${Icons.get('home')}<span>Home</span></a>
-        <a href="#/discover" class="bnav-item">${Icons.get('search')}<span>Discover</span></a>
-        <a href="#/charts" class="bnav-item">${Icons.get('barChart')}<span>Charts</span></a>
-        <a href="#/leaderboards" class="bnav-item">${Icons.get('star')}<span>Leaderboards</span></a>
-        <a href="#/profile" class="bnav-item">${Icons.get('user')}<span>Profile</span></a>
+        <a href="#/" class="bnav-item active">${Icons.get('home')}</a>
+        <a href="#/discover" class="bnav-item">${Icons.get('compass')}</a>
+        <a href="#/charts" class="bnav-item">${Icons.get('barChart')}</a>
+        <a href="#/leaderboards" class="bnav-item">${Icons.get('trophy')}</a>
+        <a href="#/profile" class="bnav-item">${Icons.get('user')}</a>
       `;
       // Call router link update right away
       if (window.RasigaRouter) window.RasigaRouter.updateNavLinks(location.hash || '#/');

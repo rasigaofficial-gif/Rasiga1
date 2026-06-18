@@ -1604,6 +1604,9 @@ window.RasigaApp = {
     const container = document.getElementById('leaderboards-container');
     if (!container || !this.supabase) return;
 
+    // Use skeleton loader while fetching
+    container.innerHTML = '<div class="skeleton skeleton-card" style="height: 400px; border-radius: var(--radius-lg);"></div>';
+
     try {
       // Fetch top users by XP
       const { data: topUsers, error } = await this.supabase
@@ -1867,6 +1870,37 @@ window.RasigaApp = {
     } else {
       navigator.clipboard.writeText(url).then(() => alert('Link copied to clipboard!'));
     }
+  },
+
+  executeGlobalSearch: function(query) {
+    const resultsContainer = document.getElementById('global-search-results');
+    if (!resultsContainer) return;
+    if (!query || query.length < 2) {
+      resultsContainer.classList.remove('active');
+      return;
+    }
+    const lowerQ = query.toLowerCase();
+    const songs = (window.RasigaSeeds || []).filter(s => s.title.toLowerCase().includes(lowerQ) || (s.film && s.film.toLowerCase().includes(lowerQ)));
+    
+    if (songs.length === 0) {
+      resultsContainer.innerHTML = '<div style="padding:1rem; color:var(--text-muted); text-align:center;">No results found</div>';
+    } else {
+      resultsContainer.innerHTML = songs.slice(0, 5).map(song => {
+        const grad = window.RasigaComponents ? window.RasigaComponents.getGradient(song.title) : 'var(--gradient-brand)';
+        const ini = window.RasigaComponents ? window.RasigaComponents.getInitials(song.title) : song.title[0];
+        return `
+        <div class="gs-result-item" onclick="location.hash='#/song/${song.id}'; document.getElementById('global-search-results').classList.remove('active'); document.getElementById('global-search-input').value='';">
+          <div style="width: 40px; height: 40px; border-radius: 8px; background: ${grad}; display:flex; align-items:center; justify-content:center; color:#fff; font-family:'DM Serif Display',serif; flex-shrink:0;">
+            ${ini}
+          </div>
+          <div>
+            <div style="font-weight:600; font-size:0.95rem;">${song.title}</div>
+            <div style="font-size:0.8rem; color:var(--text-muted);">${song.film || 'Indie'} &bull; ${song.year}</div>
+          </div>
+        </div>
+      `}).join('');
+    }
+    resultsContainer.classList.add('active');
   },
 
   // ── Custom Lists Management ──

@@ -73,7 +73,7 @@ window.RasigaPages = {
       // Languages
       const langs = ['Tamil', 'Telugu', 'Hindi', 'Malayalam', 'Kannada', 'Bengali', 'Punjabi'];
       languageHTML = `<div class="filter-pills" style="margin-bottom: 2rem;">
-        ${langs.map(l => `<button class="filter-pill" onclick="document.getElementById('search-input').value='${l}'; RasigaApp.selectFilter('all', 'All'); RasigaApp.executeSearch();">${l}</button>`).join('')}
+        ${langs.map(l => `<button class="filter-pill" onclick="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch('${l}')">${l}</button>`).join('')}
       </div>`;
     }
 
@@ -81,40 +81,15 @@ window.RasigaPages = {
       <div class="page-discover">
         <h2 class="section-title">Explore</h2>
         
-        <div class="glass page-enter" style="padding: 1rem; margin-bottom: 1.5rem; position: relative; z-index: 101; overflow: visible !important;">
-          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-            <div id="custom-filter-dropdown" tabindex="0" onblur="setTimeout(()=>document.getElementById('filter-options').style.display='none', 150)" style="position:relative; outline:none; min-width: 140px; z-index: 1000; font-family: 'Inter', sans-serif;">
-              <div id="filter-selected" onclick="const el=document.getElementById('filter-options'); el.style.display=el.style.display==='none'?'flex':'none';" style="background: color-mix(in srgb, var(--bg-color) 30%, transparent); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); color: var(--text-main); border-radius: var(--radius-sm); padding: 0.8rem 2.5rem 0.8rem 1rem; outline: none; cursor: pointer; background-image: url('data:image/svg+xml;utf8,<svg fill=%22%23999%22 height=%2224%22 viewBox=%220 0 24 24%22 width=%2224%22 xmlns=%22http://www.w3.org/2000/svg%22><path d=%22M7 10l5 5 5-5z%22/></svg>'); background-repeat: no-repeat; background-position: right 0.5rem center; height:100%; display:flex; align-items:center; font-size: 1rem;">
-                <span id="filter-selected-text">All</span>
-              </div>
-              <div id="filter-options" class="glass" style="display:none; position:absolute; top: 100%; left:0; width:100%; flex-direction:column; margin-top: 0.3rem; border-radius: var(--radius-sm); z-index:1001; padding: 0.3rem; background: color-mix(in srgb, var(--bg-color) 90%, transparent); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
-                <div onclick="RasigaApp.selectFilter('all', 'All')" style="padding: 0.8rem 1rem; cursor:pointer; border-radius:4px; transition:background 0.2s;" onmouseover="this.style.background='rgba(150,150,150,0.2)'" onmouseout="this.style.background='transparent'">All</div>
-                <div onclick="RasigaApp.selectFilter('singer', 'Singer')" style="padding: 0.8rem 1rem; cursor:pointer; border-radius:4px; transition:background 0.2s;" onmouseover="this.style.background='rgba(150,150,150,0.2)'" onmouseout="this.style.background='transparent'">Singer</div>
-                <div onclick="RasigaApp.selectFilter('composer', 'Music Director')" style="padding: 0.8rem 1rem; cursor:pointer; border-radius:4px; transition:background 0.2s;" onmouseover="this.style.background='rgba(150,150,150,0.2)'" onmouseout="this.style.background='transparent'">Music Director</div>
-                <div onclick="RasigaApp.selectFilter('film', 'Movie')" style="padding: 0.8rem 1rem; cursor:pointer; border-radius:4px; transition:background 0.2s;" onmouseover="this.style.background='rgba(150,150,150,0.2)'" onmouseout="this.style.background='transparent'">Movie</div>
-              </div>
-            </div>
-            <div style="flex:1; position:relative;">
-              <input type="text" id="search-input" placeholder="Search for songs, artists, movies..." autocomplete="off" style="width: 100%; padding: 0.8rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1); color: inherit; outline:none; font-size: 1rem;" oninput="RasigaApp.handleSearchInput(event)" onkeydown="if(event.key==='Enter') RasigaApp.executeSearch()" />
-              <div id="search-suggestions" class="glass" style="display:none; position:absolute; top: 100%; left:0; right:0; max-height: 250px; overflow-y:auto; z-index:999; flex-direction:column; margin-top: 0.5rem; background: color-mix(in srgb, var(--bg-color) 85%, transparent); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
-                <!-- Suggestions injected here -->
-              </div>
-            </div>
-            <button onclick="RasigaApp.executeSearch()" class="btn btn-primary" style="border-radius: var(--radius-sm); padding: 0.8rem 1.2rem;">
-              ${window.Icons ? window.Icons.get('search') : 'Search'}
-            </button>
-          </div>
-        </div>
-
         <div id="discover-results-container">
           <div class="page-enter" style="animation-delay: 0.2s;">
-            <h3 style="margin-bottom: 1rem; font-family: 'Cinzel Decorative', serif; color: var(--accent-saffron);">Browse by Language</h3>
+            <h3 class="section-title" style="color: var(--accent-saffron); font-size:1.8rem; font-family:'Cinzel Decorative', serif;">Browse by Language</h3>
             ${languageHTML}
 
-            <h3 style="margin-bottom: 1rem; font-family: 'Cinzel Decorative', serif; color: var(--accent-teal);">Highest Rated</h3>
+            <h3 class="section-title" style="color: var(--accent-teal); font-size:1.8rem; font-family:'Cinzel Decorative', serif;">Highest Rated</h3>
             ${topRatedHTML}
             
-            <h3 style="margin-bottom: 1rem; font-family: 'Cinzel Decorative', serif; color: var(--text-main);">Recently Added</h3>
+            <h3 class="section-title" style="color: var(--text-main); font-size:1.8rem; font-family:'Cinzel Decorative', serif;">Recently Added</h3>
             ${recentHTML}
           </div>
         </div>
@@ -196,7 +171,7 @@ window.RasigaPages = {
       </div>
     `;
 
-    reviewsHTML = '<div id="song-reviews-container"><div style="padding:2rem; text-align:center; color:var(--text-muted);">Loading reviews...</div></div>';
+    reviewsHTML = '<div id="song-reviews-container"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>';
 
     let userReviewSectionHTML = '';
     if (!RasigaData.demoUser || !RasigaData.demoUser.onboarded) {
@@ -230,24 +205,24 @@ window.RasigaPages = {
 
     return `
       <div class="page-entity page-enter">
-        <div class="glass" style="padding: 2rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1.5rem; position: relative;">
-          <div style="width: 100px; height: 100px; border-radius: 12px; background: ${grad}; display: flex; align-items:center; justify-content:center; color: #fff; font-size:2.5rem; box-shadow: var(--glass-shadow); font-family:'DM Serif Display',serif;">
+        <div class="glass song-header">
+          <div class="sh-art" style="background: ${grad};">
              ${ini}
           </div>
-          <div style="flex: 1;">
-            <h2 style="font-family:'DM Serif Display',serif; font-size: 2.2rem; margin-bottom:0.2rem;">${song.title}</h2>
-            <div style="color: var(--accent-saffron); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 0.5rem;">${song.film || 'Indie'} &bull; ${song.year}</div>
-            <div style="font-size: 0.95rem; color: var(--text-muted);">
-               Singer: <span style="color:var(--text-main)">${song.singer}</span><br>
-               Music: <span style="color:var(--text-main)">${song.composer}</span>
+          <div class="sh-info">
+            <h2 class="sh-title">${song.title}</h2>
+            <div class="sh-meta">${song.film || 'Indie'} &bull; ${song.year}</div>
+            <div class="sh-credits">
+               Singer: <span>${song.singer}</span><br>
+               Music: <span>${song.composer}</span>
             </div>
-            <button onclick="RasigaApp.openSuggestSongModal('${song.id}')" class="btn" style="margin-top:0.8rem; background:rgba(255,255,255,0.1); border:1px solid var(--glass-border); font-size:0.8rem; padding:0.4rem 0.8rem;">
+            <button onclick="RasigaApp.openSuggestSongModal('${song.id}')" class="btn sh-edit-btn">
               Suggest Edit
             </button>
           </div>
-          <div style="text-align:right;">
-             <div style="font-size:2rem; font-weight:bold; color:var(--accent-gold);">${song.avg_rating}</div>
-             <div style="font-size:0.8rem; color:var(--text-muted);">${song.total_ratings} ratings</div>
+          <div class="sh-stats">
+             <div class="sh-avg">${song.avg_rating}</div>
+             <div class="sh-count">${song.total_ratings} ratings</div>
           </div>
         </div>
         

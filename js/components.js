@@ -24,8 +24,8 @@ window.RasigaComponents = {
     const ini = this.getInitials(song.title);
     const delay = delayIdx * 0.05;
     return `
-      <div class="glass song-card page-enter" style="animation-delay: ${delay}s; position:relative;" onclick="RasigaApp.openSong('${song.id}')">
-        <button class="icon-btn" style="position:absolute; top:0.5rem; right:0.5rem; color:var(--text-main); z-index:10; background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; box-shadow:var(--glass-shadow); backdrop-filter:blur(8px); transition:var(--transition);" onclick="event.stopPropagation(); RasigaApp.openListModal('${song.id}')" title="Add to List" onmouseover="this.style.background='var(--accent-teal)'; this.style.color='#fff'; this.style.borderColor='var(--accent-teal)'" onmouseout="this.style.background='var(--glass-bg)'; this.style.color='var(--text-main)'; this.style.borderColor='var(--glass-border)'">
+      <div class="glass song-card page-enter" style="animation-delay: ${delay}s;" onclick="RasigaApp.openSong('${song.id}')">
+        <button class="icon-btn sc-add-btn" onclick="event.stopPropagation(); RasigaApp.openListModal('${song.id}')" title="Add to List">
           ${Icons.get('plus', {width: 16, height: 16})}
         </button>
         <div class="sc-art" style="background: ${grad}">
@@ -37,10 +37,10 @@ window.RasigaComponents = {
         <div class="sc-info">
           <div class="sc-title">${song.title}</div>
           <div class="sc-meta">${song.film || 'Indie'} &bull; ${song.year}</div>
-          <div class="sc-rating" style="display:flex; gap:0.6rem; align-items:center;">
-            <span style="display:flex; align-items:center; gap:0.2rem;">${Icons.get('star', {width: 14, height: 14, fill: 'currentColor', color: 'var(--accent-gold)'})} ${userRating !== null && userRating !== undefined ? userRating + ' (You)' : (song.total_ratings === 0 ? 'New' : song.avg_rating)}</span>
-            ${reactionsObj && reactionsObj.likes > 0 ? `<span style="color:var(--accent-rose); display:flex; align-items:center; gap:0.2rem;" title="You liked ${reactionsObj.likes} review(s)">${Icons.get('heart', {width:14, height:14, fill:'currentColor'})} ${reactionsObj.likes}</span>` : ''}
-            ${reactionsObj && reactionsObj.dislikes > 0 ? `<span style="color:var(--text-muted); display:flex; align-items:center; gap:0.2rem;" title="You disliked ${reactionsObj.dislikes} review(s)">${Icons.get('dislike', {width:14, height:14, fill:'currentColor'})} ${reactionsObj.dislikes}</span>` : ''}
+          <div class="sc-rating">
+            <span class="sc-rating-main">${Icons.get('star', {width: 14, height: 14, fill: 'currentColor', color: 'var(--accent-gold)'})} ${userRating !== null && userRating !== undefined ? userRating + ' (You)' : (song.total_ratings === 0 ? 'New' : song.avg_rating)}</span>
+            ${reactionsObj && reactionsObj.likes > 0 ? `<span class="sc-reaction sc-reaction-like" title="You liked ${reactionsObj.likes} review(s)">${Icons.get('heart', {width:14, height:14, fill:'currentColor'})} ${reactionsObj.likes}</span>` : ''}
+            ${reactionsObj && reactionsObj.dislikes > 0 ? `<span class="sc-reaction sc-reaction-dislike" title="You disliked ${reactionsObj.dislikes} review(s)">${Icons.get('dislike', {width:14, height:14, fill:'currentColor'})} ${reactionsObj.dislikes}</span>` : ''}
           </div>
         </div>
       </div>
@@ -52,14 +52,14 @@ window.RasigaComponents = {
     const songCount = (list.list_songs || []).length;
     const firstLetters = list.name.substring(0, 2).toUpperCase();
     return `
-      <div class="glass list-card page-enter" style="animation-delay: ${delay}s; padding:1.5rem; display:flex; align-items:center; gap:1rem; cursor:pointer; position:relative; border-radius:var(--radius-lg); transition:var(--transition);" onclick="location.hash='#/list/${list.id}'">
-        ${isOwner ? `<button class="icon-btn" style="position:absolute; top:0.5rem; right:0.5rem; color:var(--accent-rose);" onclick="event.stopPropagation(); RasigaApp.deleteList('${list.id}')" title="Delete List">${Icons.get('trash', {width: 16, height: 16})}</button>` : ''}
-        <div style="width: 60px; height: 60px; border-radius: 12px; background: var(--gradient-glass); display: flex; align-items:center; justify-content:center; color: #fff; font-size:1.5rem; font-family:'DM Serif Display',serif; flex-shrink:0;">
+      <div class="glass list-card page-enter" style="animation-delay: ${delay}s;" onclick="location.hash='#/list/${list.id}'">
+        ${isOwner ? `<button class="icon-btn lc-delete-btn" onclick="event.stopPropagation(); RasigaApp.deleteList('${list.id}')" title="Delete List">${Icons.get('trash', {width: 16, height: 16})}</button>` : ''}
+        <div class="lc-art">
           ${firstLetters}
         </div>
-        <div style="flex:1;">
-          <h3 style="margin:0 0 0.2rem 0; font-family:'DM Serif Display',serif; font-size:1.2rem;">${list.name}</h3>
-          <div style="font-size:0.9rem; color:var(--text-muted); display:flex; align-items:center; gap:0.5rem;">
+        <div class="lc-info">
+          <h3 class="lc-title">${list.name}</h3>
+          <div class="lc-meta">
             <span>${songCount} song${songCount !== 1 ? 's' : ''}</span>
             <span>&bull;</span>
             <span>${list.is_public ? 'Public' : '🔒 Private'}</span>
@@ -86,7 +86,7 @@ window.RasigaComponents = {
     const songObj = window.RasigaSeeds ? window.RasigaSeeds.find(s => s.title === review.song) : null;
     const link = songObj ? '#/song/' + songObj.id : '#/discover';
     return `
-      <div class="glass review-card" style="cursor:pointer;" onclick="location.hash='${link}'">
+      <div class="glass review-card" onclick="location.hash='${link}'">
         <div class="rc-header">
           <div class="rc-avatar" style="background: ${review.clr}">${review.name[0]}</div>
           <div class="rc-user-info">
@@ -98,7 +98,7 @@ window.RasigaComponents = {
           ${review.text}
           ${review.quote ? `<div class="rc-quote">${review.quote}</div>` : ''}
         </div>
-        <div class="rc-actions" style="display:flex; align-items:center; gap:1rem; margin-top: 0.5rem;">
+        <div class="rc-actions">
           <button class="btn-react btn-like" onclick="event.stopPropagation(); RasigaApp.toggleLike(this, ${review.likes})">
             ${Icons.get('heart', {width: 16, height: 16})}
             <span class="like-count" data-base="${review.likes}" style="font-size:0.8rem;">${review.likes}</span>
@@ -118,12 +118,12 @@ window.RasigaComponents = {
 
   EmptyState: function(iconName, title, message) {
     return `
-      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:4rem 2rem; text-align:center; color:var(--text-muted); width:100%; border-radius:var(--radius-lg); background:var(--glass-bg); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px dashed var(--glass-border);">
-        <div style="width:64px; height:64px; border-radius:50%; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; margin-bottom:1.5rem; color:var(--accent-teal);">
+      <div class="empty-state">
+        <div class="es-icon">
           ${window.Icons ? window.Icons.get(iconName, {width:32, height:32}) : ''}
         </div>
-        <h3 style="font-family:'DM Serif Display', serif; font-size:1.5rem; color:var(--text-main); margin-bottom:0.5rem;">${title}</h3>
-        <p style="max-width:400px; line-height:1.6; font-size:0.95rem;">${message}</p>
+        <h3 class="es-title">${title}</h3>
+        <p class="es-message">${message}</p>
       </div>
     `;
   }
