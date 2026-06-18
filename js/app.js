@@ -1680,7 +1680,7 @@ window.RasigaApp = {
                     ${(u.display_name || u.username)[0].toUpperCase()}
                   </div>
                   <div style="flex:1;">
-                    <div class="${rankClass}" style="font-weight:600; font-size:1.1rem;">${u.display_name || u.username}</div>
+                    <div style="font-weight:600; font-size:1.1rem; color:var(--text-main);">${u.display_name || u.username}</div>
                     <div style="font-size:0.85rem; color:var(--text-muted);">@${u.username} &bull; ${rCount} Reviews</div>
                   </div>
                   <div style="font-weight:bold; color:var(--accent-teal); font-size:1.1rem; text-align:right;">

@@ -293,8 +293,8 @@ window.RasigaPages = {
         </div>
 
         <div class="profile-stats mt-4 page-enter" style="animation-delay: 0.1s">
-          <div class="glass stat-box" style="cursor:pointer;" onclick="location.hash='#/my-reviews'"><h3>${user.stats?.ratings || 0}</h3><span>Ratings</span></div>
-          <div class="glass stat-box" style="cursor:pointer;" onclick="location.hash='#/my-reviews'"><h3>${user.stats?.reviews || 0}</h3><span>Reviews</span></div>
+          <div class="glass stat-box" style="cursor:pointer;" onclick="location.hash='#/my-reviews'"><h3>${Object.keys(RasigaData.userRatings || {}).length || user.stats?.ratings || 0}</h3><span>Ratings</span></div>
+          <div class="glass stat-box" style="cursor:pointer;" onclick="location.hash='#/my-reviews'"><h3>${Object.keys(RasigaData.userComments || {}).length || user.stats?.reviews || 0}</h3><span>Reviews</span></div>
           <div class="glass stat-box"><h3>${user.streak || 1}</h3><span>Day Streak &#128293;</span></div>
         </div>
 
@@ -605,7 +605,7 @@ window.RasigaPages = {
                 <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; padding: 0.5rem; border-radius: var(--radius-md); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="location.hash='#/song/${s.id}'">
                   <div class="${rankClass}" style="font-weight:bold; font-size:1.2rem; ${isTop3 ? '' : 'color:var(--text-light);'} width:20px; text-align:center;">${i + 1}</div>
                   <div style="flex:1;">
-                    <div class="${rankClass}" style="font-weight:600;">${s.title}</div>
+                    <div style="font-weight:600;">${s.title}</div>
                     <div style="font-size:0.85rem; color:var(--text-muted);">${s.film} &bull; ${s.language}</div>
                   </div>
                   <div style="display:flex; align-items:center; gap:0.25rem; font-weight:bold; color:var(--accent-gold);">

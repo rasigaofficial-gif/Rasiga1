@@ -242,24 +242,30 @@ button {
 
 /* ── Typography Enhancements ── */
 .text-gradient-gold {
-  background: linear-gradient(135deg, #fbbf24, #d97706);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 4px rgba(251,191,36,0.3));
+  color: #b45309;
+  font-weight: 700;
 }
 
 .text-gradient-silver {
-  background: linear-gradient(135deg, #e2e8f0, #94a3b8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 4px rgba(226,232,240,0.3));
+  color: #475569;
+  font-weight: 700;
 }
 
 .text-gradient-bronze {
-  background: linear-gradient(135deg, #fcd34d, #b45309);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 4px rgba(252,211,77,0.3));
+  color: #92400e;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .text-gradient-gold {
+  color: #fbbf24;
+}
+
+[data-theme='dark'] .text-gradient-silver {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .text-gradient-bronze {
+  color: #d97706;
 }
 
 .glass:hover::before {
@@ -385,7 +391,7 @@ button {
   width: calc(100% - 2rem);
   height: var(--bottom-nav-height);
   z-index: 100;
-  background: var(--nav-theme-bg);
+  background: linear-gradient(135deg, #d36011, #c13b7f);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -393,6 +399,10 @@ button {
   box-shadow: 0 8px 32px rgba(249, 115, 22, 0.3), inset 1px 1px 1px rgba(255, 255, 255, 0.2);
   overflow: hidden;
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+[data-theme='dark'] .bottom-nav {
+  background: linear-gradient(135deg, #592908, #541937);
 }
 
 .bottom-nav-inner {
