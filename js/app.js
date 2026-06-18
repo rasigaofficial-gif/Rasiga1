@@ -159,7 +159,12 @@ window.RasigaApp = {
           }
           const adminLink = document.getElementById('nav-admin-link');
           if (adminLink) adminLink.style.display = data.is_admin ? 'inline-block' : 'none';
-          window.RasigaRouter.handleRoute();
+          
+          // Fetch user's custom lists
+          this.supabase.from('lists').select('*, list_songs(song_id)').eq('user_id', data.id).order('created_at', { ascending: false }).then(({ data: listData }) => {
+            window.RasigaLists = listData || [];
+            window.RasigaRouter.handleRoute();
+          });
         });
 
       } else {
@@ -1056,6 +1061,9 @@ window.RasigaApp = {
 
       alert('Successfully marked as ' + newStatus);
       
+      // Re-fetch all data so search and charts reflect the new song
+      await this.fetchInitialData();
+      
       // Refresh admin page
       if (location.hash === '#/admin' && window.RasigaRouter) {
         window.RasigaRouter.handleRoute();
@@ -1679,6 +1687,160 @@ window.RasigaApp = {
       }).catch(err => console.log('Share error:', err));
     } else {
       navigator.clipboard.writeText(url).then(() => alert('Link copied to clipboard!'));
+    }
+  },
+
+  // ── Custom Lists Management ──
+  openListModal: function(songId) {
+    const user = RasigaData.demoUser;
+    if (!user || !user.id) {
+      alert("Please log in to add songs to a list.");
+      return;
+    }
+    const lists = window.RasigaLists || [];
+    
+    let modal = document.getElementById('list-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'list-modal';
+      modal.className = 'glass page-enter';
+      modal.style.position = 'fixed';
+      modal.style.top = '0'; modal.style.left = '0'; modal.style.width = '100%'; modal.style.height = '100%';
+      modal.style.zIndex = '2000';
+      modal.style.display = 'flex'; modal.style.alignItems = 'center'; modal.style.justifyContent = 'center';
+      modal.style.background = 'rgba(0,0,0,0.6)';
+      document.body.appendChild(modal);
+    }
+
+    let listsHTML = lists.length === 0 ? '<p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem;">You have no lists yet.</p>' : lists.map(l => {
+      const hasSong = l.list_songs && l.list_songs.some(ls => ls.song_id === songId);
+      return `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:1rem; border:1px solid var(--glass-border); border-radius:var(--radius-sm); margin-bottom:0.5rem;">
+          <div>
+            <div style="font-weight:600; font-family:'DM Serif Display',serif; font-size:1.1rem;">${l.name} ${l.is_public ? '' : '🔒'}</div>
+            <div style="font-size:0.8rem; color:var(--text-muted);">${(l.list_songs||[]).length} songs</div>
+          </div>
+          <button class="btn ${hasSong ? '' : 'btn-primary'}" onclick="RasigaApp.${hasSong ? 'removeSongFromList' : 'addSongToList'}('${l.id}', '${songId}')" style="padding:0.4rem 0.8rem; font-size:0.8rem;">
+            ${hasSong ? 'Added' : 'Add'}
+          </button>
+        </div>
+      `;
+    }).join('');
+
+    modal.innerHTML = `
+      <div class="glass" style="width:90%; max-width:400px; padding:2rem; border-radius:var(--radius-md); position:relative; max-height:80vh; display:flex; flex-direction:column; background:var(--bg-color);">
+        <button class="icon-btn" onclick="document.getElementById('list-modal').style.display='none'" style="position:absolute; top:1rem; right:1rem; color:var(--text-main);">${window.Icons ? window.Icons.get('close') : 'X'}</button>
+        <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; font-size:1.5rem; color:var(--accent-teal);">Add to List</h3>
+        <div style="flex:1; overflow-y:auto; margin-bottom:1.5rem;">
+          ${listsHTML}
+        </div>
+        <form onsubmit="event.preventDefault(); RasigaApp.createList(this.list_name.value, this.is_public.checked, '${songId}');" style="display:flex; flex-direction:column; gap:0.5rem; border-top:1px solid var(--glass-border); padding-top:1.5rem;">
+          <input type="text" name="list_name" placeholder="New list name..." required style="padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.9rem; color:var(--text-muted);">
+            <input type="checkbox" name="is_public" checked /> Make list public
+          </label>
+          <button type="submit" class="btn btn-primary" style="margin-top:0.5rem; padding:0.8rem; justify-content:center; background:var(--accent-teal); border-color:var(--accent-teal);">Create & Add</button>
+        </form>
+      </div>
+    `;
+    modal.style.display = 'flex';
+  },
+
+  createList: async function(name, isPublic, autoAddSongId = null) {
+    const user = RasigaData.demoUser;
+    if (!user || !this.supabase) return;
+
+    try {
+      const { data, error } = await this.supabase.from('lists').insert({
+        user_id: user.id,
+        name: name,
+        is_public: isPublic
+      }).select().single();
+
+      if (error) throw error;
+
+      if (!window.RasigaLists) window.RasigaLists = [];
+      data.list_songs = [];
+      window.RasigaLists.unshift(data);
+
+      if (autoAddSongId) {
+        await this.addSongToList(data.id, autoAddSongId);
+      } else {
+        alert("List created successfully!");
+        if (location.hash === '#/my-lists' && window.RasigaRouter) window.RasigaRouter.handleRoute();
+      }
+    } catch(err) {
+      console.error(err);
+      alert("Failed to create list.");
+    }
+  },
+
+  addSongToList: async function(listId, songId) {
+    if (!this.supabase) return;
+    try {
+      const { error } = await this.supabase.from('list_songs').insert({
+        list_id: listId,
+        song_id: songId
+      });
+      if (error && error.code !== '23505') throw error; // ignore duplicate key
+
+      // Update local state
+      const list = window.RasigaLists.find(l => l.id === listId);
+      if (list) {
+        if (!list.list_songs) list.list_songs = [];
+        if (!list.list_songs.some(ls => ls.song_id === songId)) {
+          list.list_songs.push({ song_id: songId });
+        }
+      }
+      
+      // Refresh modal
+      this.openListModal(songId);
+    } catch(err) {
+      console.error(err);
+      alert("Failed to add song.");
+    }
+  },
+
+  removeSongFromList: async function(listId, songId) {
+    if (!this.supabase) return;
+    try {
+      const { error } = await this.supabase.from('list_songs').delete().match({ list_id: listId, song_id: songId });
+      if (error) throw error;
+
+      // Update local state
+      const list = window.RasigaLists.find(l => l.id === listId);
+      if (list && list.list_songs) {
+        list.list_songs = list.list_songs.filter(ls => ls.song_id !== songId);
+      }
+      
+      // Refresh UI based on context
+      if (document.getElementById('list-modal') && document.getElementById('list-modal').style.display !== 'none') {
+        this.openListModal(songId);
+      } else if (window.RasigaRouter) {
+        window.RasigaRouter.handleRoute();
+      }
+    } catch(err) {
+      console.error(err);
+      alert("Failed to remove song.");
+    }
+  },
+
+  deleteList: async function(listId) {
+    if (!confirm('Are you sure you want to delete this list?')) return;
+    if (!this.supabase) return;
+
+    try {
+      const { error } = await this.supabase.from('lists').delete().eq('id', listId);
+      if (error) throw error;
+
+      window.RasigaLists = window.RasigaLists.filter(l => l.id !== listId);
+      if (location.hash === '#/my-lists' || location.hash.startsWith('#/list/')) {
+        location.hash = '#/my-lists';
+        if (window.RasigaRouter) window.RasigaRouter.handleRoute();
+      }
+    } catch(err) {
+      console.error(err);
+      alert("Failed to delete list.");
     }
   }
 };

@@ -2,7 +2,7 @@ window.RasigaPages = {
   renderHome: function () {
     let trendingHTML = '';
     // Trending Logic: High ratings and high popularity
-    const sorted = [...RasigaSeeds].sort((a, b) => ((b.total_ratings * 2) + b.avg_rating) - ((a.total_ratings * 2) + a.avg_rating)).slice(0, 10);
+    const sorted = [...RasigaSeeds].sort((a, b) => ((Number(b.total_ratings || 0) * 2) + Number(b.avg_rating || 0)) - ((Number(a.total_ratings || 0) * 2) + Number(a.avg_rating || 0))).slice(0, 10);
     if (sorted.length === 0) {
       trendingHTML = '<div style="padding:2rem; text-align:center; color:var(--text-muted); width:100%;">Loading songs...</div>';
     } else {
@@ -299,6 +299,9 @@ window.RasigaPages = {
         </div>
 
         <div class="mt-4 page-enter" style="animation-delay: 0.15s">
+          <button class="btn btn-primary" style="width:100%; display:flex; justify-content:center; align-items:center; gap:0.5rem; padding:1rem; font-size:1.1rem; box-shadow:0 8px 24px rgba(249, 115, 22, 0.3); margin-bottom: 1rem;" onclick="location.hash='#/my-lists'">
+            ${Icons.get('list')} Manage My Lists
+          </button>
           <button class="btn btn-primary" style="width:100%; display:flex; justify-content:center; align-items:center; gap:0.5rem; padding:1rem; font-size:1.1rem; box-shadow:0 8px 24px rgba(249, 115, 22, 0.3); margin-bottom: 1rem;" onclick="RasigaApp.openSuggestSongModal()">
             ${Icons.get('music')} Suggest a Song
           </button>
@@ -307,9 +310,16 @@ window.RasigaPages = {
           </button>
         </div>
 
+        <section class="section mt-4 page-enter" style="animation-delay: 0.2s">
+          <h2 class="section-title">My Public Lists</h2>
+          <div style="display:flex; flex-direction:column; gap:1rem;">
+            ${window.RasigaLists && window.RasigaLists.filter(l => l.is_public).length > 0 
+              ? window.RasigaLists.filter(l => l.is_public).slice(0, 3).map((l, i) => RasigaComponents.ListCard(l, i)).join('')
+              : '<p style="color:var(--text-muted); font-size:0.9rem;">No public lists yet.</p>'}
+          </div>
         </section>
 
-        <section class="section mt-4 page-enter" style="animation-delay: 0.2s">
+        <section class="section mt-4 page-enter" style="animation-delay: 0.25s">
           <h2 class="section-title">Badges & Achievements</h2>
           <div class="badges-grid">${badgesHTML}</div>
         </section>
@@ -507,10 +517,10 @@ window.RasigaPages = {
     }
 
     // Top 5 Highest Rated
-    const topRated = [...songs].sort((a, b) => b.avg_rating - a.avg_rating).slice(0, 5);
+    const topRated = [...songs].sort((a, b) => Number(b.avg_rating || 0) - Number(a.avg_rating || 0)).slice(0, 5);
 
     // Top 5 Most Popular
-    const mostPopular = [...songs].sort((a, b) => b.total_ratings - a.total_ratings).slice(0, 5);
+    const mostPopular = [...songs].sort((a, b) => Number(b.total_ratings || 0) - Number(a.total_ratings || 0)).slice(0, 5);
 
     // Compute Singer and Composer Stats based on filtered songs
     const singerStats = {};
@@ -846,8 +856,27 @@ window.RasigaPages = {
   },
 
   renderAnalytics: function () {
-    const songs = [...window.RasigaSeeds || RasigaData.songs || []];
-    const userRatingsCount = Object.keys(RasigaData.userRatings || {}).length || 24;
+    const allSongs = [...window.RasigaSeeds || []];
+    const userRatings = RasigaData.userRatings || {};
+    const ratedSongIds = Object.keys(userRatings);
+    
+    const songs = allSongs.filter(s => ratedSongIds.includes(s.id));
+    
+    if (songs.length === 0) {
+      return `
+        <div class="page-analytics page-enter">
+          <div style="display:flex; align-items:center; gap: 1rem; margin-bottom:1rem;">
+            <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
+            <h2 class="section-title" style="margin:0;">My Analytics</h2>
+          </div>
+          <div class="glass" style="padding: 3rem 1rem; text-align: center; color: var(--text-muted);">
+            You haven't rated any songs yet!<br/><br/>Rate some songs to see your personalized listening analytics here.
+          </div>
+        </div>
+      `;
+    }
+
+    const userRatingsCount = songs.length;
 
     // Moods
     const moodCounts = {};
@@ -1369,6 +1398,63 @@ window.RasigaPages = {
           </div>
         </div>
 
+      </div>
+    `;
+  },
+
+  renderMyLists: function () {
+    const user = RasigaData.demoUser;
+    if (!user || !user.onboarded) {
+      return this.renderLogin();
+    }
+    const lists = window.RasigaLists || [];
+    let listsHTML = lists.length === 0 ? '<p style="color:var(--text-muted); text-align:center; padding:2rem;">You haven\'t created any lists yet.<br/><br/>Go to any song and click the + button to create a list!</p>' : lists.map((l, i) => RasigaComponents.ListCard(l, i, true)).join('');
+
+    return `
+      <div class="page-lists page-enter">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
+          <h2 class="section-title" style="margin:0;">My Lists</h2>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+          ${listsHTML}
+        </div>
+      </div>
+    `;
+  },
+
+  renderListDetails: function (listId) {
+    const list = (window.RasigaLists || []).find(l => l.id === listId);
+    if (!list) return `<div class="page-placeholder glass page-enter"><h2 class="section-title">List Not Found</h2></div>`;
+    
+    const allSongs = window.RasigaSeeds || [];
+    const listSongIds = (list.list_songs || []).map(ls => ls.song_id);
+    const songsInList = allSongs.filter(s => listSongIds.includes(s.id));
+
+    const songCardsHTML = songsInList.length === 0 
+      ? '<p style="color:var(--text-muted); text-align:center; padding:2rem;">This list is empty.</p>'
+      : songsInList.map((song, i) => {
+          const userRating = RasigaData.userRatings && RasigaData.userRatings[song.id] ? RasigaData.userRatings[song.id] : null;
+          return `
+            <div style="position:relative;">
+              ${RasigaComponents.SongCard(song, i, userRating)}
+              ${list.user_id === RasigaData.demoUser?.id ? `<button class="icon-btn" style="position:absolute; top:0.5rem; right:2.5rem; color:var(--accent-rose); z-index:10; background:rgba(0,0,0,0.5); border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center;" onclick="event.stopPropagation(); RasigaApp.removeSongFromList('${list.id}', '${song.id}')" title="Remove from List">${Icons.get('trash', {width:14, height:14})}</button>` : ''}
+            </div>
+          `;
+        }).join('');
+
+    return `
+      <div class="page-list-details page-enter">
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:2rem;">
+          <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
+          <div style="flex:1;">
+            <h2 class="section-title" style="margin:0;">${list.name}</h2>
+            <div style="font-size:0.9rem; color:var(--text-muted); margin-top:0.2rem;">${list.is_public ? 'Public' : 'Private'} List &bull; ${songsInList.length} songs</div>
+          </div>
+        </div>
+        <div class="discover-grid">
+          ${songCardsHTML}
+        </div>
       </div>
     `;
   }

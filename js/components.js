@@ -24,7 +24,10 @@ window.RasigaComponents = {
     const ini = this.getInitials(song.title);
     const delay = delayIdx * 0.05;
     return `
-      <div class="glass song-card page-enter" style="animation-delay: ${delay}s" onclick="RasigaApp.openSong('${song.id}')">
+      <div class="glass song-card page-enter" style="animation-delay: ${delay}s; position:relative;" onclick="RasigaApp.openSong('${song.id}')">
+        <button class="icon-btn" style="position:absolute; top:0.5rem; right:0.5rem; color:var(--text-muted); z-index:10; background:rgba(0,0,0,0.5); border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center;" onclick="event.stopPropagation(); RasigaApp.openListModal('${song.id}')" title="Add to List">
+          ${Icons.get('plus', {width: 16, height: 16})}
+        </button>
         <div class="sc-art" style="background: ${grad}">
           ${ini}
           <div class="sc-play-overlay">
@@ -38,6 +41,28 @@ window.RasigaComponents = {
             <span style="display:flex; align-items:center; gap:0.2rem;">${Icons.get('star', {width: 14, height: 14, fill: 'currentColor', color: 'var(--accent-gold)'})} ${userRating !== null && userRating !== undefined ? userRating + ' (You)' : (song.total_ratings === 0 ? 'New' : song.avg_rating)}</span>
             ${reactionsObj && reactionsObj.likes > 0 ? `<span style="color:var(--accent-rose); display:flex; align-items:center; gap:0.2rem;" title="You liked ${reactionsObj.likes} review(s)">${Icons.get('heart', {width:14, height:14, fill:'currentColor'})} ${reactionsObj.likes}</span>` : ''}
             ${reactionsObj && reactionsObj.poops > 0 ? `<span style="color:#8b4513; display:flex; align-items:center; gap:0.2rem;" title="You disliked ${reactionsObj.poops} review(s)">${Icons.get('poop', {width:14, height:14, fill:'currentColor'})} ${reactionsObj.poops}</span>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  ListCard: function(list, delayIdx = 0, isOwner = false) {
+    const delay = delayIdx * 0.05;
+    const songCount = (list.list_songs || []).length;
+    const firstLetters = list.name.substring(0, 2).toUpperCase();
+    return `
+      <div class="glass list-card page-enter" style="animation-delay: ${delay}s; padding:1.5rem; display:flex; align-items:center; gap:1rem; cursor:pointer; position:relative; border-radius:var(--radius-lg); transition:var(--transition);" onclick="location.hash='#/list/${list.id}'">
+        ${isOwner ? `<button class="icon-btn" style="position:absolute; top:0.5rem; right:0.5rem; color:var(--accent-rose);" onclick="event.stopPropagation(); RasigaApp.deleteList('${list.id}')" title="Delete List">${Icons.get('trash', {width: 16, height: 16})}</button>` : ''}
+        <div style="width: 60px; height: 60px; border-radius: 12px; background: var(--gradient-glass); display: flex; align-items:center; justify-content:center; color: #fff; font-size:1.5rem; font-family:'DM Serif Display',serif; flex-shrink:0;">
+          ${firstLetters}
+        </div>
+        <div style="flex:1;">
+          <h3 style="margin:0 0 0.2rem 0; font-family:'DM Serif Display',serif; font-size:1.2rem;">${list.name}</h3>
+          <div style="font-size:0.9rem; color:var(--text-muted); display:flex; align-items:center; gap:0.5rem;">
+            <span>${songCount} song${songCount !== 1 ? 's' : ''}</span>
+            <span>&bull;</span>
+            <span>${list.is_public ? 'Public' : '🔒 Private'}</span>
           </div>
         </div>
       </div>

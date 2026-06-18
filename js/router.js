@@ -14,7 +14,8 @@ window.RasigaRouter = {
     '#/analytics': 'renderAnalytics',
     '#/leaderboards': 'renderLeaderboards',
     '#/admin': 'renderAdminPanel',
-    '#/login': 'renderLogin'
+    '#/login': 'renderLogin',
+    '#/my-lists': 'renderMyLists'
   },
 
   init: function() {
@@ -35,6 +36,10 @@ window.RasigaRouter = {
       routeFn = 'renderSongPage';
       params = hash.replace('#/song/', '');
       this.injectDynamicNavIcon(hash, params);
+    } else if (hash.startsWith('#/list/')) {
+      routeFn = 'renderListDetails';
+      params = hash.replace('#/list/', '');
+      this.removeDynamicNavIcon();
     } else if (hash.startsWith('#/user/')) {
       routeFn = 'renderPublicProfile';
       params = hash.replace('#/user/', '');
