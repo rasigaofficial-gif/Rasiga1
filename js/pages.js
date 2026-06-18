@@ -592,7 +592,7 @@ window.RasigaPages = {
         
         <div style="display:flex; flex-wrap:wrap; gap:2rem; margin-top:1.5rem;">
           
-          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg); background:var(--glass-bg-frosted);">
+          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Highest Rated Songs</h3>
             <div style="display:flex; flex-direction:column; gap:1.25rem;">
               ${topRated.map((s, i) => {
@@ -606,7 +606,7 @@ window.RasigaPages = {
                 return `
                 <div class="song-card" style="background:transparent; border:none; box-shadow:none; padding:0; align-items:center;" onclick="location.hash='#/song/${s.id}'">
                   <div class="${rankClass}" style="font-weight:bold; font-size:1.2rem; ${isTop3 ? '' : 'color:var(--text-light);'} width:20px; text-align:center;">${i + 1}</div>
-                  <div class="sc-art" style="background: ${grad}; width: 48px; height: 48px; font-size: 1.1rem; flex-shrink: 0;">
+                  <div class="sc-art" style="background: ${grad};">
                     ${ini}
                   </div>
                   <div class="sc-info" style="flex:1;">
@@ -621,7 +621,7 @@ window.RasigaPages = {
             </div>
           </div>
 
-          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg); background:var(--glass-bg-frosted);">
+          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Most Popular Songs</h3>
             <div style="display:flex; flex-direction:column; gap:1.25rem;">
               ${mostPopular.map((s, i) => {
@@ -630,7 +630,7 @@ window.RasigaPages = {
                 return `
                 <div class="song-card" style="background:transparent; border:none; box-shadow:none; padding:0; align-items:center;" onclick="location.hash='#/song/${s.id}'">
                   <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px; text-align:center;">${i + 1}</div>
-                  <div class="sc-art" style="background: ${grad}; width: 48px; height: 48px; font-size: 1.1rem; flex-shrink: 0;">
+                  <div class="sc-art" style="background: ${grad};">
                     ${ini}
                   </div>
                   <div class="sc-info" style="flex:1;">
