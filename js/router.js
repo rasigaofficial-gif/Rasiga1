@@ -136,12 +136,12 @@ window.RasigaRouter = {
       link.href = hash;
       link.id = 'm-dynamic-nav';
       link.className = 'bnav-item';
-      link.innerHTML = `${Icons.get('guitar')}<span>${title}</span>`;
+      link.innerHTML = `${Icons.get('guitar')}`;
       mNav.insertBefore(link, mNav.children[insertIdx]);
     } else if (document.getElementById('m-dynamic-nav')) {
       const link = document.getElementById('m-dynamic-nav');
       link.href = hash;
-      link.querySelector('span').innerText = title;
+      link.innerHTML = `${Icons.get('guitar')}`;
     }
 
     // Desktop Nav
