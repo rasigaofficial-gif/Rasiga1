@@ -83,7 +83,7 @@
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 
   --accent-teal: #14b8a6;
-  --nav-theme-bg: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), var(--gradient-brand);
+  --nav-theme-bg: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), var(--gradient-brand);
 
   /* Spotlight - Warm Golden in Dark Mode */
   --spotlight-top: rgba(255, 220, 150, 0.85);
