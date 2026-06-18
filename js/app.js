@@ -501,7 +501,7 @@ window.RasigaApp = {
           </div>
           <div>
             <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Music Director</label>
-            <input name="director" type="text" required value="${songData ? songData.director : ''}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+            <input name="director" type="text" required value="${songData ? songData.composer : ''}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
           </div>
           <div>
             <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Singer(s)</label>
