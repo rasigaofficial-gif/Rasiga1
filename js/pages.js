@@ -4,7 +4,7 @@ window.RasigaPages = {
     // Trending Logic: High ratings and high popularity
     const sorted = [...RasigaSeeds].sort((a, b) => ((Number(b.total_ratings || 0) * 2) + Number(b.avg_rating || 0)) - ((Number(a.total_ratings || 0) * 2) + Number(a.avg_rating || 0))).slice(0, 10);
     if (sorted.length === 0) {
-      trendingHTML = '<div style="padding:2rem; text-align:center; color:var(--text-muted); width:100%;">Loading songs...</div>';
+      trendingHTML = '<div class="horizontal-scroll"><div class="skeleton skeleton-card" style="min-width:180px;"></div><div class="skeleton skeleton-card" style="min-width:180px;"></div><div class="skeleton skeleton-card" style="min-width:180px;"></div></div>';
     } else {
       let cards = '';
       sorted.forEach((s, i) => cards += RasigaComponents.SongCard(s, i));
@@ -16,7 +16,7 @@ window.RasigaPages = {
       if (window.RasigaReviewsLoaded) {
         reviewsHTML = '<div style="padding:2rem; text-align:center; color:var(--text-muted); grid-column:1/-1;">No community activity yet. Be the first to leave a review!</div>';
       } else {
-        reviewsHTML = '<div style="padding:2rem; text-align:center; color:var(--text-muted); grid-column:1/-1;">Loading community pulse...</div>';
+        reviewsHTML = '<div class="grid-reviews" style="width:100%;"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>';
       }
     } else {
       RasigaReviews.forEach(r => reviewsHTML += RasigaComponents.ReviewCard(r));
@@ -56,7 +56,7 @@ window.RasigaPages = {
     let languageHTML = '';
     
     if (RasigaSeeds.length === 0) {
-      topRatedHTML = '<div style="padding:2rem; text-align:center; color:var(--text-muted); width:100%;">Loading songs...</div>';
+      topRatedHTML = '<div class="horizontal-scroll" style="margin-bottom:2rem;"><div class="skeleton skeleton-card" style="min-width:180px;"></div><div class="skeleton skeleton-card" style="min-width:180px;"></div></div>';
     } else {
       // Top Rated
       const topRated = [...RasigaSeeds].sort((a, b) => Number(b.avg_rating || 0) - Number(a.avg_rating || 0)).slice(0, 10);
@@ -84,7 +84,7 @@ window.RasigaPages = {
         <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; animation-delay: 0.05s;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3 class="section-title" style="margin: 0; color: var(--text-main);">Search Songs</h3>
-            <select id="discover-search-filter" class="glass-input" style="width: auto; cursor: pointer; padding: 0.4rem 2.5rem 0.4rem 1rem; font-size: 0.9rem; border-radius: var(--radius-full);" onchange="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(document.getElementById('discover-search-input').value, 'discover-search-input')">
+            <select id="discover-search-filter" class="glass-input custom-select" style="width: auto; cursor: pointer; padding: 0.4rem 2.5rem 0.4rem 1rem; font-size: 0.9rem; border-radius: var(--radius-full);" onchange="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(document.getElementById('discover-search-input').value, 'discover-search-input')">
               <option value="all" style="background: var(--bg-color)">All</option>
               <option value="artist" style="background: var(--bg-color)">Artist</option>
               <option value="song" style="background: var(--bg-color)">Song</option>
@@ -111,7 +111,7 @@ window.RasigaPages = {
 
   renderSongPage: function (id) {
     const song = RasigaSeeds.find(s => s.id === id);
-    if (!song) return '<div class="page-entity page-enter"><div style="padding: 2rem; text-align: center; color: var(--text-muted);">Song not found.</div></div>';
+    if (!song) return '<div class="page-entity page-enter"><div class="card text-center text-muted">Song not found.</div></div>';
 
     const grad = RasigaComponents.getGradient(song.title);
     const ini = RasigaComponents.getInitials(song.title);
@@ -126,16 +126,16 @@ window.RasigaPages = {
 
     if (userComment && RasigaData.demoUser && RasigaData.demoUser.onboarded) {
       reviewsHTML += `
-        <div class="glass page-enter" style="padding: 1.2rem; margin-bottom: 1rem; border: 1px solid var(--accent-saffron); animation-delay: 0.2s;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-            <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom: 0.8rem;">
+        <div class="card glass page-enter" style="border: 1px solid var(--accent-saffron); animation-delay: 0.2s;">
+          <div class="flex-between" style="align-items:flex-start;">
+            <div class="flex-start gap-1 mb-1">
               <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--gradient-brand); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">${(RasigaData.demoUser.displayName || 'U')[0].toUpperCase()}</div>
               <div>
                 <div style="font-weight:600; font-size:0.95rem;">${RasigaData.demoUser.displayName || 'User'} (You)</div>
                 <div style="font-size:0.8rem; color:var(--text-muted);">Just now</div>
               </div>
             </div>
-            <div style="display:flex; align-items:center; gap:0.2rem; color:var(--accent-gold); font-size:0.9rem; font-weight:600;">
+            <div class="flex-center gap-05" style="color:var(--accent-gold); font-size:0.9rem; font-weight:600;">
               ${window.Icons ? window.Icons.get('star', { width: 14, height: 14, fill: 'currentColor' }) : ''} ${RasigaData.userRatings && RasigaData.userRatings[id] ? RasigaData.userRatings[id] : 0}
             </div>
           </div>
@@ -159,7 +159,7 @@ window.RasigaPages = {
     }
 
     if (reviews.length === 0 && !userComment) {
-      reviewsHTML = '<p style="color:var(--text-muted)">No reviews yet.</p>';
+      reviewsHTML = '<p class="text-muted">No reviews yet.</p>';
     }
 
     if (!RasigaData.userRatings) RasigaData.userRatings = {};
@@ -188,27 +188,27 @@ window.RasigaPages = {
     let userReviewSectionHTML = '';
     if (!RasigaData.demoUser || !RasigaData.demoUser.onboarded) {
       userReviewSectionHTML = `
-        <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; text-align:center; animation-delay: 0.1s;" id="user-review-section">
-          <p style="color:var(--text-muted); margin-bottom:1rem;">Please log in to leave a rating and review.</p>
-          <button class="btn btn-primary" onclick="location.hash='#/profile'" style="display:inline-flex; align-items:center; gap:0.5rem; justify-content:center; padding: 0.8rem 1.5rem;">
+        <div class="card glass page-enter text-center" style="animation-delay: 0.1s;" id="user-review-section">
+          <p class="text-muted mb-1">Please log in to leave a rating and review.</p>
+          <button class="btn btn-primary flex-center gap-05" onclick="location.hash='#/profile'" style="padding: 0.8rem 1.5rem; margin: 0 auto;">
             ${window.Icons ? window.Icons.get('user', {width:18, height:18}) : ''} Log In to Rate
           </button>
         </div>
       `;
     } else {
       userReviewSectionHTML = `
-        <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; animation-delay: 0.1s;" id="user-review-section">
-          <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
-            <div style="display:flex; align-items:center;">
+        <div class="card glass page-enter" style="animation-delay: 0.1s;" id="user-review-section">
+          <div class="flex-start gap-1 mb-1">
+            <div class="flex-center">
               ${ratingStarsHTML}
             </div>
             <span style="font-size: 0.9rem; color: var(--text-muted);" id="user-rating-text-${id}">${userRating > 0 ? userRating + ' Stars' : 'Tap to rate'}</span>
           </div>
           ${userComment ? `
-             <p style="font-size:1rem; margin-bottom:1rem;">${userComment}</p>
+             <p class="mb-1" style="font-size:1rem;">${userComment}</p>
              <button onclick="RasigaApp.editComment('${id}')" class="btn" style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Edit</button>
           ` : `
-             <textarea id="review-textarea-${id}" placeholder="Write your review here... (Required)" style="width: 100%; height: 100px; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1); color: inherit; outline:none; font-size: 1rem; font-family: inherit; resize: vertical; margin-bottom: 1rem;"></textarea>
+             <textarea id="review-textarea-${id}" class="glass-input mb-1" placeholder="Write your review here... (Required)" style="height: 100px; resize: vertical;"></textarea>
              <button onclick="RasigaApp.submitComment('${id}')" class="btn btn-primary">Submit</button>
           `}
         </div>
@@ -217,9 +217,13 @@ window.RasigaPages = {
 
     return `
       <div class="page-entity">
+        <a href="#/discover" class="breadcrumb" onclick="window.history.back(); return false;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </a>
         <div class="glass song-header page-enter" style="animation-delay: 0s;">
-          <div class="sh-art" style="background: ${grad};">
-             ${ini}
+          <div class="sh-art" style="background: ${song.album_art_url ? '#1e293b' : grad}; position:relative; overflow:hidden;">
+             ${song.album_art_url ? `<img src="${song.album_art_url}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:0;" alt="Cover" />` : ini}
           </div>
           <div class="sh-info">
             <h2 class="sh-title">${song.title}</h2>
@@ -238,10 +242,10 @@ window.RasigaPages = {
           </div>
         </div>
         
-        <h3 style="margin-bottom: 1rem;">Your Rating & Review</h3>
+        <h3 class="mb-1">Your Rating & Review</h3>
         ${userReviewSectionHTML}
 
-        <h3 style="margin-bottom: 1rem;">Community Reviews</h3>
+        <h3 class="mb-1">Community Reviews</h3>
         <div>
           ${reviewsHTML}
         </div>

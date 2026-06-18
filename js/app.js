@@ -104,6 +104,11 @@ window.RasigaApp = {
       }
       if (data) {
         window.RasigaSeeds = data;
+        
+        // MOCK: Add generated album art to a specific song for demonstration
+        const lagJaGale = window.RasigaSeeds.find(s => s.title === 'Lag Ja Gale');
+        if (lagJaGale) lagJaGale.album_art_url = 'data/art1.png';
+        
         // Re-render if we are on a page that needs songs (like home or discover)
         if (window.RasigaRouter) window.RasigaRouter.handleRoute();
       }

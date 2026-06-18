@@ -23,13 +23,18 @@ window.RasigaComponents = {
     const grad = this.getGradient(song.title);
     const ini = this.getInitials(song.title);
     const delay = delayIdx * 0.05;
+    
+    const artHTML = song.album_art_url 
+      ? `<img src="${song.album_art_url}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; position:absolute; top:0; left:0; z-index:0;" loading="lazy" alt="${song.title} Cover" />` 
+      : ini;
+
     return `
       <div class="glass song-card page-enter" style="animation-delay: ${delay}s;" onclick="RasigaApp.openSong('${song.id}')">
         <button class="icon-btn sc-add-btn" onclick="event.stopPropagation(); RasigaApp.openListModal('${song.id}')" title="Add to List">
           ${Icons.get('plus', {width: 16, height: 16})}
         </button>
-        <div class="sc-art" style="background: ${grad}">
-          ${ini}
+        <div class="sc-art" style="background: ${song.album_art_url ? '#1e293b' : grad}; position:relative;">
+          ${artHTML}
           <div class="sc-play-overlay">
             <button class="sc-play-btn">${Icons.get('play', {fill: 'currentColor'})}</button>
           </div>
