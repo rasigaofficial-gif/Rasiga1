@@ -1033,6 +1033,7 @@ window.RasigaApp = {
           singer: sugData.singer,
           composer: sugData.director, // Using director as composer for now
           lyricist: sugData.lyricist,
+          language: 'Tamil', // Required by songs table schema
           tags: ['Suggested']
         };
 
