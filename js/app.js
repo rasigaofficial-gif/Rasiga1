@@ -1521,11 +1521,12 @@ window.RasigaApp = {
       const si = normalize(s.singer);
       const c = normalize(s.composer);
       const f = normalize(s.film);
+      const lang = normalize(s.language);
 
       if (filter === 'all' || filter === 'singer') match = match || si.includes(q);
       if (filter === 'all' || filter === 'film') match = match || f.includes(q);
       if (filter === 'all' || filter === 'composer') match = match || c.includes(q);
-      if (filter === 'all') match = match || t.includes(q);
+      if (filter === 'all') match = match || t.includes(q) || lang.includes(q);
       if (match && !matches.find(m => m.id === s.id)) matches.push(s);
     });
 
@@ -1686,10 +1687,10 @@ window.RasigaApp = {
 
       if (ratingError) throw ratingError;
 
-      // 2. Insert review
+      // 2. Upsert review
       const { error: reviewError } = await this.supabase
         .from('reviews')
-        .insert({ user_id: user.id, song_id: id, rating_id: ratingData.id, body: text });
+        .upsert({ user_id: user.id, song_id: id, rating_id: ratingData.id, body: text }, { onConflict: 'user_id, song_id' });
 
       if (reviewError) throw reviewError;
 
