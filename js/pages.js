@@ -592,8 +592,8 @@ window.RasigaPages = {
         
         <div style="display:flex; flex-wrap:wrap; gap:2rem; margin-top:1.5rem;">
           
-          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
-            <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Highest Rated Songs</h3>
+          <div style="flex:1; min-width:300px;">
+            <h3 class="section-title" style="margin-bottom:1.5rem;">Highest Rated Songs</h3>
             <div style="display:flex; flex-direction:column; gap:1.25rem;">
               ${topRated.map((s, i) => {
                 const isTop3 = i < 3;
@@ -602,7 +602,7 @@ window.RasigaPages = {
                 if (i === 1) { rankClass = 'text-gradient-silver'; }
                 if (i === 2) { rankClass = 'text-gradient-bronze'; }
                 return `
-                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; padding: 0.5rem; border-radius: var(--radius-md); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="location.hash='#/song/${s.id}'">
+                <div class="glass" style="display:flex; align-items:center; gap:1rem; cursor:pointer; padding: 1rem; border-radius: var(--radius-md); transition: all 0.2s; box-shadow: var(--glass-shadow);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="location.hash='#/song/${s.id}'">
                   <div class="${rankClass}" style="font-weight:bold; font-size:1.2rem; ${isTop3 ? '' : 'color:var(--text-light);'} width:20px; text-align:center;">${i + 1}</div>
                   <div style="flex:1;">
                     <div style="font-weight:600;">${s.title}</div>
@@ -616,11 +616,11 @@ window.RasigaPages = {
             </div>
           </div>
 
-          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
-            <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Most Popular Songs</h3>
+          <div style="flex:1; min-width:300px;">
+            <h3 class="section-title" style="margin-bottom:1.5rem;">Most Popular Songs</h3>
             <div style="display:flex; flex-direction:column; gap:1.25rem;">
               ${mostPopular.map((s, i) => `
-                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer;" onclick="location.hash='#/song/${s.id}'">
+                <div class="glass" style="display:flex; align-items:center; gap:1rem; cursor:pointer; padding: 1rem; border-radius: var(--radius-md); transition: all 0.2s; box-shadow: var(--glass-shadow);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="location.hash='#/song/${s.id}'">
                   <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px;">${i + 1}</div>
                   <div style="flex:1;">
                     <div style="font-weight:600;">${s.title}</div>
