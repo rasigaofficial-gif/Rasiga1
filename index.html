@@ -50,11 +50,17 @@
       <div style="display:flex; gap:0.5rem; align-items:center;">
         <div class="search-container hide-on-mobile">
           <input type="text" id="global-search-input" placeholder="Search songs..." oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value)">
-          <select id="global-search-filter" class="custom-select" style="width: auto; cursor: pointer; padding: 0 1.5rem 0 0.5rem; border: none; background-color: transparent; color: var(--text-muted); font-size: 0.85rem; outline: none;" onchange="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(document.getElementById('global-search-input').value)">
-            <option value="all" style="background: var(--bg-color)">All</option>
-            <option value="artist" style="background: var(--bg-color)">Artist</option>
-            <option value="song" style="background: var(--bg-color)">Song</option>
-          </select>
+          <div id="global-search-filter" class="custom-dropdown-container" data-value="all" onclick="this.classList.toggle('open')">
+            <div class="custom-dropdown-selected" style="background:transparent; border:none; padding:0 0.5rem;">
+              <span class="selected-text">All</span>
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="custom-dropdown-menu">
+              <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('all', 'All', 'global-search-filter', 'global-search-input')">All</div>
+              <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('artist', 'Artist', 'global-search-filter', 'global-search-input')">Artist</div>
+              <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('song', 'Song', 'global-search-filter', 'global-search-input')">Song</div>
+            </div>
+          </div>
           <div class="search-icon" id="top-search-icon"></div>
 
         </div>

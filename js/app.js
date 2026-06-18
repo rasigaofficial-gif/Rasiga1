@@ -1724,12 +1724,33 @@ window.RasigaApp = {
     if (txt) txt.textContent = rating > 0 ? rating + ' Stars' : 'Tap to rate';
   },
 
+  saveRating: async function (id, val) {
+    this.setRatingInput(id, val);
+    
+    const rating = parseFloat(val);
+    const user = RasigaData.demoUser;
+    if (!user || !user.id || !this.supabase) return;
+
+    try {
+      const { error } = await this.supabase
+        .from('ratings')
+        .upsert({ user_id: user.id, song_id: id, score: rating }, { onConflict: 'user_id, song_id' });
+      
+      if (!error) {
+        window.showToast("Rating saved!");
+        await this.fetchInitialData(); // Refresh overall song stats quietly
+      }
+    } catch(e) {
+      console.error('Failed to save rating', e);
+    }
+  },
+
   submitComment: async function (id) {
     const textEl = document.getElementById('review-textarea-' + id);
     const text = textEl ? textEl.value.trim() : '';
 
     if (!text) {
-      window.showToast("A text comment is mandatory to submit your review.", 'error');
+      window.showToast("Please write a review to submit.", 'error');
       return;
     }
 
@@ -1919,6 +1940,20 @@ window.RasigaApp = {
     }
   },
 
+  setSearchFilter: function(val, label, detailsId, inputId) {
+    const details = document.getElementById(detailsId);
+    if (details) {
+      const summaryText = details.querySelector('.selected-text');
+      if (summaryText) summaryText.textContent = label;
+      details.classList.remove('open');
+      details.dataset.value = val;
+    }
+    const inputEl = document.getElementById(inputId);
+    if (inputEl && inputEl.value) {
+      this.executeGlobalSearch(inputEl.value, inputId);
+    }
+  },
+
   executeGlobalSearch: function (query, triggerElementId = 'global-search-input') {
     const resultsContainer = document.getElementById('global-search-results');
     if (!resultsContainer) return;
@@ -1935,10 +1970,10 @@ window.RasigaApp = {
     let filterType = 'all';
     if (triggerElementId === 'discover-search-input') {
       const f = document.getElementById('discover-search-filter');
-      if (f) filterType = f.value;
+      if (f) filterType = f.dataset.value || f.value || 'all';
     } else {
       const f = document.getElementById('global-search-filter');
-      if (f) filterType = f.value;
+      if (f) filterType = f.dataset.value || f.value || 'all';
     }
     
     // Find the active search input to position against

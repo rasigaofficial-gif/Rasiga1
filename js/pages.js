@@ -81,14 +81,20 @@ window.RasigaPages = {
       <div class="page-discover">
         <h2 class="section-title">Explore</h2>
         
-        <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; animation-delay: 0.05s;">
+        <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; animation-delay: 0.05s; overflow: visible;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3 class="section-title" style="margin: 0; color: var(--text-main);">Search Songs</h3>
-            <select id="discover-search-filter" class="glass-input custom-select" style="width: auto; cursor: pointer; padding: 0.4rem 2.5rem 0.4rem 1rem; font-size: 0.9rem; border-radius: var(--radius-full);" onchange="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(document.getElementById('discover-search-input').value, 'discover-search-input')">
-              <option value="all" style="background: var(--bg-color)">All</option>
-              <option value="artist" style="background: var(--bg-color)">Artist</option>
-              <option value="song" style="background: var(--bg-color)">Song</option>
-            </select>
+            <div id="discover-search-filter" class="custom-dropdown-container" data-value="all" onclick="this.classList.toggle('open')">
+              <div class="custom-dropdown-selected">
+                <span class="selected-text">All</span>
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+              <div class="custom-dropdown-menu">
+                <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('all', 'All', 'discover-search-filter', 'discover-search-input')">All</div>
+                <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('artist', 'Artist', 'discover-search-filter', 'discover-search-input')">Artist</div>
+                <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('song', 'Song', 'discover-search-filter', 'discover-search-input')">Song</div>
+              </div>
+            </div>
           </div>
           <input type="text" id="discover-search-input" class="glass-input" style="width: 100%;" placeholder="Search songs..." oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value, 'discover-search-input')">
         </div>
@@ -178,7 +184,7 @@ window.RasigaPages = {
         </div>
         <input type="range" min="0" max="5" step="0.25" value="${userRating}" 
                oninput="RasigaApp.setRatingInput('${id}', this.value)" 
-               onchange="RasigaApp.setRatingInput('${id}', this.value)"
+               onchange="RasigaApp.saveRating('${id}', this.value)"
                style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; margin:0;" />
       </div>
     `;
@@ -208,8 +214,8 @@ window.RasigaPages = {
              <p class="mb-1" style="font-size:1rem;">${userComment}</p>
              <button onclick="RasigaApp.editComment('${id}')" class="btn" style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Edit</button>
           ` : `
-             <textarea id="review-textarea-${id}" class="glass-input mb-1" placeholder="Write your review here... (Required)" style="height: 100px; resize: vertical;"></textarea>
-             <button onclick="RasigaApp.submitComment('${id}')" class="btn btn-primary">Submit</button>
+             <textarea id="review-textarea-${id}" class="glass-input mb-1" placeholder="Write your review here... (Optional)" style="height: 100px; resize: vertical;"></textarea>
+             <button onclick="RasigaApp.submitComment('${id}')" class="btn btn-primary">Submit Review</button>
           `}
         </div>
       `;
@@ -231,10 +237,13 @@ window.RasigaPages = {
             <div class="sh-credits">
                Singer: <span>${song.singer}</span><br>
                Music: <span>${song.composer}</span>
+               ${song.lyricist ? `<br>Lyricist: <span>${song.lyricist}</span>` : ''}
+               <div style="margin-top: 0.6rem;">
+                 <button onclick="RasigaApp.openSuggestSongModal('${song.id}')" style="background:none; border:none; color:var(--text-muted); font-size:0.8rem; display:inline-flex; align-items:center; gap:0.3rem; padding:0; cursor:pointer; font-family:inherit;">
+                   ${window.Icons ? window.Icons.get('edit', {width: 12, height: 12}) : '✎'} Suggest Edit
+                 </button>
+               </div>
             </div>
-            <button onclick="RasigaApp.openSuggestSongModal('${song.id}')" class="btn sh-edit-btn">
-              Suggest Edit
-            </button>
           </div>
           <div class="sh-stats">
              <div class="sh-avg">${song.avg_rating}</div>
