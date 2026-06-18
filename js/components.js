@@ -25,7 +25,7 @@ window.RasigaComponents = {
     const delay = delayIdx * 0.05;
     return `
       <div class="glass song-card page-enter" style="animation-delay: ${delay}s; position:relative;" onclick="RasigaApp.openSong('${song.id}')">
-        <button class="icon-btn" style="position:absolute; top:0.5rem; right:0.5rem; color:var(--text-muted); z-index:10; background:rgba(0,0,0,0.5); border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center;" onclick="event.stopPropagation(); RasigaApp.openListModal('${song.id}')" title="Add to List">
+        <button class="icon-btn" style="position:absolute; top:0.5rem; right:0.5rem; color:var(--text-main); z-index:10; background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; box-shadow:var(--glass-shadow); backdrop-filter:blur(8px); transition:var(--transition);" onclick="event.stopPropagation(); RasigaApp.openListModal('${song.id}')" title="Add to List" onmouseover="this.style.background='var(--accent-teal)'; this.style.color='#fff'; this.style.borderColor='var(--accent-teal)'" onmouseout="this.style.background='var(--glass-bg)'; this.style.color='var(--text-main)'; this.style.borderColor='var(--glass-border)'">
           ${Icons.get('plus', {width: 16, height: 16})}
         </button>
         <div class="sc-art" style="background: ${grad}">

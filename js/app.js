@@ -91,16 +91,16 @@ window.RasigaApp = {
       }
     });
 
-    // Fetch recent reviews for community pulse
-    this.supabase.from('reviews').select('*, users(display_name, avatar_url), songs(title)').order('created_at', { ascending: false }).limit(6).then(({ data, error }) => {
+    // Fetch recent reviews for community pulse (join ratings to get actual score)
+    this.supabase.from('reviews').select('*, users(display_name, avatar_url), songs(title), ratings(score)').order('created_at', { ascending: false }).limit(6).then(({ data, error }) => {
       window.RasigaReviewsLoaded = true;
       if (data) {
         window.RasigaReviews = data.map(r => ({
           id: r.id,
           name: r.users?.display_name || 'User',
-          clr: '#f97316', // Placeholder color, could be generated from name
+          clr: '#f97316',
           text: r.body,
-          rating: r.rating_id ? 5 : null, // Would need a join on ratings
+          rating: r.ratings?.score || 0,
           song: r.songs?.title || 'Unknown Song',
           likes: r.likes_count || 0,
           time: new Date(r.created_at).toLocaleDateString()
@@ -1034,12 +1034,10 @@ window.RasigaApp = {
         const songPayload = {
           title: sugData.song_name,
           year: sugData.year,
-          director: sugData.director,
           singer: sugData.singer,
-          composer: sugData.director, // Using director as composer for now
+          composer: sugData.director,
           lyricist: sugData.lyricist,
-          language: 'Tamil', // Required by songs table schema
-          tags: ['Suggested']
+          language: 'Tamil'
         };
 
         if (sugData.target_song_id) {
@@ -1047,9 +1045,8 @@ window.RasigaApp = {
           const { error: songUpdateError } = await this.supabase.from('songs').update(songPayload).eq('id', sugData.target_song_id);
           if (songUpdateError) throw songUpdateError;
         } else {
-          // Insert new song
+          // Insert new song — let Supabase auto-generate the UUID
           const { error: songInsertError } = await this.supabase.from('songs').insert({
-            id: 'song-' + Date.now(),
             ...songPayload,
             total_ratings: 0,
             avg_rating: 0,

@@ -15,19 +15,17 @@ CREATE POLICY "Anyone can read songs"
   ON songs FOR SELECT 
   USING (true);
 
--- Note: The admin check here uses a JWT claim 'role' = 'admin'. 
--- You might need to adjust this depending on how you implement admin roles in Supabase.
 CREATE POLICY "Admins can insert songs" 
   ON songs FOR INSERT 
-  WITH CHECK (auth.jwt() ->> 'role' = 'admin');
+  WITH CHECK (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND is_admin = true));
 
 CREATE POLICY "Admins can update songs" 
   ON songs FOR UPDATE 
-  USING (auth.jwt() ->> 'role' = 'admin');
+  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND is_admin = true));
 
 CREATE POLICY "Admins can delete songs" 
   ON songs FOR DELETE 
-  USING (auth.jwt() ->> 'role' = 'admin');
+  USING (EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND is_admin = true));
 
 -- ==========================================
 -- USERS
