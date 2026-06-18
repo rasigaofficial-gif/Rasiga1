@@ -592,7 +592,7 @@ window.RasigaPages = {
         
         <div style="display:flex; flex-wrap:wrap; gap:2rem; margin-top:1.5rem;">
           
-          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
+          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg); background:var(--glass-bg-frosted);">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Highest Rated Songs</h3>
             <div style="display:flex; flex-direction:column; gap:1.25rem;">
               ${topRated.map((s, i) => {
@@ -621,7 +621,7 @@ window.RasigaPages = {
             </div>
           </div>
 
-          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
+          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg); background:var(--glass-bg-frosted);">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Most Popular Songs</h3>
             <div style="display:flex; flex-direction:column; gap:1.25rem;">
               ${mostPopular.map((s, i) => {
