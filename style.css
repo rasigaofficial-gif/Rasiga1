@@ -5,9 +5,9 @@
 :root {
   /* LIGHT THEME (Default) */
   --bg-color: #e2e8f0;
-  --bg-gradient: radial-gradient(circle at 15% 50%, color-mix(in srgb, var(--accent-rose) 25%, transparent), transparent 40%),
-    radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--accent-saffron) 25%, transparent), transparent 40%),
-    radial-gradient(circle at 50% 80%, color-mix(in srgb, var(--accent-teal) 20%, transparent), transparent 40%);
+  --bg-gradient: radial-gradient(circle at 15% 50%, rgba(236, 72, 153, 0.25), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(249, 115, 22, 0.25), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(13, 148, 136, 0.2), transparent 40%);
 
   --text-main: #0f172a;
   --text-muted: #334155;
@@ -15,11 +15,11 @@
 
   /* Pastel Glass Surfaces */
   --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
-  --glass-bg-tinted: linear-gradient(135deg, color-mix(in srgb, var(--accent-saffron) 12%, rgba(255, 255, 255, 0.5)), color-mix(in srgb, var(--accent-saffron) 5%, rgba(255, 255, 255, 0.2)));
+  --glass-bg-tinted: linear-gradient(135deg, rgba(249, 115, 22, 0.12), rgba(249, 115, 22, 0.05));
   --glass-bg-frosted: linear-gradient(135deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.55));
   --glass-bg-hover: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.2));
   --glass-border: rgba(255, 255, 255, 0.25);
-  --glass-border-hover: color-mix(in srgb, var(--accent-saffron) 40%, transparent);
+  --glass-border-hover: rgba(249, 115, 22, 0.4);
   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
 
   /* Colorful Accents (Vibrant) */
@@ -31,7 +31,7 @@
   --gradient-brand: linear-gradient(135deg, var(--accent-saffron), var(--accent-rose));
   --gradient-success: linear-gradient(135deg, var(--accent-teal), #10b981);
   --gradient-gold: linear-gradient(135deg, var(--accent-gold), var(--accent-saffron));
-  --nav-theme-bg: linear-gradient(135deg, color-mix(in srgb, var(--accent-saffron) 85%, black), color-mix(in srgb, var(--accent-rose) 85%, black));
+  --nav-theme-bg: linear-gradient(135deg, #d36011, #c13b7f);
 
   /* UI Elements */
   --radius-sm: 8px;
@@ -45,9 +45,9 @@
   --bottom-nav-height: 65px;
 
   /* Spotlight */
-  --spotlight-top: color-mix(in srgb, var(--accent-saffron) 80%, transparent);
-  --spotlight-glow: color-mix(in srgb, var(--accent-saffron) 40%, transparent);
-  --spotlight-cone: color-mix(in srgb, var(--accent-saffron) 15%, transparent);
+  --spotlight-top: rgba(249, 115, 22, 0.8);
+  --spotlight-glow: rgba(249, 115, 22, 0.4);
+  --spotlight-cone: rgba(249, 115, 22, 0.15);
 }
 
 @keyframes pulse {
@@ -65,9 +65,9 @@
 [data-theme='dark'] {
   /* DARK THEME */
   --bg-color: #020617;
-  --bg-gradient: radial-gradient(circle at 15% 50%, color-mix(in srgb, var(--accent-rose) 20%, transparent), transparent 40%),
-    radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--accent-saffron) 20%, transparent), transparent 40%),
-    radial-gradient(circle at 50% 80%, color-mix(in srgb, var(--accent-teal) 15%, transparent), transparent 40%);
+  --bg-gradient: radial-gradient(circle at 15% 50%, rgba(236, 72, 153, 0.2), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(249, 115, 22, 0.2), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(20, 184, 166, 0.15), transparent 40%);
 
   --text-main: #f8fafc;
   --text-muted: #cbd5e1;
@@ -75,15 +75,15 @@
 
   /* Dark Pastel Glass Surfaces */
   --glass-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.5), rgba(15, 23, 42, 0.3));
-  --glass-bg-tinted: linear-gradient(135deg, color-mix(in srgb, var(--accent-saffron) 15%, rgba(30, 41, 59, 0.7)), color-mix(in srgb, var(--accent-saffron) 8%, rgba(15, 23, 42, 0.3)));
+  --glass-bg-tinted: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(249, 115, 22, 0.08));
   --glass-bg-frosted: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.7));
   --glass-bg-hover: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.5));
   --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-border-hover: color-mix(in srgb, var(--accent-saffron) 40%, transparent);
+  --glass-border-hover: rgba(249, 115, 22, 0.4);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 
   --accent-teal: #14b8a6;
-  --nav-theme-bg: linear-gradient(135deg, color-mix(in srgb, var(--accent-saffron) 35%, black), color-mix(in srgb, var(--accent-rose) 35%, black));
+  --nav-theme-bg: linear-gradient(135deg, #592908, #541937);
 
   /* Spotlight - Warm Golden in Dark Mode */
   --spotlight-top: rgba(255, 220, 150, 0.85);
@@ -238,6 +238,28 @@ button {
   transition: none;
   pointer-events: none;
   z-index: 10;
+}
+
+/* ── Typography Enhancements ── */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(251,191,36,0.3));
+}
+
+.text-gradient-silver {
+  background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(226,232,240,0.3));
+}
+
+.text-gradient-bronze {
+  background: linear-gradient(135deg, #fcd34d, #b45309);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(252,211,77,0.3));
 }
 
 .glass:hover::before {
@@ -1513,10 +1535,106 @@ main {
 }
 
 .marquee-content:hover {
+}.marquee-container {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+
+.marquee-content {
+  display: flex;
+  gap: 1rem;
+  width: max-content;
+  animation: scroll-left 30s linear infinite;
+}
+
+.marquee-content:hover {
   animation-play-state: paused;
 }
 
 @keyframes scroll-left {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
+}
+
+/* ── UI Polish ── */
+/* Hide Scrollbars but keep functionality */
+::-webkit-scrollbar {
+  display: none;
+}
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Empty State Animation */
+@keyframes slowPulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+.empty-state svg {
+  animation: slowPulse 3s ease-in-out infinite;
+}
+
+/* ── Toast Notifications ── */
+#toast-container {
+  position: fixed;
+  bottom: calc(var(--bottom-nav-height) + 20px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--glass-bg-frosted);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  padding: 12px 24px;
+  border-radius: 50px;
+  color: var(--text-main);
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: toastEnter 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  pointer-events: auto;
+  min-width: 200px;
+  max-width: 90vw;
+  text-align: center;
+  justify-content: center;
+}
+
+.toast.toast-error {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
+}
+
+.toast.toast-success {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+}
+
+.toast.toast-fadeout {
+  animation: toastExit 0.3s ease forwards;
+}
+
+@keyframes toastEnter {
+  0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toastExit {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(10px) scale(0.95); }
 }

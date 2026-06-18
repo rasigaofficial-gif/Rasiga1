@@ -1,3 +1,21 @@
+window.showToast = function(message, type = 'success') {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement('div');
+  toast.className = 'toast toast-' + type;
+  const icon = type === 'success' ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+  toast.innerHTML = icon + '<span>' + message + '</span>';
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('toast-fadeout');
+    toast.addEventListener('animationend', () => toast.remove());
+  }, 3000);
+};
+
 window.RasigaApp = {
   supabase: null,
 
@@ -62,7 +80,7 @@ window.RasigaApp = {
           token: response.credential
         }).then(({ data, error }) => {
           if (error) {
-            alert('Google Login failed: ' + error.message);
+            window.showToast('Google Login failed: ' + error.message, 'error');
           } else {
             console.log('Google login successful natively!');
           }
@@ -81,7 +99,7 @@ window.RasigaApp = {
     this.supabase.from('songs').select('*').order('total_ratings', { ascending: false }).then(({ data, error }) => {
       if (error) {
         console.error('Error fetching songs:', error);
-        alert('Failed to load songs from database! Please check your connection.');
+        window.showToast('Failed to load songs from database! Please check your connection.', 'error');
         return;
       }
       if (data) {
@@ -659,7 +677,7 @@ window.RasigaApp = {
   submitSongSuggestion: async function (form) {
     const me = RasigaData.demoUser;
     if (!me || !me.id || !this.supabase) {
-      alert("Please log in to submit suggestions.");
+      window.showToast("Please log in to submit suggestions.", 'error');
       return;
     }
 
@@ -687,7 +705,7 @@ window.RasigaApp = {
       if (error) throw error;
       
       this.closeSuggestSongModal();
-      alert(targetSongId ? 'Thank you! Your edit suggestion has been sent for review.' : 'Thank you! Your song suggestion has been sent for review.');
+      window.showToast(targetSongId ? 'Thank you! Your edit suggestion has been sent for review.' : 'Thank you! Your song suggestion has been sent for review.', 'success');
       
       // Refresh profile page if it's currently open
       if (location.hash === '#/profile' && window.RasigaRouter) {
@@ -695,7 +713,7 @@ window.RasigaApp = {
       }
     } catch (err) {
       console.error(err);
-      alert("Failed to submit suggestion.");
+      window.showToast("Failed to submit suggestion.", 'error');
       if (btn) btn.innerHTML = 'Submit Suggestion';
     }
   },
@@ -713,13 +731,13 @@ window.RasigaApp = {
         }
       } catch (err) {
         console.error(err);
-        alert("Failed to delete suggestion.");
+        window.showToast("Failed to delete suggestion.", 'error');
       }
     }
   },
 
   mockOfflineError: function () {
-    alert("Please connect online to perform this action.");
+    window.showToast("Please connect online to perform this action.", 'error');
   },
 
   referFriend: function () {
@@ -733,14 +751,14 @@ window.RasigaApp = {
       navigator.share(shareData).catch(console.error);
     } else {
       navigator.clipboard.writeText(shareData.url).then(() => {
-        alert("App link copied to clipboard! You can now paste it to your friends.");
+        window.showToast("App link copied to clipboard! You can now paste it to your friends.", 'success');
       });
     }
   },
 
   loginWith: function (provider) {
     if (!this.supabase) {
-      alert('Connection error. Please try again later.');
+      window.showToast('Connection error. Please try again later.', 'error');
       return;
     }
 
@@ -751,12 +769,12 @@ window.RasigaApp = {
           redirectTo: window.location.origin + '/#/profile'
         }
       }).then(({ error }) => {
-        if (error) alert('Google login failed: ' + error.message);
+        if (error) window.showToast('Google login failed: ' + error.message, 'error');
       });
     } else if (provider === 'email') {
       const emailInput = document.getElementById('login-email-input');
       const email = emailInput ? emailInput.value.trim() : '';
-      if (!email) { alert('Please enter your email address.'); return; }
+      if (!email) { window.showToast('Please enter your email address.', 'error'); return; }
 
       this.supabase.auth.signInWithOtp({
         email: email,
@@ -765,9 +783,9 @@ window.RasigaApp = {
         }
       }).then(({ error }) => {
         if (error) {
-          alert('Login failed: ' + error.message);
+          window.showToast('Login failed: ' + error.message, 'error');
         } else {
-          alert('Check your email! We sent you a magic login link.');
+          window.showToast('Check your email! We sent you a magic login link.', 'success');
         }
       });
     }
@@ -779,14 +797,14 @@ window.RasigaApp = {
     const themeColor = form.themeColor.value;
 
     if (!displayName || !username) {
-      alert('Please fill in all fields.');
+      window.showToast('Please fill in all fields.', 'error');
       return;
     }
 
     const user = window.RasigaData.demoUser;
-    if (!user || !user.id) { alert('Auth error. Please try logging in again.'); return; }
+    if (!user || !user.id) { window.showToast('Auth error. Please try logging in again.', 'error'); return; }
 
-    if (!this.supabase) { alert('Connection error.'); return; }
+    if (!this.supabase) { window.showToast('Connection error.', 'error'); return; }
 
     // Insert into Supabase users table
     this.supabase.from('users').insert({
@@ -796,9 +814,9 @@ window.RasigaApp = {
     }).then(({ error }) => {
       if (error) {
         if (error.message.includes('duplicate') || error.message.includes('unique')) {
-          alert('That username is already taken. Please choose another.');
+          window.showToast('That username is already taken. Please choose another.', 'error');
         } else {
-          alert('Error creating profile: ' + error.message);
+          window.showToast('Error creating profile: ' + error.message, 'error');
         }
         return;
       }
@@ -826,7 +844,7 @@ window.RasigaApp = {
     const newDisplayName = displayNameInput.value.trim();
 
     if (!newDisplayName) {
-      alert("Display Name cannot be empty.");
+      window.showToast("Display Name cannot be empty.", 'error');
       return;
     }
 
@@ -842,7 +860,7 @@ window.RasigaApp = {
       });
     }
 
-    alert("Profile changes saved successfully!");
+    window.showToast("Profile changes saved successfully!", 'success');
     window.RasigaRouter.handleRoute();
   },
 
@@ -903,7 +921,7 @@ window.RasigaApp = {
       }
     } catch(err) {
       console.error("Follow error:", err);
-      alert("Failed to update follow status.");
+      window.showToast("Failed to update follow status.", 'error');
     }
   },
 
@@ -1230,7 +1248,7 @@ window.RasigaApp = {
         }
       }
 
-      alert('Successfully marked as ' + newStatus);
+      window.showToast('Successfully marked as ' + newStatus, 'success');
       
       // Re-fetch all data so search and charts reflect the new song
       await this.fetchInitialData();
@@ -1241,7 +1259,7 @@ window.RasigaApp = {
       }
     } catch(err) {
       console.error(err);
-      alert('Failed to update suggestion status.');
+      window.showToast('Failed to update suggestion status.', 'error');
     }
   },
 
@@ -1302,7 +1320,7 @@ window.RasigaApp = {
       modal.style.display = 'flex';
     } catch(err) {
       console.error(err);
-      alert('Failed to load suggestion details.');
+      window.showToast('Failed to load suggestion details.', 'error');
     }
   },
 
@@ -1333,7 +1351,7 @@ window.RasigaApp = {
       
     } catch (err) {
       console.error(err);
-      alert("Failed to save and approve suggestion.");
+      window.showToast("Failed to save and approve suggestion.", 'error');
       if (btn) btn.innerHTML = 'Approve and Save';
     }
   },
@@ -1627,18 +1645,19 @@ window.RasigaApp = {
               ${topUsers.map((u, i) => {
                 const isTop3 = i < 3;
                 let rankColor = 'var(--text-light)';
-                if (i === 0) rankColor = 'var(--accent-gold)';
-                if (i === 1) rankColor = '#C0C0C0'; // Silver
-                if (i === 2) rankColor = '#CD7F32'; // Bronze
+                let rankClass = '';
+                if (i === 0) { rankColor = 'var(--accent-gold)'; rankClass = 'text-gradient-gold'; }
+                if (i === 1) { rankColor = '#e2e8f0'; rankClass = 'text-gradient-silver'; }
+                if (i === 2) { rankColor = '#fcd34d'; rankClass = 'text-gradient-bronze'; }
                 
                 return `
-                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer;" onclick="location.hash='#/user/${u.username}'">
-                  <div style="font-weight:bold; font-size:1.5rem; color:${rankColor}; width:30px; text-align:center;">${i + 1}</div>
+                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; padding: 0.5rem; border-radius: var(--radius-md); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="location.hash='#/user/${u.username}'">
+                  <div class="${rankClass}" style="font-weight:bold; font-size:1.5rem; ${isTop3 ? '' : 'color:var(--text-light);'} width:30px; text-align:center;">${i + 1}</div>
                   <div style="width: 40px; height: 40px; border-radius: 50%; background: ${rankColor}; display:flex; align-items:center; justify-content:center; color:${i<3?'#000':'#fff'}; font-weight:bold; font-size:1.2rem;">
                     ${(u.display_name || u.username)[0].toUpperCase()}
                   </div>
                   <div style="flex:1;">
-                    <div style="font-weight:600; font-size:1.1rem; ${isTop3 ? `color:${rankColor}` : ''}">${u.display_name || u.username}</div>
+                    <div class="${rankClass}" style="font-weight:600; font-size:1.1rem;">${u.display_name || u.username}</div>
                     <div style="font-size:0.85rem; color:var(--text-muted);">@${u.username}</div>
                   </div>
                   <div style="font-weight:bold; color:var(--accent-teal); font-size:1.1rem;">
@@ -1682,19 +1701,19 @@ window.RasigaApp = {
     const text = textEl ? textEl.value.trim() : '';
 
     if (!text) {
-      alert("A text comment is mandatory to submit your review.");
+      window.showToast("A text comment is mandatory to submit your review.", 'error');
       return;
     }
 
     const rating = RasigaData.userRatings && RasigaData.userRatings[id];
     if (!rating) {
-      alert("Please select a star rating before submitting your review.");
+      window.showToast("Please select a star rating before submitting your review.", 'error');
       return;
     }
 
     const user = RasigaData.demoUser;
     if (!user || !user.id || !this.supabase) {
-      alert("You must be logged in to review.");
+      window.showToast("You must be logged in to review.", 'error');
       return;
     }
 
@@ -1732,7 +1751,7 @@ window.RasigaApp = {
       RasigaRouter.handleRoute();
     } catch (err) {
       console.error(err);
-      alert("Error submitting review: " + err.message);
+      window.showToast("Error submitting review: " + err.message, 'error');
     }
   },
 
@@ -1859,7 +1878,7 @@ window.RasigaApp = {
   },
 
   shareComment: function (songId) {
-    if (!songId) { alert("Cannot share this review."); return; }
+    if (!songId) { window.showToast("Cannot share this review.", 'error'); return; }
     const url = window.location.origin + window.location.pathname + '#/song/' + songId;
     if (navigator.share) {
       navigator.share({
@@ -1868,7 +1887,7 @@ window.RasigaApp = {
         url: url
       }).catch(err => console.log('Share error:', err));
     } else {
-      navigator.clipboard.writeText(url).then(() => alert('Link copied to clipboard!'));
+      navigator.clipboard.writeText(url).then(() => window.showToast('Link copied to clipboard!', 'success'));
     }
   },
 
@@ -1907,7 +1926,7 @@ window.RasigaApp = {
   openListModal: function(songId) {
     const user = RasigaData.demoUser;
     if (!user || !user.id) {
-      alert("Please log in to add songs to a list.");
+      window.showToast("Please log in to add songs to a list.", 'error');
       return;
     }
     const lists = window.RasigaLists || [];
@@ -1979,12 +1998,12 @@ window.RasigaApp = {
       if (autoAddSongId) {
         await this.addSongToList(data.id, autoAddSongId);
       } else {
-        alert("List created successfully!");
+        window.showToast("List created successfully!", 'success');
         if (location.hash === '#/my-lists' && window.RasigaRouter) window.RasigaRouter.handleRoute();
       }
     } catch(err) {
       console.error(err);
-      alert("Failed to create list.");
+      window.showToast("Failed to create list.", 'error');
     }
   },
 
@@ -2010,7 +2029,7 @@ window.RasigaApp = {
       this.openListModal(songId);
     } catch(err) {
       console.error(err);
-      alert("Failed to add song.");
+      window.showToast("Failed to add song.", 'error');
     }
   },
 
@@ -2034,7 +2053,7 @@ window.RasigaApp = {
       }
     } catch(err) {
       console.error(err);
-      alert("Failed to remove song.");
+      window.showToast("Failed to remove song.", 'error');
     }
   },
 
@@ -2053,7 +2072,7 @@ window.RasigaApp = {
       }
     } catch(err) {
       console.error(err);
-      alert("Failed to delete list.");
+      window.showToast("Failed to delete list.", 'error');
     }
   }
 };

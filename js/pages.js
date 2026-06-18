@@ -596,18 +596,24 @@ window.RasigaPages = {
           <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Highest Rated Songs</h3>
             <div style="display:flex; flex-direction:column; gap:1.25rem;">
-              ${topRated.map((s, i) => `
-                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer;" onclick="location.hash='#/song/${s.id}'">
-                  <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px;">${i + 1}</div>
+              ${topRated.map((s, i) => {
+                const isTop3 = i < 3;
+                let rankClass = '';
+                if (i === 0) { rankClass = 'text-gradient-gold'; }
+                if (i === 1) { rankClass = 'text-gradient-silver'; }
+                if (i === 2) { rankClass = 'text-gradient-bronze'; }
+                return `
+                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; padding: 0.5rem; border-radius: var(--radius-md); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="location.hash='#/song/${s.id}'">
+                  <div class="${rankClass}" style="font-weight:bold; font-size:1.2rem; ${isTop3 ? '' : 'color:var(--text-light);'} width:20px; text-align:center;">${i + 1}</div>
                   <div style="flex:1;">
-                    <div style="font-weight:600;">${s.title}</div>
+                    <div class="${rankClass}" style="font-weight:600;">${s.title}</div>
                     <div style="font-size:0.85rem; color:var(--text-muted);">${s.film} &bull; ${s.language}</div>
                   </div>
                   <div style="display:flex; align-items:center; gap:0.25rem; font-weight:bold; color:var(--accent-gold);">
                     ${s.avg_rating} ${Icons.get('star')}
                   </div>
                 </div>
-              `).join('')}
+              `}).join('')}
             </div>
           </div>
 
@@ -735,7 +741,7 @@ window.RasigaPages = {
           <h3 style="margin-bottom: 1rem;">Find Rasigans</h3>
           <div style="display:flex; gap:0.5rem; position:relative;">
             <input type="text" id="user-search-input" placeholder="Search users by name or username..." autocomplete="off" style="flex:1; padding: 0.8rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1); color: inherit; outline:none; font-size: 1rem;" oninput="RasigaApp.searchUsers(this.value)" />
-            <div id="user-search-suggestions" class="glass" style="display:none; position:absolute; top: 100%; left:0; right:0; max-height: 250px; overflow-y:auto; z-index:999; flex-direction:column; margin-top: 0.5rem; background: color-mix(in srgb, var(--bg-color) 85%, transparent); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+            <div id="user-search-suggestions" class="glass" style="display:none; position:absolute; top: 100%; left:0; right:0; max-height: 250px; overflow-y:auto; z-index:999; flex-direction:column; margin-top: 0.5rem; background: var(--glass-bg-frosted); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
             </div>
           </div>
         </div>
