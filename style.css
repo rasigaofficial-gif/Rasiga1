@@ -136,6 +136,22 @@ html {
   overscroll-behavior-y: none;
 }
 
+/* ── Custom Scrollbar ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
 body {
   background-color: var(--bg-color);
   background-image: var(--bg-gradient);
@@ -609,8 +625,10 @@ main {
   scroll-snap-type: x mandatory;
   margin-left: -1rem;
   margin-right: -1rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: 2rem;
+  padding-right: 3rem;
+  mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
 }
 
 .horizontal-scroll::-webkit-scrollbar {
@@ -1155,11 +1173,43 @@ main {
 
 /* â”€â”€ Badge Card â”€â”€ */
 .badge-card {
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.bc-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  min-height: 80px;
+}
+
+.badge-card.flipped .bc-inner {
+  transform: rotateY(180deg);
+}
+
+.bc-front, .bc-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
   display: flex;
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  transition: transform 0.3s;
+  border-radius: var(--radius-lg);
+}
+
+.bc-back {
+  transform: rotateY(180deg);
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0;
 }
 
 .badge-card.locked {
@@ -1956,4 +2006,31 @@ select.custom-select option {
 }
 .breadcrumb:hover {
   color: var(--text-main);
+}
+
+/* ── Charts Grid ── */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 1200px) {
+  .chart-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Song Page Grid ── */
+.song-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+@media (orientation: landscape) and (min-width: 768px) {
+  .song-grid-layout {
+    grid-template-columns: 1fr 1.5fr;
+  }
 }

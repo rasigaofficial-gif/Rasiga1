@@ -254,12 +254,17 @@ window.RasigaPages = {
           </div>
         </div>
         
-        <h3 class="mb-1">Your Rating & Review</h3>
-        ${userReviewSectionHTML}
-
-        <h3 class="mb-1">Community Reviews</h3>
-        <div>
-          ${reviewsHTML}
+        <div class="song-grid-layout">
+          <div>
+            <h3 class="mb-1">Your Rating & Review</h3>
+            ${userReviewSectionHTML}
+          </div>
+          <div>
+            <h3 class="mb-1">Community Reviews</h3>
+            <div>
+              ${reviewsHTML}
+            </div>
+          </div>
         </div>
       </div>
     `;
@@ -622,7 +627,7 @@ window.RasigaPages = {
           
           <div class="glass page-enter" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg); animation-delay:0.2s;">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Highest Rated Songs</h3>
-            <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            <div class="chart-grid">
               ${topRated.map((s, i) => {
                 const isTop3 = i < 3;
                 let rankClass = '';
@@ -651,7 +656,7 @@ window.RasigaPages = {
 
           <div class="glass page-enter" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg); animation-delay:0.3s;">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Most Popular Songs</h3>
-            <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            <div class="chart-grid">
               ${mostPopular.map((s, i) => {
                 const grad = RasigaComponents.getGradient(s.title);
                 const ini = RasigaComponents.getInitials(s.title);
@@ -679,9 +684,9 @@ window.RasigaPages = {
           
           <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Top Rated Singers</h3>
-            <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            <div class="chart-grid">
               ${topSingersRated.map((a, i) => `
-                <div style="display:flex; align-items:center; gap:1rem; cursor:default;">
+                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'" onclick="location.hash='#/artist/${encodeURIComponent(a.name)}'">
                   <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px;">${i + 1}</div>
                   <div class="ph-avatar vinyl-avatar" style="width:36px; height:36px; font-size:1rem; margin:0;"><span class="vinyl-text">${a.name.charAt(0)}</span></div>
                   <div style="flex:1;">
@@ -698,9 +703,9 @@ window.RasigaPages = {
 
           <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Most Popular Singers</h3>
-            <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            <div class="chart-grid">
               ${topSingersPopular.map((a, i) => `
-                <div style="display:flex; align-items:center; gap:1rem; cursor:default;">
+                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'" onclick="location.hash='#/artist/${encodeURIComponent(a.name)}'">
                   <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px;">${i + 1}</div>
                   <div class="ph-avatar vinyl-avatar" style="width:36px; height:36px; font-size:1rem; margin:0;"><span class="vinyl-text">${a.name.charAt(0)}</span></div>
                   <div style="flex:1;">
@@ -721,9 +726,9 @@ window.RasigaPages = {
           
           <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Top Rated Music Directors</h3>
-            <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            <div class="chart-grid">
               ${topComposersRated.map((a, i) => `
-                <div style="display:flex; align-items:center; gap:1rem; cursor:default;">
+                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'" onclick="location.hash='#/artist/${encodeURIComponent(a.name)}'">
                   <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px;">${i + 1}</div>
                   <div class="ph-avatar vinyl-avatar" style="width:36px; height:36px; font-size:1rem; margin:0;"><span class="vinyl-text">${a.name.charAt(0)}</span></div>
                   <div style="flex:1;">
@@ -740,9 +745,9 @@ window.RasigaPages = {
 
           <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Most Popular Music Directors</h3>
-            <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            <div class="chart-grid">
               ${topComposersPopular.map((a, i) => `
-                <div style="display:flex; align-items:center; gap:1rem; cursor:default;">
+                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'" onclick="location.hash='#/artist/${encodeURIComponent(a.name)}'">
                   <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px;">${i + 1}</div>
                   <div class="ph-avatar vinyl-avatar" style="width:36px; height:36px; font-size:1rem; margin:0;"><span class="vinyl-text">${a.name.charAt(0)}</span></div>
                   <div style="flex:1;">
@@ -1508,6 +1513,87 @@ window.RasigaPages = {
           </div>
         </div>
         <div class="discover-grid">
+          ${songCardsHTML}
+        </div>
+      </div>
+    `;
+  },
+
+  renderArtistPage: function (name) {
+    if (!name) return `<div class="page-placeholder glass page-enter"><h2 class="section-title">Artist Not Found</h2></div>`;
+    
+    const allSongs = window.RasigaSeeds || [];
+    const lowerName = name.toLowerCase();
+    
+    // Filter songs where artist is singer, composer, or lyricist
+    const artistSongs = allSongs.filter(s => {
+      const isSinger = s.singer && s.singer.toLowerCase().includes(lowerName);
+      const isComposer = s.composer && s.composer.toLowerCase().includes(lowerName);
+      const isLyricist = s.lyricist && s.lyricist.toLowerCase().includes(lowerName);
+      return isSinger || isComposer || isLyricist;
+    });
+
+    if (artistSongs.length === 0) {
+      return `
+        <div class="page-list-details">
+          <div class="page-enter" style="display:flex; align-items:center; gap:1rem; margin-bottom:2rem;">
+            <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
+            <h2 class="section-title" style="margin:0;">${name}</h2>
+          </div>
+          ${RasigaComponents.EmptyState('user', 'No Songs Found', 'We could not find any songs credited to this artist.')}
+        </div>
+      `;
+    }
+
+    // Compute stats
+    const totalSongs = artistSongs.length;
+    let totalRatings = 0;
+    let ratingSum = 0;
+    
+    artistSongs.forEach(s => {
+      if (s.avg_rating && s.total_ratings) {
+        totalRatings += s.total_ratings;
+        ratingSum += (s.avg_rating * s.total_ratings);
+      }
+    });
+    
+    const avgRating = totalRatings > 0 ? (ratingSum / totalRatings).toFixed(1) : 0;
+
+    const songCardsHTML = artistSongs.map((song, i) => {
+      const userRating = RasigaData.userRatings && RasigaData.userRatings[song.id] ? RasigaData.userRatings[song.id] : null;
+      return RasigaComponents.SongCard(song, i, userRating);
+    }).join('');
+
+    return `
+      <div class="page-list-details">
+        <a href="#/discover" class="breadcrumb" onclick="window.history.back(); return false;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back
+        </a>
+        <div class="glass song-header page-enter" style="animation-delay: 0s;">
+          <div class="sh-art" style="background: linear-gradient(135deg, var(--accent-saffron), var(--accent-rose)); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; color:white;">
+            ${window.Icons ? window.Icons.get('artist', {width: 48, height: 48}) : ''}
+          </div>
+          <div class="sh-info">
+            <h2 class="sh-title" style="margin-bottom:0.5rem;">${name}</h2>
+            <div style="font-size:0.9rem; color:var(--text-light); margin-bottom: 1rem;">
+              Artist Profile
+            </div>
+            <div style="display: flex; gap: 2rem;">
+              <div>
+                <div style="font-size:1.5rem; font-family:'Cinzel Decorative', serif; font-weight:bold; color:var(--text-main);">${totalSongs}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Songs</div>
+              </div>
+              <div>
+                <div style="font-size:1.5rem; font-family:'Cinzel Decorative', serif; font-weight:bold; color:var(--accent-gold);">${avgRating}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Avg Rating</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <h3 class="section-title page-enter" style="margin-bottom:1.5rem; animation-delay: 0.1s;">Credited Songs</h3>
+        <div class="discover-grid page-enter" style="animation-delay: 0.15s;">
           ${songCardsHTML}
         </div>
       </div>

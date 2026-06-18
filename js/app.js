@@ -54,6 +54,10 @@ window.RasigaApp = {
     this.setupMusicCanvas();
     RasigaRouter.init();
 
+    if (!localStorage.getItem('rasiga_onboarded_carousel') && window.RasigaComponents && window.RasigaComponents.showOnboardingCarousel) {
+      setTimeout(() => window.RasigaComponents.showOnboardingCarousel(), 500);
+    }
+
     // Load PWA features only if hosted
     if (window.location.protocol !== 'file:') {
       const manifestLink = document.createElement('link');
@@ -589,6 +593,11 @@ window.RasigaApp = {
     `;
     
     document.body.appendChild(toast);
+    
+    // Trigger confetti for badges
+    if (title === 'Badge Earned!' && window.RasigaComponents && window.RasigaComponents.fireConfetti) {
+      window.RasigaComponents.fireConfetti();
+    }
     
     void toast.offsetWidth;
     toast.style.transform = 'translateY(0)';
@@ -1738,6 +1747,9 @@ window.RasigaApp = {
       
       if (!error) {
         window.showToast("Rating saved!");
+        if (rating === 5 && window.RasigaComponents && window.RasigaComponents.fireConfetti) {
+          window.RasigaComponents.fireConfetti();
+        }
         await this.fetchInitialData(); // Refresh overall song stats quietly
       }
     } catch(e) {
@@ -2018,11 +2030,37 @@ window.RasigaApp = {
       }
       return matchTitle || matchFilm || matchLang || matchSinger || matchComposer;
     });
+
+    let resultsHTML = '';
     
-    if (songs.length === 0) {
-      resultsContainer.innerHTML = '<div style="padding:1rem; color:var(--text-muted); text-align:center;">No results found</div>';
-    } else {
-      resultsContainer.innerHTML = songs.slice(0, 5).map(song => {
+    // If searching for artists or all, extract matching artists
+    if (filterType === 'artist' || filterType === 'all') {
+      const allArtists = new Set();
+      (window.RasigaSeeds || []).forEach(s => {
+        if (s.singer) s.singer.split(',').map(x => x.trim()).forEach(a => allArtists.add(a));
+        if (s.composer) s.composer.split(',').map(x => x.trim()).forEach(a => allArtists.add(a));
+        if (s.lyricist) s.lyricist.split(',').map(x => x.trim()).forEach(a => allArtists.add(a));
+      });
+      
+      const matchingArtists = Array.from(allArtists).filter(a => a.toLowerCase().includes(lowerQ)).slice(0, 3);
+      
+      if (matchingArtists.length > 0) {
+        resultsHTML += matchingArtists.map(artist => `
+          <div class="gs-result-item" onclick="location.hash='#/artist/${encodeURIComponent(artist)}'; document.getElementById('global-search-results').classList.remove('active'); document.getElementById('global-search-input').value='';">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--gradient-brand); display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0;">
+              ${Icons.get('artist', {width: 20, height: 20})}
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-weight:600; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${artist}</div>
+              <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:2px;">Artist Profile</div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+    
+    if (filterType !== 'artist') {
+      resultsHTML += songs.slice(0, 5).map(song => {
         const grad = window.RasigaComponents ? window.RasigaComponents.getGradient(song.title) : 'var(--gradient-brand)';
         const ini = window.RasigaComponents ? window.RasigaComponents.getInitials(song.title) : song.title[0];
         return `
@@ -2039,7 +2077,13 @@ window.RasigaApp = {
             </div>
           </div>
         </div>
-      `}).join('');
+        `}).join('');
+    }
+    
+    if (!resultsHTML) {
+      resultsContainer.innerHTML = '<div style="padding:1rem; color:var(--text-muted); text-align:center;">No results found</div>';
+    } else {
+      resultsContainer.innerHTML = resultsHTML;
     }
     resultsContainer.classList.add('active');
   },

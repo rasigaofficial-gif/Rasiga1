@@ -77,11 +77,18 @@ window.RasigaComponents = {
   BadgeCard: function(badge, isUnlocked) {
     const cls = isUnlocked ? 'unlocked' : 'locked';
     return `
-      <div class="glass badge-card page-enter ${cls}">
-        <div class="bc-icon">${Icons.get(badge.icon)}</div>
-        <div class="bc-info">
-          <div class="bc-name">${badge.name}</div>
-          <div class="bc-desc">${badge.desc}</div>
+      <div class="badge-card page-enter ${cls}" onclick="this.classList.toggle('flipped')">
+        <div class="bc-inner">
+          <div class="bc-front glass">
+            <div class="bc-icon">${Icons.get(badge.icon)}</div>
+            <div class="bc-info">
+              <div class="bc-name">${badge.name}</div>
+            </div>
+          </div>
+          <div class="bc-back glass">
+            <div class="bc-desc">${badge.desc}</div>
+            <div style="font-size: 0.75rem; color: var(--accent-gold); margin-top: 0.5rem;">+${badge.xp || 0} XP</div>
+          </div>
         </div>
       </div>
     `;
@@ -131,5 +138,111 @@ window.RasigaComponents = {
         <p class="es-message">${message}</p>
       </div>
     `;
+  },
+
+  fireConfetti: function() {
+    const colors = ['#f97316', '#e11d48', '#fbbf24', '#10b981', '#0ea5e9'];
+    const maxConfetti = 50;
+    
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.inset = '0';
+    container.style.pointerEvents = 'none';
+    container.style.zIndex = '99999';
+    document.body.appendChild(container);
+    
+    for(let i=0; i<maxConfetti; i++) {
+      const conf = document.createElement('div');
+      conf.style.position = 'absolute';
+      conf.style.width = Math.random() * 8 + 4 + 'px';
+      conf.style.height = Math.random() * 8 + 4 + 'px';
+      conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      conf.style.left = Math.random() * 100 + 'vw';
+      conf.style.top = '-10px';
+      conf.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+      conf.style.opacity = Math.random() + 0.5;
+      
+      const duration = Math.random() * 2 + 2;
+      conf.style.transition = `transform ${duration}s cubic-bezier(0.25, 0.46, 0.45, 0.94), top ${duration}s ease-in, opacity ${duration}s ease-out`;
+      
+      container.appendChild(conf);
+      
+      setTimeout(() => {
+        conf.style.top = '100vh';
+        conf.style.transform = `rotate(${Math.random() * 720}deg) translateX(${Math.random() * 200 - 100}px)`;
+        conf.style.opacity = '0';
+      }, 50);
+    }
+    
+    setTimeout(() => container.remove(), 5000);
+  },
+
+  showOnboardingCarousel: function() {
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.inset = '0';
+    overlay.style.background = 'var(--glass-bg-frosted)';
+    overlay.style.backdropFilter = 'blur(24px)';
+    overlay.style.zIndex = '100000';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.padding = '2rem';
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity 0.4s ease';
+
+    const slides = [
+      { title: 'Welcome to Rasiga', desc: 'Your personal music journal and discovery platform.', icon: 'star' },
+      { title: 'Rate & Review', desc: 'Keep track of songs you love. Share your thoughts with the community.', icon: 'user' },
+      { title: 'Earn Badges', desc: 'Unlock achievements as you explore, rate, and engage with music.', icon: 'music' }
+    ];
+
+    let currentSlide = 0;
+
+    const renderSlide = () => {
+      const slide = slides[currentSlide];
+      return `
+        <div class="glass" style="max-width: 400px; width: 100%; padding: 2.5rem 2rem; text-align: center; border-radius: var(--radius-lg); position: relative;">
+          <div style="color: var(--accent-saffron); margin-bottom: 1.5rem;">
+            ${window.Icons ? window.Icons.get(slide.icon, {width: 64, height: 64}) : ''}
+          </div>
+          <h2 style="font-family: 'DM Serif Display', serif; font-size: 2rem; margin-bottom: 1rem;">${slide.title}</h2>
+          <p style="color: var(--text-muted); margin-bottom: 2.5rem; line-height: 1.6;">${slide.desc}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; gap: 0.5rem;">
+              ${slides.map((_, i) => `<div style="width: 8px; height: 8px; border-radius: 50%; background: ${i === currentSlide ? 'var(--accent-saffron)' : 'var(--glass-border)'}; transition: background 0.3s;"></div>`).join('')}
+            </div>
+            <button id="carousel-next-btn" class="btn btn-primary" style="padding: 0.6rem 1.5rem;">
+              ${currentSlide === slides.length - 1 ? 'Get Started' : 'Next'}
+            </button>
+          </div>
+        </div>
+      `;
+    };
+
+    overlay.innerHTML = renderSlide();
+    document.body.appendChild(overlay);
+
+    // Fade in
+    requestAnimationFrame(() => overlay.style.opacity = '1');
+
+    const attachEvents = () => {
+      const btn = overlay.querySelector('#carousel-next-btn');
+      if (btn) {
+        btn.onclick = () => {
+          if (currentSlide < slides.length - 1) {
+            currentSlide++;
+            overlay.innerHTML = renderSlide();
+            attachEvents();
+          } else {
+            localStorage.setItem('rasiga_onboarded_carousel', 'true');
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.remove(), 400);
+          }
+        };
+      }
+    };
+    
+    attachEvents();
   }
 };

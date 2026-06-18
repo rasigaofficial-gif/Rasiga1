@@ -34,6 +34,10 @@ window.RasigaRouter = {
       routeFn = 'renderSongPage';
       params = hash.replace('#/song/', '');
       this.injectDynamicNavIcon(hash, params);
+    } else if (hash.startsWith('#/artist/')) {
+      routeFn = 'renderArtistPage';
+      params = decodeURIComponent(hash.replace('#/artist/', ''));
+      this.injectDynamicNavIcon(hash, params, 'artist');
     } else if (hash.startsWith('#/list/')) {
       routeFn = 'renderListDetails';
       params = hash.replace('#/list/', '');
@@ -122,10 +126,18 @@ window.RasigaRouter = {
     });
   },
 
-  injectDynamicNavIcon: function(hash, id) {
-    const song = RasigaSeeds.find(s => s.id === id);
-    if (!song) return;
-    const title = song.title.length > 8 ? song.title.substring(0,8)+'...' : song.title;
+  injectDynamicNavIcon: function(hash, id, type = 'song') {
+    let title = '';
+    let iconName = 'guitar';
+    
+    if (type === 'song') {
+      const song = RasigaSeeds.find(s => s.id === id);
+      if (!song) return;
+      title = song.title.length > 8 ? song.title.substring(0,8)+'...' : song.title;
+    } else if (type === 'artist') {
+      title = id.length > 8 ? id.substring(0,8)+'...' : id;
+      iconName = 'artist';
+    }
 
     // Mobile Nav
     const mNav = document.getElementById('mobile-nav-container');
@@ -136,12 +148,12 @@ window.RasigaRouter = {
       link.href = hash;
       link.id = 'm-dynamic-nav';
       link.className = 'bnav-item';
-      link.innerHTML = `${Icons.get('guitar')}`;
+      link.innerHTML = `${Icons.get(iconName)}`;
       mNav.insertBefore(link, mNav.children[insertIdx]);
     } else if (document.getElementById('m-dynamic-nav')) {
       const link = document.getElementById('m-dynamic-nav');
       link.href = hash;
-      link.innerHTML = `${Icons.get('guitar')}`;
+      link.innerHTML = `${Icons.get(iconName)}`;
     }
 
     // Desktop Nav
@@ -153,12 +165,12 @@ window.RasigaRouter = {
       link.href = hash;
       link.id = 'd-dynamic-nav';
       link.className = 'nav-link';
-      link.innerHTML = `${Icons.get('guitar', {width: 16, height: 16, style: 'margin-right:4px; vertical-align:text-bottom;'})}`;
+      link.innerHTML = `${Icons.get(iconName, {width: 16, height: 16, style: 'margin-right:4px; vertical-align:text-bottom;'})}`;
       dNav.insertBefore(link, dNav.children[insertIdx]);
     } else if (document.getElementById('d-dynamic-nav')) {
       const link = document.getElementById('d-dynamic-nav');
       link.href = hash;
-      link.innerHTML = `${Icons.get('guitar', {width: 16, height: 16, style: 'margin-right:4px; vertical-align:text-bottom;'})}`;
+      link.innerHTML = `${Icons.get(iconName, {width: 16, height: 16, style: 'margin-right:4px; vertical-align:text-bottom;'})}`;
     }
   },
 
