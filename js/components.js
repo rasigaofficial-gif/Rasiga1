@@ -114,5 +114,17 @@ window.RasigaComponents = {
         </div>
       </div>
     `;
+  },
+
+  EmptyState: function(iconName, title, message) {
+    return `
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:4rem 2rem; text-align:center; color:var(--text-muted); width:100%; border-radius:var(--radius-lg); background:var(--glass-bg); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px dashed var(--glass-border);">
+        <div style="width:64px; height:64px; border-radius:50%; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; margin-bottom:1.5rem; color:var(--accent-teal);">
+          ${window.Icons ? window.Icons.get(iconName, {width:32, height:32}) : ''}
+        </div>
+        <h3 style="font-family:'DM Serif Display', serif; font-size:1.5rem; color:var(--text-main); margin-bottom:0.5rem;">${title}</h3>
+        <p style="max-width:400px; line-height:1.6; font-size:0.95rem;">${message}</p>
+      </div>
+    `;
   }
 };

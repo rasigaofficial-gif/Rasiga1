@@ -774,13 +774,6 @@ window.RasigaPages = {
     `;
   },
 
-  renderLists: function () {
-    return `<div class="page-placeholder glass page-enter"><h2 class="section-title">Lists</h2><p>Curated playlists coming soon...</p></div>`;
-  },
-  renderArtists: function () {
-    return `<div class="page-placeholder glass page-enter"><h2 class="section-title">Artists Directory</h2><p>Artist profiles loading...</p></div>`;
-  },
-
   renderContact: function () {
     return `
       <div class="page-discover page-enter">
@@ -1451,7 +1444,7 @@ window.RasigaPages = {
       return this.renderLogin();
     }
     const lists = window.RasigaLists || [];
-    let listsHTML = lists.length === 0 ? '<p style="color:var(--text-muted); text-align:center; padding:2rem;">You haven\'t created any lists yet.<br/><br/>Go to any song and click the + button to create a list!</p>' : lists.map((l, i) => RasigaComponents.ListCard(l, i, true)).join('');
+    let listsHTML = lists.length === 0 ? RasigaComponents.EmptyState('list', 'No Lists Yet', 'You haven\'t created any custom lists. Go to any song and click the + button to start curating!') : lists.map((l, i) => RasigaComponents.ListCard(l, i, true)).join('');
 
     return `
       <div class="page-lists page-enter">
@@ -1475,13 +1468,13 @@ window.RasigaPages = {
     const songsInList = allSongs.filter(s => listSongIds.includes(s.id));
 
     const songCardsHTML = songsInList.length === 0 
-      ? '<p style="color:var(--text-muted); text-align:center; padding:2rem;">This list is empty.</p>'
+      ? RasigaComponents.EmptyState('music', 'List is Empty', 'There are no songs in this list yet.')
       : songsInList.map((song, i) => {
           const userRating = RasigaData.userRatings && RasigaData.userRatings[song.id] ? RasigaData.userRatings[song.id] : null;
           return `
             <div style="position:relative;">
               ${RasigaComponents.SongCard(song, i, userRating)}
-              ${list.user_id === RasigaData.demoUser?.id ? `<button class="icon-btn" style="position:absolute; top:0.5rem; right:2.5rem; color:var(--accent-rose); z-index:10; background:rgba(0,0,0,0.5); border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center;" onclick="event.stopPropagation(); RasigaApp.removeSongFromList('${list.id}', '${song.id}')" title="Remove from List">${Icons.get('trash', {width:14, height:14})}</button>` : ''}
+              ${list.user_id === RasigaData.demoUser?.id ? `<button class="icon-btn" style="position:absolute; top:0.5rem; right:2.5rem; color:var(--accent-rose); z-index:10; background:var(--glass-bg); border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); border: 1px solid var(--glass-border);" onclick="event.stopPropagation(); RasigaApp.removeSongFromList('${list.id}', '${song.id}')" title="Remove from List">${window.Icons ? window.Icons.get('trash', {width:14, height:14}) : '🗑️'}</button>` : ''}
             </div>
           `;
         }).join('');

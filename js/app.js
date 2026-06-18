@@ -280,7 +280,7 @@ window.RasigaApp = {
       const otherReviews = reviews.filter(r => !user || r.user_id !== user.id);
 
       if (reviews.length === 0) {
-        reviewsContainer.innerHTML = '<p style="color:var(--text-muted)">No reviews yet.</p>';
+        reviewsContainer.innerHTML = window.RasigaComponents ? window.RasigaComponents.EmptyState('penTool', 'No Reviews Yet', 'Be the first to review this song and share your thoughts with the community!') : '<p style="color:var(--text-muted)">No reviews yet.</p>';
         return;
       }
 
