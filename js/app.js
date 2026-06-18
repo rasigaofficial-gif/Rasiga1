@@ -171,9 +171,16 @@ window.RasigaApp = {
               }
               
               // Calculate streak
-              this.supabase.from('ratings').select('created_at').eq('user_id', data.id).order('created_at', { ascending: false }).then(({ data: ratingsData }) => {
+              this.supabase.from('ratings').select('*').eq('user_id', data.id).order('created_at', { ascending: false }).then(({ data: ratingsData }) => {
                 let streak = 0;
+                if (!window.RasigaData.userRatings) window.RasigaData.userRatings = {};
+                
                 if (ratingsData && ratingsData.length > 0) {
+                  // Populate userRatings map
+                  ratingsData.forEach(r => window.RasigaData.userRatings[r.song_id] = r.score);
+                  window.RasigaData.demoUser.stats.ratings = ratingsData.length;
+                  
+                  // Streak logic
                   let currentDate = new Date();
                   currentDate.setHours(0,0,0,0);
                   
@@ -201,8 +208,18 @@ window.RasigaApp = {
                 }
                 
                 window.RasigaData.demoUser.streak = streak;
-                localStorage.setItem('rasiga_user', JSON.stringify(window.RasigaData.demoUser));
-                window.RasigaRouter.handleRoute();
+                
+                // Fetch reviews
+                this.supabase.from('reviews').select('*').eq('user_id', data.id).then(({ data: reviewsData }) => {
+                  if (!window.RasigaData.userComments) window.RasigaData.userComments = {};
+                  if (reviewsData && reviewsData.length > 0) {
+                    reviewsData.forEach(c => window.RasigaData.userComments[c.song_id] = { text: c.body, id: c.id });
+                    window.RasigaData.demoUser.stats.reviews = reviewsData.length;
+                  }
+                  
+                  localStorage.setItem('rasiga_user', JSON.stringify(window.RasigaData.demoUser));
+                  window.RasigaRouter.handleRoute();
+                });
               });
             });
           });
