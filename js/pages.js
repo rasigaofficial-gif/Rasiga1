@@ -81,22 +81,25 @@ window.RasigaPages = {
       <div class="page-discover">
         <h2 class="section-title">Explore</h2>
         
-        <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; animation-delay: 0.05s; overflow: visible;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h3 class="section-title" style="margin: 0; color: var(--text-main);">Search Songs</h3>
-            <div id="discover-search-filter" class="custom-dropdown-container" data-value="all" onclick="this.classList.toggle('open')">
-              <div class="custom-dropdown-selected">
-                <span class="selected-text">All</span>
-                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
-              </div>
-              <div class="custom-dropdown-menu">
-                <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('all', 'All', 'discover-search-filter', 'discover-search-input')">All</div>
-                <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('artist', 'Artist', 'discover-search-filter', 'discover-search-input')">Artist</div>
-                <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('song', 'Song', 'discover-search-filter', 'discover-search-input')">Song</div>
-              </div>
+        <div style="position: relative; margin-bottom: 2rem; z-index: 50;">
+          <div class="glass page-enter" style="padding: 1.5rem; animation-delay: 0.05s;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3 class="section-title" style="margin: 0; color: var(--text-main);">Search Songs</h3>
+            </div>
+            <input type="text" id="discover-search-input" class="glass-input" style="width: 100%;" placeholder="Search songs..." oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value, 'discover-search-input')">
+          </div>
+
+          <div id="discover-search-filter" class="custom-dropdown-container page-enter" data-value="all" onclick="this.classList.toggle('open')" style="position: absolute; top: 1.25rem; right: 1.5rem; animation-delay: 0.05s;">
+            <div class="custom-dropdown-selected">
+              <span class="selected-text">All</span>
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="custom-dropdown-menu">
+              <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('all', 'All', 'discover-search-filter', 'discover-search-input')">All</div>
+              <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('artist', 'Artist', 'discover-search-filter', 'discover-search-input')">Artist</div>
+              <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('song', 'Song', 'discover-search-filter', 'discover-search-input')">Song</div>
             </div>
           </div>
-          <input type="text" id="discover-search-input" class="glass-input" style="width: 100%;" placeholder="Search songs..." oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value, 'discover-search-input')">
         </div>
         
         <div id="discover-results-container">
