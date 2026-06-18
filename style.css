@@ -31,7 +31,7 @@
   --gradient-brand: linear-gradient(135deg, var(--accent-saffron), var(--accent-rose));
   --gradient-success: linear-gradient(135deg, var(--accent-teal), #10b981);
   --gradient-gold: linear-gradient(135deg, var(--accent-gold), var(--accent-saffron));
-  --nav-theme-bg: linear-gradient(135deg, #d36011, #c13b7f);
+  --nav-theme-bg: var(--gradient-brand);
 
   /* UI Elements */
   --radius-sm: 8px;
@@ -83,7 +83,7 @@
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 
   --accent-teal: #14b8a6;
-  --nav-theme-bg: linear-gradient(135deg, #592908, #541937);
+  --nav-theme-bg: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), var(--gradient-brand);
 
   /* Spotlight - Warm Golden in Dark Mode */
   --spotlight-top: rgba(255, 220, 150, 0.85);
@@ -391,12 +391,12 @@ button {
   width: calc(100% - 2rem);
   height: var(--bottom-nav-height);
   z-index: 100;
-  background: var(--glass-bg-frosted);
+  background: var(--nav-theme-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--glass-border);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-full);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 32px rgba(249, 115, 22, 0.3), inset 1px 1px 1px rgba(255, 255, 255, 0.2);
   overflow: hidden;
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -416,7 +416,7 @@ button {
   align-items: center;
   height: 100%;
   flex: 1;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.6);
   transition: color 0.4s var(--ease);
 }
 
@@ -428,12 +428,12 @@ button {
 }
 
 .bnav-item.active {
-  color: var(--accent-saffron);
+  color: #ffffff;
 }
 
 .bnav-item.active svg {
   transform: translateY(-2px);
-  filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.5));
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
 }
 
 /* Spotlight Top Line */
@@ -445,9 +445,9 @@ button {
   transform: translateX(-50%) translateY(-10px);
   width: 24px;
   height: 3px;
-  background: var(--accent-saffron);
+  background: #ffffff;
   border-radius: 0 0 4px 4px;
-  box-shadow: 0 2px 10px rgba(249, 115, 22, 0.6);
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.9);
   z-index: 2;
   opacity: 0;
   transition: opacity 0.4s ease, transform 0.4s ease;
@@ -467,7 +467,7 @@ button {
   transform: translateX(-50%) translateY(-10px);
   width: 60px;
   height: 100%;
-  background: linear-gradient(to bottom, rgba(249, 115, 22, 0.15) 0%, transparent 80%);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, transparent 80%);
   clip-path: polygon(30% 0, 70% 0, 100% 100%, 0% 100%);
   pointer-events: none;
   z-index: 1;
