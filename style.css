@@ -1515,6 +1515,11 @@ main {
 
 .hero-keyword {
   font-family: 'Dancing Script', cursive;
+  background: linear-gradient(135deg, var(--accent-saffron), var(--accent-rose));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  padding-right: 4px; /* prevents cursive font clipping */
 }
 
 .hero-punchline {
