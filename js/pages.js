@@ -1,16 +1,23 @@
 window.RasigaPages = {
   renderHome: function () {
     let trendingHTML = '';
-    const sorted = [...RasigaSeeds].sort((a, b) => b.total_ratings - a.total_ratings).slice(0, 10);
+    // Trending Logic: High ratings and high popularity
+    const sorted = [...RasigaSeeds].sort((a, b) => ((b.total_ratings * 2) + b.avg_rating) - ((a.total_ratings * 2) + a.avg_rating)).slice(0, 10);
     if (sorted.length === 0) {
       trendingHTML = '<div style="padding:2rem; text-align:center; color:var(--text-muted); width:100%;">Loading songs...</div>';
     } else {
-      sorted.forEach((s, i) => trendingHTML += RasigaComponents.SongCard(s, i));
+      let cards = '';
+      sorted.forEach((s, i) => cards += RasigaComponents.SongCard(s, i));
+      trendingHTML = `<div class="marquee-container"><div class="marquee-content">${cards}${cards}</div></div>`;
     }
 
     let reviewsHTML = '';
     if (RasigaReviews.length === 0) {
-      reviewsHTML = '<div style="padding:2rem; text-align:center; color:var(--text-muted); grid-column:1/-1;">Loading community pulse...</div>';
+      if (window.RasigaReviewsLoaded) {
+        reviewsHTML = '<div style="padding:2rem; text-align:center; color:var(--text-muted); grid-column:1/-1;">No community activity yet. Be the first to leave a review!</div>';
+      } else {
+        reviewsHTML = '<div style="padding:2rem; text-align:center; color:var(--text-muted); grid-column:1/-1;">Loading community pulse...</div>';
+      }
     } else {
       RasigaReviews.forEach(r => reviewsHTML += RasigaComponents.ReviewCard(r));
     }
@@ -32,7 +39,7 @@ window.RasigaPages = {
 
         <section class="section">
           <h2 class="section-title">Trending Now</h2>
-          <div class="horizontal-scroll">${trendingHTML}</div>
+          ${trendingHTML}
         </section>
 
         <section class="section">

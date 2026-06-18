@@ -93,6 +93,7 @@ window.RasigaApp = {
 
     // Fetch recent reviews for community pulse
     this.supabase.from('reviews').select('*, users(display_name, avatar_url), songs(title)').order('created_at', { ascending: false }).limit(6).then(({ data, error }) => {
+      window.RasigaReviewsLoaded = true;
       if (data) {
         window.RasigaReviews = data.map(r => ({
           id: r.id,
@@ -104,8 +105,10 @@ window.RasigaApp = {
           likes: r.likes_count || 0,
           time: new Date(r.created_at).toLocaleDateString()
         }));
-        if (window.RasigaRouter && location.hash === '#/') window.RasigaRouter.handleRoute();
+      } else {
+        window.RasigaReviews = [];
       }
+      if (window.RasigaRouter && (location.hash === '#/' || location.hash === '')) window.RasigaRouter.handleRoute();
     });
 
     // Fetch suggestions (for admin)
