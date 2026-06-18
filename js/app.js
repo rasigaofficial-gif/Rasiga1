@@ -163,7 +163,48 @@ window.RasigaApp = {
           // Fetch user's custom lists
           this.supabase.from('lists').select('*, list_songs(song_id)').eq('user_id', data.id).order('created_at', { ascending: false }).then(({ data: listData }) => {
             window.RasigaLists = listData || [];
-            window.RasigaRouter.handleRoute();
+            
+            // Fetch badges
+            this.supabase.from('user_badges').select('badge_id').eq('user_id', data.id).then(({ data: badgeData }) => {
+              if (badgeData) {
+                window.RasigaData.demoUser.badges = badgeData.map(b => b.badge_id);
+              }
+              
+              // Calculate streak
+              this.supabase.from('ratings').select('created_at').eq('user_id', data.id).order('created_at', { ascending: false }).then(({ data: ratingsData }) => {
+                let streak = 0;
+                if (ratingsData && ratingsData.length > 0) {
+                  let currentDate = new Date();
+                  currentDate.setHours(0,0,0,0);
+                  
+                  let uniqueDates = [...new Set(ratingsData.map(r => {
+                    const d = new Date(r.created_at);
+                    d.setHours(0,0,0,0);
+                    return d.getTime();
+                  }))];
+                  
+                  let expectedTime = currentDate.getTime();
+                  if (uniqueDates[0] === expectedTime || uniqueDates[0] === expectedTime - 86400000) {
+                      expectedTime = uniqueDates[0];
+                      for (let i=0; i<uniqueDates.length; i++) {
+                          if (uniqueDates[i] === expectedTime) {
+                              streak++;
+                              expectedTime -= 86400000;
+                          } else {
+                              break;
+                          }
+                      }
+                  }
+                  if (streak === 0) streak = 1;
+                } else {
+                  streak = 1;
+                }
+                
+                window.RasigaData.demoUser.streak = streak;
+                localStorage.setItem('rasiga_user', JSON.stringify(window.RasigaData.demoUser));
+                window.RasigaRouter.handleRoute();
+              });
+            });
           });
         });
 
@@ -480,6 +521,122 @@ window.RasigaApp = {
   closeSuggestSongModal: function () {
     const modal = document.getElementById('suggest-modal');
     if (modal) modal.style.display = 'none';
+  },
+
+  showToast: function(title, message, icon='star') {
+    const toast = document.createElement('div');
+    toast.className = 'glass';
+    toast.style.position = 'fixed';
+    toast.style.bottom = '2rem';
+    toast.style.right = '2rem';
+    toast.style.padding = '1rem 1.5rem';
+    toast.style.borderRadius = 'var(--radius-md)';
+    toast.style.zIndex = '9999';
+    toast.style.display = 'flex';
+    toast.style.alignItems = 'center';
+    toast.style.gap = '1rem';
+    toast.style.boxShadow = '0 10px 40px rgba(0,0,0,0.5)';
+    toast.style.transform = 'translateY(100px)';
+    toast.style.opacity = '0';
+    toast.style.transition = 'all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+    
+    toast.innerHTML = `
+      <div style="color:var(--accent-gold);">${window.Icons ? window.Icons.get(icon, {width: 24, height: 24}) : ''}</div>
+      <div>
+        <div style="font-weight:600; font-size:1rem; color:var(--text-main);">${title}</div>
+        <div style="font-size:0.85rem; color:var(--text-muted);">${message}</div>
+      </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    void toast.offsetWidth;
+    toast.style.transform = 'translateY(0)';
+    toast.style.opacity = '1';
+    
+    setTimeout(() => {
+      toast.style.transform = 'translateY(100px)';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 500);
+    }, 4000);
+  },
+
+  addXP: async function(amount) {
+    const user = window.RasigaData.demoUser;
+    if (!user || !user.onboarded || !this.supabase) return;
+    
+    user.xp += amount;
+    localStorage.setItem('rasiga_user', JSON.stringify(user));
+    
+    try {
+      await this.supabase.from('users').update({ xp: user.xp }).eq('id', user.id);
+    } catch(e) {
+      console.error('Failed to sync XP', e);
+    }
+  },
+
+  checkAndAwardBadges: async function() {
+    const user = window.RasigaData.demoUser;
+    if (!user || !user.onboarded || !this.supabase) return;
+    
+    const userBadges = new Set(user.badges || []);
+    const newlyEarned = [];
+    
+    const { data: ratingsData } = await this.supabase.from('ratings').select('score, song_id, created_at').eq('user_id', user.id);
+    const { data: reviewsData } = await this.supabase.from('reviews').select('id, created_at').eq('user_id', user.id);
+    
+    const ratings = ratingsData || [];
+    const reviews = reviewsData || [];
+    
+    if (ratings.length >= 1 && !userBadges.has('first_note')) newlyEarned.push('first_note');
+    if (reviews.length >= 1 && !userBadges.has('wordsmith')) newlyEarned.push('wordsmith');
+    if (ratings.length >= 5 && !userBadges.has('dawn_raga')) newlyEarned.push('dawn_raga');
+    if (ratings.length >= 100 && !userBadges.has('century')) newlyEarned.push('century');
+    if (ratings.some(r => r.score < 2.0) && !userBadges.has('critic')) newlyEarned.push('critic');
+    if (ratings.length >= 50 && !userBadges.has('connoisseur')) newlyEarned.push('connoisseur');
+    if (user.streak >= 3 && !userBadges.has('streak_starter')) newlyEarned.push('streak_starter');
+    if (user.streak >= 7 && !userBadges.has('dedicated')) newlyEarned.push('dedicated');
+    if (user.streak >= 30 && !userBadges.has('diamond')) newlyEarned.push('diamond');
+    
+    const ratedSongIds = ratings.map(r => r.song_id);
+    const ratedSongs = (window.RasigaSeeds || []).filter(s => ratedSongIds.includes(s.id));
+    const languages = new Set(ratedSongs.map(s => s.language));
+    if (languages.size >= 3 && !userBadges.has('polyglot')) newlyEarned.push('polyglot');
+    
+    let moods = new Set();
+    ratedSongs.forEach(s => { (s.mood || []).forEach(m => moods.add(m)); });
+    if (moods.size >= 5 && !userBadges.has('mood_master')) newlyEarned.push('mood_master');
+    
+    const highRatings = ratings.filter(r => r.score >= 4.5);
+    if (highRatings.length >= 10 && !userBadges.has('summit')) newlyEarned.push('summit');
+    
+    const hasNightOwl = ratings.some(r => {
+      const h = new Date(r.created_at).getHours();
+      return h >= 0 && h < 4;
+    });
+    if (hasNightOwl && !userBadges.has('night_owl')) newlyEarned.push('night_owl');
+    
+    for (let badgeId of newlyEarned) {
+      user.badges.push(badgeId);
+      const badgeDef = window.RasigaData.BADGES.find(b => b.id === badgeId);
+      if (badgeDef) {
+        this.showToast('Badge Earned!', badgeDef.name, badgeDef.icon);
+        await this.addXP(badgeDef.xp);
+      }
+      
+      try {
+        await this.supabase.from('user_badges').insert({
+          user_id: user.id,
+          badge_id: badgeId
+        });
+      } catch(e) {
+        console.error('Failed to insert badge', e);
+      }
+    }
+    
+    if (newlyEarned.length > 0) {
+      localStorage.setItem('rasiga_user', JSON.stringify(user));
+    }
   },
 
   submitSongSuggestion: async function (form) {
@@ -1536,9 +1693,16 @@ window.RasigaApp = {
 
       if (reviewError) throw reviewError;
 
+      const isNewReview = !RasigaData.userComments[id];
+
       // 3. Update local state for immediate UI reflection
       if (!RasigaData.userComments) RasigaData.userComments = {};
       RasigaData.userComments[id] = text;
+
+      if (isNewReview) {
+        await this.addXP(30); // 10 for rating, 20 for review
+        await this.checkAndAwardBadges();
+      }
 
       // Re-fetch initial data to get updated community pulse and song stats
       await this.fetchInitialData();

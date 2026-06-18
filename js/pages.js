@@ -51,11 +51,30 @@ window.RasigaPages = {
   },
 
   renderDiscover: function () {
-    let gridHTML = '';
+    let topRatedHTML = '';
+    let recentHTML = '';
+    let languageHTML = '';
+    
     if (RasigaSeeds.length === 0) {
-      gridHTML = '<div style="padding:2rem; text-align:center; color:var(--text-muted); width:100%;">Loading songs...</div>';
+      topRatedHTML = '<div style="padding:2rem; text-align:center; color:var(--text-muted); width:100%;">Loading songs...</div>';
     } else {
-      RasigaSeeds.forEach((s, i) => gridHTML += RasigaComponents.SongCard(s, i));
+      // Top Rated
+      const topRated = [...RasigaSeeds].sort((a, b) => Number(b.avg_rating || 0) - Number(a.avg_rating || 0)).slice(0, 10);
+      let trCards = '';
+      topRated.forEach((s, i) => trCards += RasigaComponents.SongCard(s, i));
+      topRatedHTML = `<div class="horizontal-scroll" style="padding-bottom: 1rem; margin-bottom: 2rem;">${trCards}</div>`;
+      
+      // Recently Added
+      const recent = [...RasigaSeeds].slice(-10).reverse();
+      let rCards = '';
+      recent.forEach((s, i) => rCards += RasigaComponents.SongCard(s, i));
+      recentHTML = `<div class="horizontal-scroll" style="padding-bottom: 1rem; margin-bottom: 2rem;">${rCards}</div>`;
+      
+      // Languages
+      const langs = ['Tamil', 'Telugu', 'Hindi', 'Malayalam', 'Kannada', 'Bengali', 'Punjabi'];
+      languageHTML = `<div class="filter-pills" style="margin-bottom: 2rem;">
+        ${langs.map(l => `<button class="filter-pill" onclick="document.getElementById('search-input').value='${l}'; RasigaApp.selectFilter('all', 'All'); RasigaApp.executeSearch();">${l}</button>`).join('')}
+      </div>`;
     }
 
     return `
@@ -82,14 +101,21 @@ window.RasigaPages = {
               </div>
             </div>
             <button onclick="RasigaApp.executeSearch()" class="btn btn-primary" style="border-radius: var(--radius-sm); padding: 0.8rem 1.2rem;">
-              ${Icons.get('search')}
+              ${window.Icons ? window.Icons.get('search') : 'Search'}
             </button>
           </div>
         </div>
 
         <div id="discover-results-container">
-          <div class="song-grid mt-4 page-enter" style="animation-delay: 0.2s;" id="discover-grid">
-            ${gridHTML}
+          <div class="page-enter" style="animation-delay: 0.2s;">
+            <h3 style="margin-bottom: 1rem; font-family: 'Cinzel Decorative', serif; color: var(--accent-saffron);">Browse by Language</h3>
+            ${languageHTML}
+
+            <h3 style="margin-bottom: 1rem; font-family: 'Cinzel Decorative', serif; color: var(--accent-teal);">Highest Rated</h3>
+            ${topRatedHTML}
+            
+            <h3 style="margin-bottom: 1rem; font-family: 'Cinzel Decorative', serif; color: var(--text-main);">Recently Added</h3>
+            ${recentHTML}
           </div>
         </div>
       </div>
@@ -884,7 +910,24 @@ window.RasigaPages = {
     const topMoods = Object.entries(moodCounts).sort((a, b) => b[1] - a[1]).slice(0, 6);
     const moodLabels = topMoods.map(m => m[0]);
     const moodData = topMoods.map(m => m[1]);
-    const communityMoodData = moodData.map(v => Math.max(1, v - Math.floor(Math.random() * 3)));
+    
+    // Community Mood Data based on actual song stats
+    const communityMoodTotals = {};
+    let totalCommunityMoodRatings = 0;
+    allSongs.forEach(s => { 
+      if (s.total_ratings > 0) {
+        (s.mood || []).forEach(m => { 
+          communityMoodTotals[m] = (communityMoodTotals[m] || 0) + s.total_ratings; 
+          totalCommunityMoodRatings += s.total_ratings;
+        });
+      }
+    });
+
+    const communityMoodData = moodLabels.map(m => {
+      if (totalCommunityMoodRatings === 0) return 1;
+      const relativePop = (communityMoodTotals[m] || 0) / totalCommunityMoodRatings;
+      return Math.max(1, Math.round(relativePop * userRatingsCount * 1.5));
+    });
 
     // Genres
     const genreCounts = {};
