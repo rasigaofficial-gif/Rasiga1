@@ -97,6 +97,7 @@ CREATE TABLE list_songs (
 CREATE TABLE review_likes (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     review_id UUID REFERENCES reviews(id) ON DELETE CASCADE,
+    reaction_type TEXT DEFAULT 'like',
     PRIMARY KEY (user_id, review_id)
 );
 
