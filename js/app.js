@@ -1428,10 +1428,12 @@ window.RasigaApp = {
       const rEl = document.getElementById('home-stat-ratings');
       const uEl = document.getElementById('home-stat-users');
       const lEl = document.getElementById('home-stat-languages');
+      const sEl = document.getElementById('home-stat-songs');
 
       if (rEl) rEl.textContent = formatStat(ratingsCount);
       if (uEl) uEl.textContent = formatStat(usersCount);
       if (lEl) lEl.textContent = uniqueLanguages;
+      if (sEl) sEl.textContent = formatStat(window.RasigaSeeds ? window.RasigaSeeds.length : 0);
 
     } catch (err) {
       console.error("Error fetching home stats:", err);
