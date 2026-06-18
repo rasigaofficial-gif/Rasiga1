@@ -100,9 +100,9 @@ window.RasigaComponents = {
     return `
       <div class="glass review-card page-enter" onclick="location.hash='${link}'">
         <div class="rc-header">
-          <div class="rc-avatar" style="background: ${review.clr}">${review.name[0]}</div>
+          <div class="rc-avatar" style="background: ${review.clr}; cursor: pointer;" onclick="if('${review.username}' && '${review.username}' !== 'undefined') { event.stopPropagation(); location.hash='#/user/${review.username}'; }">${review.name[0]}</div>
           <div class="rc-user-info">
-            <div class="rc-name">${review.name}</div>
+            <div class="rc-name" style="cursor: pointer;" onclick="if('${review.username}' && '${review.username}' !== 'undefined') { event.stopPropagation(); location.hash='#/user/${review.username}'; }">${review.name}</div>
             <div class="rc-meta">Reviewed <b>${review.song}</b> &bull; ${Icons.get('star', {width:12, height:12, fill:'var(--accent-gold)', color:'var(--accent-gold)'})} ${review.rating}</div>
           </div>
         </div>

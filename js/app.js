@@ -119,12 +119,13 @@ window.RasigaApp = {
     });
 
     // Fetch recent reviews for community pulse (join ratings to get actual score)
-    this.supabase.from('reviews').select('*, users!reviews_user_id_fkey(display_name, avatar_url), songs(title), ratings(score)').order('created_at', { ascending: false }).limit(6).then(({ data, error }) => {
+    this.supabase.from('reviews').select('*, users!reviews_user_id_fkey(display_name, username, avatar_url), songs(title), ratings(score)').order('created_at', { ascending: false }).limit(6).then(({ data, error }) => {
       window.RasigaReviewsLoaded = true;
       if (data) {
         window.RasigaReviews = data.map(r => ({
           id: r.id,
-          name: r.users?.display_name || 'User',
+          name: r.users?.display_name || r.users?.username || 'User',
+          username: r.users?.username,
           clr: '#f97316',
           text: r.body,
           rating: r.ratings?.score || 0,
@@ -198,7 +199,7 @@ window.RasigaApp = {
               }
               
               // Calculate streak
-              this.supabase.from('ratings').select('*').eq('user_id', data.id).order('created_at', { ascending: false }).then(({ data: ratingsData }) => {
+              this.supabase.from('ratings').select('*').eq('user_id', data.id).order('rated_at', { ascending: false }).then(({ data: ratingsData }) => {
                 let streak = 0;
                 if (!window.RasigaData.userRatings) window.RasigaData.userRatings = {};
                 
@@ -212,7 +213,7 @@ window.RasigaApp = {
                   currentDate.setHours(0,0,0,0);
                   
                   let uniqueDates = [...new Set(ratingsData.map(r => {
-                    const d = new Date(r.created_at);
+                    const d = new Date(r.rated_at);
                     d.setHours(0,0,0,0);
                     return d.getTime();
                   }))];
@@ -242,6 +243,19 @@ window.RasigaApp = {
                   if (reviewsData && reviewsData.length > 0) {
                     reviewsData.forEach(c => window.RasigaData.userComments[c.song_id] = { text: c.body, id: c.id });
                     window.RasigaData.demoUser.stats.reviews = reviewsData.length;
+                  }
+                  
+                  // XP Sync/Recovery Logic
+                  let expectedXp = (window.RasigaData.demoUser.stats.ratings || 0) * 10 + (window.RasigaData.demoUser.stats.reviews || 0) * 20;
+                  if (window.RasigaData.demoUser.badges) {
+                    window.RasigaData.demoUser.badges.forEach(b => {
+                      const bDef = Object.values(window.RasigaBadges || {}).find(bd => bd.id === b);
+                      if (bDef && bDef.xp) expectedXp += bDef.xp;
+                    });
+                  }
+                  const currentXp = window.RasigaData.demoUser.xp || 0;
+                  if (currentXp < expectedXp && window.RasigaApp) {
+                    window.RasigaApp.addXP(expectedXp - currentXp);
                   }
                   
                   localStorage.setItem('rasiga_user', JSON.stringify(window.RasigaData.demoUser));
@@ -283,7 +297,7 @@ window.RasigaApp = {
       // Fetch all reviews for this song
       const { data: reviews, error } = await this.supabase
         .from('reviews')
-        .select('*, users!reviews_user_id_fkey(display_name), review_likes(reaction_type, user_id)')
+        .select('*, users!reviews_user_id_fkey(display_name, username), review_likes(reaction_type, user_id)')
         .eq('song_id', songId)
         .order('created_at', { ascending: false });
 
@@ -328,12 +342,12 @@ window.RasigaApp = {
         return;
       }
 
-      // Generate HTML for other reviews
       otherReviews.forEach(r => {
         const clr = '#14b8a6'; // placeholder
         const time = new Date(r.created_at).toLocaleDateString();
         const score = ratingsMap[r.user_id] || '?';
-        const name = r.users?.display_name || 'Anonymous';
+        const name = r.users?.display_name || r.users?.username || 'Anonymous';
+        const username = r.users?.username || name.toLowerCase().replace(/[^a-z0-9]/g, '');
         
         // Count likes/dislikes
         const likes = (r.review_likes || []).filter(l => l.reaction_type === 'like').length;
@@ -350,9 +364,9 @@ window.RasigaApp = {
           <div class="glass" style="padding: 1.2rem; margin-bottom: 1rem;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
               <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom: 0.8rem;">
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: ${clr}; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold;">${name[0]}</div>
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: ${clr}; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; cursor: pointer;" onclick="event.stopPropagation(); location.hash='#/user/${username}'">${name[0]}</div>
                 <div>
-                  <a href="#/user/${name.toLowerCase().replace(/[^a-z0-9]/g, '')}" style="font-weight:600; font-size:0.95rem; text-decoration:none; color:inherit;">${name}</a>
+                  <a href="#/user/${username}" style="font-weight:600; font-size:0.95rem; text-decoration:none; color:inherit;">${name}</a>
                   <div style="font-size:0.8rem; color:var(--text-muted);">${time}</div>
                 </div>
               </div>
@@ -615,18 +629,28 @@ window.RasigaApp = {
     if (!user || !user.onboarded || !this.supabase) return;
     
     try {
-      const { error } = await this.supabase.rpc('increment_xp', { amount });
-      if (error) throw error;
-      
-      const { data, error: fetchError } = await this.supabase.from('users').select('xp').eq('id', user.id).single();
+      const { data: currentData, error: fetchError } = await this.supabase
+        .from('users')
+        .select('xp')
+        .eq('id', user.id)
+        .single();
+        
       if (fetchError) throw fetchError;
       
-      if (data) {
-        user.xp = data.xp || 0;
-        localStorage.setItem('rasiga_user', JSON.stringify(user));
-        if (window.RasigaRouter && location.hash === '#/profile') {
-           window.RasigaRouter.handleRoute();
-        }
+      const newXp = (currentData.xp || 0) + amount;
+      
+      const { error: updateError } = await this.supabase
+        .from('users')
+        .update({ xp: newXp })
+        .eq('id', user.id);
+        
+      if (updateError) throw updateError;
+      
+      user.xp = newXp;
+      localStorage.setItem('rasiga_user', JSON.stringify(user));
+      
+      if (window.RasigaRouter && location.hash === '#/profile') {
+         window.RasigaRouter.handleRoute();
       }
     } catch(e) {
       console.error('Failed to sync XP', e);
@@ -640,7 +664,7 @@ window.RasigaApp = {
     const userBadges = new Set(user.badges || []);
     const newlyEarned = [];
     
-    const { data: ratingsData } = await this.supabase.from('ratings').select('score, song_id, created_at').eq('user_id', user.id);
+    const { data: ratingsData } = await this.supabase.from('ratings').select('score, song_id, rated_at').eq('user_id', user.id);
     const { data: reviewsData } = await this.supabase.from('reviews').select('id, created_at').eq('user_id', user.id);
     
     const ratings = ratingsData || [];
