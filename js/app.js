@@ -1922,7 +1922,20 @@ window.RasigaApp = {
       return;
     }
     const lowerQ = query.toLowerCase();
-    const songs = (window.RasigaSeeds || []).filter(s => s.title.toLowerCase().includes(lowerQ) || (s.film && s.film.toLowerCase().includes(lowerQ)));
+    
+    // Update input visually if triggered externally
+    const inputEl = document.getElementById('global-search-input');
+    if (inputEl && inputEl.value !== query) {
+      inputEl.value = query;
+    }
+
+    const songs = (window.RasigaSeeds || []).filter(s => {
+      return s.title.toLowerCase().includes(lowerQ) || 
+             (s.film && s.film.toLowerCase().includes(lowerQ)) ||
+             (s.language && s.language.toLowerCase().includes(lowerQ)) ||
+             (s.singer && s.singer.toLowerCase().includes(lowerQ)) ||
+             (s.composer && s.composer.toLowerCase().includes(lowerQ));
+    });
     
     if (songs.length === 0) {
       resultsContainer.innerHTML = '<div style="padding:1rem; color:var(--text-muted); text-align:center;">No results found</div>';

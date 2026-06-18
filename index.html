@@ -50,7 +50,7 @@
       <div style="display:flex; gap:0.5rem; align-items:center;">
         <div class="search-container hide-on-mobile">
           <input type="text" id="global-search-input" placeholder="Search songs..." oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value)">
-          <div class="search-icon">${Icons.get('search', {width: 16, height: 16})}</div>
+          <div class="search-icon" id="top-search-icon"></div>
           <div id="global-search-results" class="glass"></div>
         </div>
         <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme" title="Toggle Theme"></button>
@@ -111,6 +111,12 @@
       `;
       // Call router link update right away
       if (window.RasigaRouter) window.RasigaRouter.updateNavLinks(location.hash || '#/');
+
+      // Inject search icon
+      const searchIcon = document.getElementById('top-search-icon');
+      if (searchIcon && window.Icons) {
+        searchIcon.innerHTML = Icons.get('search', {width: 16, height: 16});
+      }
     });
   </script>
 </body>
