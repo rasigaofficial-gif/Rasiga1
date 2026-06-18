@@ -600,11 +600,20 @@ window.RasigaApp = {
     const user = window.RasigaData.demoUser;
     if (!user || !user.onboarded || !this.supabase) return;
     
-    user.xp += amount;
-    localStorage.setItem('rasiga_user', JSON.stringify(user));
-    
     try {
-      await this.supabase.from('users').update({ xp: user.xp }).eq('id', user.id);
+      const { error } = await this.supabase.rpc('increment_xp', { amount });
+      if (error) throw error;
+      
+      const { data, error: fetchError } = await this.supabase.from('users').select('xp').eq('id', user.id).single();
+      if (fetchError) throw fetchError;
+      
+      if (data) {
+        user.xp = data.xp || 0;
+        localStorage.setItem('rasiga_user', JSON.stringify(user));
+        if (window.RasigaRouter && location.hash === '#/profile') {
+           window.RasigaRouter.handleRoute();
+        }
+      }
     } catch(e) {
       console.error('Failed to sync XP', e);
     }
@@ -945,7 +954,7 @@ window.RasigaApp = {
       
       const { data: reviews } = await this.supabase.from('reviews').select('*, songs(title, film, year), ratings(score)').eq('user_id', user.id).order('created_at', { ascending: false });
 
-      const xp = (reviews ? reviews.length * 50 : 0) + (user.xp || 0);
+      const xp = user.xp || 0;
       const level = window.RasigaData.getLevel ? window.RasigaData.getLevel(xp) : { name: 'Rasigan' };
       
       const isFollowing = window.RasigaData.following && window.RasigaData.following[username];
@@ -1629,7 +1638,7 @@ window.RasigaApp = {
       // Fetch top users by XP
       const { data: topUsers, error } = await this.supabase
         .from('users')
-        .select('username, display_name, xp')
+        .select('username, display_name, xp, id')
         .order('xp', { ascending: false })
         .limit(10);
 
@@ -1638,6 +1647,19 @@ window.RasigaApp = {
       let html = '';
 
       if (topUsers && topUsers.length > 0) {
+        // Fetch review counts for context
+        const { data: userReviews } = await this.supabase
+          .from('reviews')
+          .select('user_id')
+          .in('user_id', topUsers.map(u => u.id));
+          
+        const reviewCounts = {};
+        if (userReviews) {
+          userReviews.forEach(r => {
+            reviewCounts[r.user_id] = (reviewCounts[r.user_id] || 0) + 1;
+          });
+        }
+
         html += `
           <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Top Rasigans (XP)</h3>
@@ -1649,6 +1671,7 @@ window.RasigaApp = {
                 if (i === 0) { rankColor = 'var(--accent-gold)'; rankClass = 'text-gradient-gold'; }
                 if (i === 1) { rankColor = '#e2e8f0'; rankClass = 'text-gradient-silver'; }
                 if (i === 2) { rankColor = '#fcd34d'; rankClass = 'text-gradient-bronze'; }
+                const rCount = reviewCounts[u.id] || 0;
                 
                 return `
                 <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; padding: 0.5rem; border-radius: var(--radius-md); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="location.hash='#/user/${u.username}'">
@@ -1658,10 +1681,10 @@ window.RasigaApp = {
                   </div>
                   <div style="flex:1;">
                     <div class="${rankClass}" style="font-weight:600; font-size:1.1rem;">${u.display_name || u.username}</div>
-                    <div style="font-size:0.85rem; color:var(--text-muted);">@${u.username}</div>
+                    <div style="font-size:0.85rem; color:var(--text-muted);">@${u.username} &bull; ${rCount} Reviews</div>
                   </div>
-                  <div style="font-weight:bold; color:var(--accent-teal); font-size:1.1rem;">
-                    ${u.xp || 0} XP
+                  <div style="font-weight:bold; color:var(--accent-teal); font-size:1.1rem; text-align:right;">
+                    ${u.xp || 0} <span style="font-size:0.8rem; font-weight:normal;">XP</span>
                   </div>
                 </div>
               `}).join('')}

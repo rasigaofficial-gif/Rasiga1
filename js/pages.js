@@ -247,8 +247,7 @@ window.RasigaPages = {
       return this.renderOnboarding();
     }
 
-    const approvedSuggestionsXP = (window.RasigaSuggestions || []).filter(s => s.status === 'Approved').length * 50;
-    const totalXP = user.xp + approvedSuggestionsXP;
+    const totalXP = user.xp || 0;
 
     const level = RasigaData.getLevel(totalXP);
     const nextLevel = RasigaData.getNextLevel(totalXP);
@@ -294,9 +293,9 @@ window.RasigaPages = {
         </div>
 
         <div class="profile-stats mt-4 page-enter" style="animation-delay: 0.1s">
-          <div class="glass stat-box" style="cursor:pointer;" onclick="location.hash='#/my-reviews'"><h3>${Object.keys(RasigaData.userRatings || {}).length}</h3><span>Ratings</span></div>
-          <div class="glass stat-box" style="cursor:pointer;" onclick="location.hash='#/my-reviews'"><h3>${Object.keys(RasigaData.userComments || {}).length}</h3><span>Reviews</span></div>
-          <div class="glass stat-box"><h3>${user.streak}</h3><span>Day Streak &#128293;</span></div>
+          <div class="glass stat-box" style="cursor:pointer;" onclick="location.hash='#/my-reviews'"><h3>${user.stats?.ratings || 0}</h3><span>Ratings</span></div>
+          <div class="glass stat-box" style="cursor:pointer;" onclick="location.hash='#/my-reviews'"><h3>${user.stats?.reviews || 0}</h3><span>Reviews</span></div>
+          <div class="glass stat-box"><h3>${user.streak || 1}</h3><span>Day Streak &#128293;</span></div>
         </div>
 
         <div class="mt-4 page-enter" style="animation-delay: 0.15s">
