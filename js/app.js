@@ -92,7 +92,7 @@ window.RasigaApp = {
     });
 
     // Fetch recent reviews for community pulse (join ratings to get actual score)
-    this.supabase.from('reviews').select('*, users(display_name, avatar_url), songs(title), ratings(score)').order('created_at', { ascending: false }).limit(6).then(({ data, error }) => {
+    this.supabase.from('reviews').select('*, users!reviews_user_id_fkey(display_name, avatar_url), songs(title), ratings(score)').order('created_at', { ascending: false }).limit(6).then(({ data, error }) => {
       window.RasigaReviewsLoaded = true;
       if (data) {
         window.RasigaReviews = data.map(r => ({
@@ -239,7 +239,7 @@ window.RasigaApp = {
       // Fetch all reviews for this song
       const { data: reviews, error } = await this.supabase
         .from('reviews')
-        .select('*, users(display_name), review_likes(reaction_type, user_id)')
+        .select('*, users!reviews_user_id_fkey(display_name), review_likes(reaction_type, user_id)')
         .eq('song_id', songId)
         .order('created_at', { ascending: false });
 
