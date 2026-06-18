@@ -158,9 +158,9 @@ window.RasigaPages = {
               ${window.Icons ? window.Icons.get('heart', { width: 16, height: 16 }) : ''}
               <span class="like-count" data-base="0" style="font-size:0.8rem;">${userReaction === 'like' ? 1 : 0}</span>
             </button>
-            <button class="btn-react btn-poop ${userReaction === 'poop' ? 'anim-poop-fill' : ''}" onclick="RasigaApp.togglePoop(this, 0, '${id}_user')">
-              ${window.Icons ? window.Icons.get('poop', { width: 16, height: 16 }) : ''}
-              <span class="poop-count" data-base="0" style="font-size:0.8rem;">${userReaction === 'poop' ? 1 : 0}</span>
+            <button class="btn-react btn-dislike ${userReaction === 'dislike' ? 'anim-dislike-fill' : ''}" onclick="RasigaApp.toggleDislike(this, 0, '${id}_user')">
+              ${window.Icons ? window.Icons.get('dislike', { width: 16, height: 16 }) : ''}
+              <span class="dislike-count" data-base="0" style="font-size:0.8rem;">${userReaction === 'dislike' ? 1 : 0}</span>
             </button>
             <button class="btn-react" onclick="RasigaApp.shareComment('${id}')">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
@@ -467,14 +467,14 @@ window.RasigaPages = {
       reviewedIds.forEach((id, i) => {
         const song = RasigaSeeds.find(s => s.id === id);
         if (song) {
-          let likes = 0, poops = 0;
+          let likes = 0, dislikes = 0;
           Object.keys(userReactions).forEach(k => {
             if (k.startsWith(id + '_')) {
               if (userReactions[k] === 'like') likes++;
-              if (userReactions[k] === 'poop') poops++;
+              if (userReactions[k] === 'dislike') dislikes++;
             }
           });
-          const reactionsObj = { likes, poops };
+          const reactionsObj = { likes, dislikes };
 
           gridHTML += RasigaComponents.SongCard(song, i, userRatings[id], reactionsObj);
         }

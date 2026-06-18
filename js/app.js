@@ -308,9 +308,9 @@ window.RasigaApp = {
         const score = ratingsMap[r.user_id] || '?';
         const name = r.users?.display_name || 'Anonymous';
         
-        // Count likes/poops
+        // Count likes/dislikes
         const likes = (r.review_likes || []).filter(l => l.reaction_type === 'like').length;
-        const poops = (r.review_likes || []).filter(l => l.reaction_type === 'poop').length;
+        const dislikes = (r.review_likes || []).filter(l => l.reaction_type === 'dislike').length;
         
         let reaction = null;
         if (user && r.review_likes) {
@@ -339,9 +339,9 @@ window.RasigaApp = {
                 ${window.Icons ? window.Icons.get('heart', { width: 16, height: 16 }) : ''}
                 <span class="like-count" data-base="${likes - (reaction==='like'?1:0)}" style="font-size:0.8rem;">${likes}</span>
               </button>
-              <button class="btn-react btn-poop ${reaction === 'poop' ? 'anim-poop-fill' : ''}" onclick="RasigaApp.togglePoop(this, ${poops - (reaction==='poop'?1:0)}, '${r.id}')">
-                ${window.Icons ? window.Icons.get('poop', { width: 16, height: 16 }) : ''}
-                <span class="poop-count" data-base="${poops - (reaction==='poop'?1:0)}" style="font-size:0.8rem;">${poops}</span>
+              <button class="btn-react btn-dislike ${reaction === 'dislike' ? 'anim-dislike-fill' : ''}" onclick="RasigaApp.toggleDislike(this, ${dislikes - (reaction==='dislike'?1:0)}, '${r.id}')">
+                ${window.Icons ? window.Icons.get('dislike', { width: 16, height: 16 }) : ''}
+                <span class="dislike-count" data-base="${dislikes - (reaction==='dislike'?1:0)}" style="font-size:0.8rem;">${dislikes}</span>
               </button>
               <button class="btn-react" onclick="RasigaApp.shareComment('${songId}', '${r.id}')">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
@@ -1398,7 +1398,8 @@ window.RasigaApp = {
     const vibrantColors = ['#ec4899', '#f97316', '#14b8a6', '#8b5cf6', '#3b82f6'];
 
     // Create particles
-    for (let i = 0; i < 40; i++) {
+    const numParticles = window.innerWidth < 768 ? 15 : 40;
+    for (let i = 0; i < numParticles; i++) {
       let sym = symbols[Math.floor(Math.random() * symbols.length)];
       let type, color;
 
@@ -1783,12 +1784,13 @@ window.RasigaApp = {
         btn.querySelector('.like-count').textContent = baseCount + 1;
         if (reviewId) RasigaData.userReactions[reviewId] = 'like';
 
-        const poopBtn = btn.parentElement.querySelector('.btn-poop');
-        if (poopBtn && poopBtn.classList.contains('anim-poop-fill')) {
-          const poopBase = parseInt(poopBtn.querySelector('.poop-count').getAttribute('data-base'));
-          poopBtn.classList.remove('anim-poop-fill', 'anim-poop-pop');
-          poopBtn.style.color = '';
-          poopBtn.querySelector('.poop-count').textContent = poopBase;
+        // If there was a dislike reaction on this review, remove it visually
+        const dislikeBtn = btn.parentElement.querySelector('.btn-dislike');
+        if (dislikeBtn && dislikeBtn.classList.contains('anim-dislike-fill')) {
+          const dislikeBase = parseInt(dislikeBtn.querySelector('.dislike-count').getAttribute('data-base'));
+          dislikeBtn.classList.remove('anim-dislike-fill', 'anim-dislike-pop');
+          dislikeBtn.style.color = '';
+          dislikeBtn.querySelector('.dislike-count').textContent = dislikeBase;
         }
 
         if (this.supabase && reviewId && !reviewId.includes('_')) { // avoid dummy ids like uuid_Name
@@ -1808,7 +1810,7 @@ window.RasigaApp = {
     btn.blur();
   },
 
-  togglePoop: async function (btn, baseCount, reviewId) {
+  toggleDislike: async function (btn, baseCount, reviewId) {
     if (!window.RasigaData || !window.RasigaData.demoUser || !window.RasigaData.demoUser.onboarded) {
       if (confirm('Please log in to react. Go to Login page?')) {
         location.hash = '#/profile';
@@ -1817,34 +1819,32 @@ window.RasigaApp = {
     }
 
     const user = RasigaData.demoUser;
-    const isPooped = btn.classList.toggle('anim-poop-fill');
-    btn.classList.remove('anim-poop-pop');
+    const isDisliked = btn.classList.toggle('anim-dislike-fill');
+    btn.classList.remove('anim-dislike-pop');
 
-    void btn.offsetWidth;
+    void btn.offsetWidth; // trigger reflow
     if (!RasigaData.userReactions) RasigaData.userReactions = {};
 
     try {
-      if (isPooped) {
-        btn.classList.add('anim-poop-pop');
-        btn.querySelector('.poop-count').textContent = baseCount + 1;
-        if (reviewId) RasigaData.userReactions[reviewId] = 'poop';
+      if (isDisliked) {
+        btn.classList.add('anim-dislike-pop');
+        btn.querySelector('.dislike-count').textContent = baseCount + 1;
+        if (reviewId) RasigaData.userReactions[reviewId] = 'dislike';
 
+        // remove like if exists
         const likeBtn = btn.parentElement.querySelector('.btn-like');
         if (likeBtn && likeBtn.classList.contains('anim-heart-fill')) {
-          const likeBase = parseInt(likeBtn.querySelector('.like-count').getAttribute('data-base'));
-          likeBtn.classList.remove('anim-heart-fill', 'anim-heart-pop');
-          likeBtn.style.color = '';
-          likeBtn.querySelector('.like-count').textContent = likeBase;
+          likeBtn.classList.remove('anim-heart-fill');
+          likeBtn.querySelector('.like-count').textContent = parseInt(likeBtn.querySelector('.like-count').getAttribute('data-base'));
         }
 
         if (this.supabase && reviewId && !reviewId.includes('_')) {
-          await this.supabase.from('review_likes').upsert({ user_id: user.id, review_id: reviewId, reaction_type: 'poop' }, { onConflict: 'user_id, review_id' });
+          await this.supabase.from('review_likes').upsert({ user_id: user.id, review_id: reviewId, reaction_type: 'dislike' }, { onConflict: 'user_id, review_id' });
         }
       } else {
-        btn.style.color = '';
-        btn.querySelector('.poop-count').textContent = baseCount;
-        if (reviewId && RasigaData.userReactions[reviewId] === 'poop') delete RasigaData.userReactions[reviewId];
-
+        btn.querySelector('.dislike-count').textContent = baseCount;
+        if (reviewId && RasigaData.userReactions[reviewId] === 'dislike') delete RasigaData.userReactions[reviewId];
+        
         if (this.supabase && reviewId && !reviewId.includes('_')) {
           await this.supabase.from('review_likes').delete().match({ user_id: user.id, review_id: reviewId });
         }

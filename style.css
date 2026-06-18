@@ -10,8 +10,8 @@
     radial-gradient(circle at 50% 80%, color-mix(in srgb, var(--accent-teal) 20%, transparent), transparent 40%);
 
   --text-main: #0f172a;
-  --text-muted: #475569;
-  --text-light: #94a3b8;
+  --text-muted: #334155;
+  --text-light: #64748b;
 
   /* Pastel Glass Surfaces */
   --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
@@ -116,6 +116,18 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--accent-saffron);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 html {
@@ -358,6 +370,7 @@ button {
   border-radius: var(--radius-full);
   box-shadow: 0 8px 32px rgba(249, 115, 22, 0.3), inset 1px 1px 1px rgba(255, 255, 255, 0.2);
   overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .bottom-nav-inner {
@@ -380,12 +393,15 @@ button {
 }
 
 .bnav-item span {
-  display: none;
+  display: block;
+  font-size: 0.65rem;
+  margin-top: 0.2rem;
+  opacity: 0.8;
 }
 
 .bnav-item svg {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   transition: transform 0.4s var(--ease), filter 0.4s;
   z-index: 2;
 }
@@ -1112,14 +1128,14 @@ main {
   color: var(--accent-rose);
 }
 
-@keyframes poopPop {
+@keyframes dislikePop {
   0% {
     transform: scale(1);
   }
 
   50% {
     transform: scale(1.4);
-    filter: drop-shadow(0 0 8px #8B4513);
+    filter: drop-shadow(0 0 8px var(--text-muted));
   }
 
   100% {
@@ -1127,13 +1143,13 @@ main {
   }
 }
 
-.anim-poop-pop svg {
-  animation: poopPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+.anim-dislike-pop svg {
+  animation: dislikePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-.anim-poop-fill svg path {
-  fill: #8B4513;
-  color: #8B4513;
+.anim-dislike-fill svg path {
+  fill: var(--text-muted);
+  color: var(--text-muted);
 }
 
 @keyframes flyPoop {
