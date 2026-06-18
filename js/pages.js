@@ -125,6 +125,14 @@ window.RasigaPages = {
     const grad = RasigaComponents.getGradient(song.title);
     const ini = RasigaComponents.getInitials(song.title);
 
+    const createArtistLinks = (artistsStr) => {
+      if (!artistsStr) return '';
+      return artistsStr.split(',').map(a => {
+        const name = a.trim();
+        return `<a href="#/artist/${encodeURIComponent(name)}" class="artist-link" style="color:var(--text-main); text-decoration:underline; text-decoration-color:rgba(255,255,255,0.2); text-underline-offset:2px; transition:color 0.2s;" onmouseover="this.style.color='var(--accent-saffron)'" onmouseout="this.style.color='var(--text-main)'">${name}</a>`;
+      }).join(', ');
+    };
+
     // Existing reviews logic + editable comment logic
     const reviews = RasigaReviews.filter(r => r.song === song.title);
     let reviewsHTML = '';
@@ -238,9 +246,9 @@ window.RasigaPages = {
             <h2 class="sh-title">${song.title}</h2>
             <div class="sh-meta">${song.film || 'Indie'} &bull; ${song.year}</div>
             <div class="sh-credits">
-               Singer: <span>${song.singer}</span><br>
-               Music: <span>${song.composer}</span>
-               ${song.lyricist ? `<br>Lyricist: <span>${song.lyricist}</span>` : ''}
+               Singer: <span>${createArtistLinks(song.singer)}</span><br>
+               Music: <span>${createArtistLinks(song.composer)}</span>
+               ${song.lyricist ? `<br>Lyricist: <span>${createArtistLinks(song.lyricist)}</span>` : ''}
                <div style="margin-top: 0.6rem;">
                  <button onclick="RasigaApp.openSuggestSongModal('${song.id}')" style="background:none; border:none; color:var(--text-muted); font-size:0.8rem; display:inline-flex; align-items:center; gap:0.3rem; padding:0; cursor:pointer; font-family:inherit;">
                    ${window.Icons ? window.Icons.get('edit', {width: 12, height: 12}) : '✎'} Suggest Edit
