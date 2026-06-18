@@ -48,10 +48,15 @@
         <a href="#/admin" class="nav-link" id="nav-admin-link" style="display:none; color:var(--accent-teal);">Admin</a>
       </div>
       <div style="display:flex; gap:0.5rem; align-items:center;">
-        <div class="search-container">
+        <div class="search-container hide-on-mobile">
           <input type="text" id="global-search-input" placeholder="Search songs..." oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value)">
+          <select id="global-search-filter" style="width: auto; cursor: pointer; padding: 0 0.5rem; border: none; background: transparent; color: var(--text-muted); font-size: 0.85rem; outline: none; appearance: none; -webkit-appearance: none;" onchange="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(document.getElementById('global-search-input').value)">
+            <option value="all" style="background: var(--bg-color)">All</option>
+            <option value="artist" style="background: var(--bg-color)">Artist</option>
+            <option value="song" style="background: var(--bg-color)">Song</option>
+          </select>
           <div class="search-icon" id="top-search-icon"></div>
-          <div id="global-search-results" class="glass"></div>
+
         </div>
         <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme" title="Toggle Theme"></button>
       </div>
@@ -119,6 +124,7 @@
       }
     });
   </script>
+  <div id="global-search-results" class="glass"></div>
 </body>
 
 </html>

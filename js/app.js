@@ -1914,27 +1914,69 @@ window.RasigaApp = {
     }
   },
 
-  executeGlobalSearch: function(query) {
+  executeGlobalSearch: function (query, triggerElementId = 'global-search-input') {
     const resultsContainer = document.getElementById('global-search-results');
     if (!resultsContainer) return;
-    if (!query || query.length < 2) {
+
+    if (!query.trim()) {
       resultsContainer.classList.remove('active');
       return;
     }
+
+    resultsContainer.classList.add('active');
+    
     const lowerQ = query.toLowerCase();
     
-    // Update input visually if triggered externally
-    const inputEl = document.getElementById('global-search-input');
-    if (inputEl && inputEl.value !== query) {
-      inputEl.value = query;
+    let filterType = 'all';
+    if (triggerElementId === 'discover-search-input') {
+      const f = document.getElementById('discover-search-filter');
+      if (f) filterType = f.value;
+    } else {
+      const f = document.getElementById('global-search-filter');
+      if (f) filterType = f.value;
+    }
+    
+    // Find the active search input to position against
+    let anchorEl = document.getElementById(triggerElementId);
+    if (!anchorEl || anchorEl.offsetParent === null) {
+      anchorEl = document.getElementById('global-search-input');
+      if (!anchorEl || anchorEl.offsetParent === null) {
+        anchorEl = document.getElementById('discover-search-input');
+      }
+    }
+    
+    // Dynamically position the results container
+    if (anchorEl && anchorEl.offsetParent !== null) {
+      if (anchorEl.value !== query) {
+        anchorEl.value = query;
+      }
+      const rect = anchorEl.getBoundingClientRect();
+      resultsContainer.style.top = (rect.bottom + 10) + 'px';
+      
+      const width = window.innerWidth <= 768 ? 260 : 300;
+      let leftPos = rect.right - width;
+      if (leftPos < 10) leftPos = 10; // Keep it on screen
+      resultsContainer.style.left = leftPos + 'px';
+    } else {
+      // Fallback position if triggered by language pill on mobile without visible search box
+      resultsContainer.style.top = '80px';
+      const width = window.innerWidth <= 768 ? 260 : 300;
+      resultsContainer.style.left = ((window.innerWidth - width) / 2) + 'px';
     }
 
     const songs = (window.RasigaSeeds || []).filter(s => {
-      return s.title.toLowerCase().includes(lowerQ) || 
-             (s.film && s.film.toLowerCase().includes(lowerQ)) ||
-             (s.language && s.language.toLowerCase().includes(lowerQ)) ||
-             (s.singer && s.singer.toLowerCase().includes(lowerQ)) ||
-             (s.composer && s.composer.toLowerCase().includes(lowerQ));
+      const matchTitle = (s.title || '').toLowerCase().includes(lowerQ);
+      const matchFilm = (s.film || '').toLowerCase().includes(lowerQ);
+      const matchLang = (s.language || '').toLowerCase().includes(lowerQ);
+      const matchSinger = (s.singer || '').toLowerCase().includes(lowerQ);
+      const matchComposer = (s.composer || '').toLowerCase().includes(lowerQ);
+
+      if (filterType === 'artist') {
+        return matchSinger || matchComposer;
+      } else if (filterType === 'song') {
+        return matchTitle || matchFilm || matchLang;
+      }
+      return matchTitle || matchFilm || matchLang || matchSinger || matchComposer;
     });
     
     if (songs.length === 0) {
@@ -1948,9 +1990,13 @@ window.RasigaApp = {
           <div style="width: 40px; height: 40px; border-radius: 8px; background: ${grad}; display:flex; align-items:center; justify-content:center; color:#fff; font-family:'DM Serif Display',serif; flex-shrink:0;">
             ${ini}
           </div>
-          <div>
-            <div style="font-weight:600; font-size:0.95rem;">${song.title}</div>
-            <div style="font-size:0.8rem; color:var(--text-muted);">${song.film || 'Indie'} &bull; ${song.year}</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:600; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${song.title}</div>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${song.film || 'Indie'} &bull; ${song.year}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              <span style="display:flex; align-items:center; gap:0.2rem;" title="Singer">${Icons.get('user', {width:10, height:10})} ${song.singer || 'Unknown'}</span>
+              <span style="display:flex; align-items:center; gap:0.2rem;" title="Music Director">${Icons.get('music', {width:10, height:10})} ${song.composer || 'Unknown'}</span>
+            </div>
           </div>
         </div>
       `}).join('');

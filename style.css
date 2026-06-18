@@ -1649,22 +1649,28 @@ main {
   100% { opacity: 0; transform: translateY(10px) scale(0.95); }
 }
 
-/* -- Search Bar -- */
+/* ── Search Bar ── */
 .search-container {
   position: relative;
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--glass-border);
+  background: rgba(0, 0, 0, 0.08); /* Subtle background for light/dark */
+  border: none;
   border-radius: var(--radius-full);
   padding: 0.4rem 1rem;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease;
+}
+
+[data-theme="dark"] .search-container {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .search-container:focus-within {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: var(--accent-saffron);
-  box-shadow: 0 0 10px rgba(249, 115, 22, 0.2);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="dark"] .search-container:focus-within {
+  background: rgba(255, 255, 255, 0.12);
 }
 
 #global-search-input {
@@ -1691,9 +1697,7 @@ main {
 }
 
 #global-search-results {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
+  position: fixed;
   width: 300px;
   max-height: 400px;
   overflow-y: auto;
@@ -1703,7 +1707,24 @@ main {
   flex-direction: column;
   gap: 0.5rem;
   z-index: 200;
-  box-shadow: var(--glass-shadow);
+  
+  /* Border fade color theme using background-clip trick */
+  background: 
+    var(--glass-bg-frosted) padding-box,
+    linear-gradient(135deg, var(--accent-saffron), var(--accent-rose), transparent 70%) border-box;
+  border: 1px solid transparent;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Keep it completely static on hover, preserving the gradient border */
+#global-search-results:hover {
+  background: 
+    var(--glass-bg-frosted) padding-box,
+    linear-gradient(135deg, var(--accent-saffron), var(--accent-rose), transparent 70%) border-box;
+  border-color: transparent;
+}
+#global-search-results:hover::before {
+  animation: none;
 }
 
 #global-search-results.active {
@@ -1721,7 +1742,7 @@ main {
 }
 
 .gs-result-item:hover {
-  background: rgba(255,255,255,0.1);
+  background: var(--glass-bg-hover);
 }
 
 @media (max-width: 768px) {
@@ -1734,7 +1755,32 @@ main {
   }
   #global-search-results {
     width: 260px;
-    right: -40px; /* Adjust so it doesn't overflow screen */
   }
 }
 
+/* ── Form Inputs ── */
+.glass-input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border);
+  background: rgba(0, 0, 0, 0.1);
+  color: var(--text-main);
+  outline: none;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .glass-input {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.glass-input:focus {
+  border-color: var(--accent-saffron);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .glass-input:focus {
+  background: rgba(255, 255, 255, 0.1);
+}

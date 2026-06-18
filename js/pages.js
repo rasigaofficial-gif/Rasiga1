@@ -81,6 +81,18 @@ window.RasigaPages = {
       <div class="page-discover">
         <h2 class="section-title">Explore</h2>
         
+        <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; animation-delay: 0.05s;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 class="section-title" style="margin: 0; color: var(--text-main);">Search Songs</h3>
+            <select id="discover-search-filter" class="glass-input" style="width: auto; cursor: pointer; padding: 0.4rem 2.5rem 0.4rem 1rem; font-size: 0.9rem; border-radius: var(--radius-full);" onchange="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(document.getElementById('discover-search-input').value, 'discover-search-input')">
+              <option value="all" style="background: var(--bg-color)">All</option>
+              <option value="artist" style="background: var(--bg-color)">Artist</option>
+              <option value="song" style="background: var(--bg-color)">Song</option>
+            </select>
+          </div>
+          <input type="text" id="discover-search-input" class="glass-input" style="width: 100%;" placeholder="Search songs..." oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value, 'discover-search-input')">
+        </div>
+        
         <div id="discover-results-container">
           <div>
             <h3 class="section-title page-enter" style="color: var(--accent-saffron); font-size:1.8rem; font-family:'Cinzel Decorative', serif; animation-delay: 0.1s;">Browse by Language</h3>
@@ -750,7 +762,7 @@ window.RasigaPages = {
         <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-lg); z-index: 100; position:relative; animation-delay: 0.1s;">
           <h3 style="margin-bottom: 1rem;">Find Rasigans</h3>
           <div style="display:flex; gap:0.5rem; position:relative;">
-            <input type="text" id="user-search-input" placeholder="Search users by name or username..." autocomplete="off" style="flex:1; padding: 0.8rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1); color: inherit; outline:none; font-size: 1rem;" oninput="RasigaApp.searchUsers(this.value)" />
+            <input type="text" id="user-search-input" class="glass-input" placeholder="Search users by name or username..." autocomplete="off" oninput="RasigaApp.searchUsers(this.value)" />
             <div id="user-search-suggestions" class="glass" style="display:none; position:absolute; top: 100%; left:0; right:0; max-height: 250px; overflow-y:auto; z-index:999; flex-direction:column; margin-top: 0.5rem; background: var(--glass-bg-frosted); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
             </div>
           </div>
