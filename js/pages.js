@@ -592,8 +592,8 @@ window.RasigaPages = {
         
         <div style="display:flex; flex-wrap:wrap; gap:2rem; margin-top:1.5rem;">
           
-          <div style="flex:1; min-width:300px;">
-            <h3 class="section-title" style="margin-bottom:1.5rem;">Highest Rated Songs</h3>
+          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
+            <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Highest Rated Songs</h3>
             <div style="display:flex; flex-direction:column; gap:1.25rem;">
               ${topRated.map((s, i) => {
                 const isTop3 = i < 3;
@@ -601,12 +601,17 @@ window.RasigaPages = {
                 if (i === 0) { rankClass = 'text-gradient-gold'; }
                 if (i === 1) { rankClass = 'text-gradient-silver'; }
                 if (i === 2) { rankClass = 'text-gradient-bronze'; }
+                const grad = RasigaComponents.getGradient(s.title);
+                const ini = RasigaComponents.getInitials(s.title);
                 return `
-                <div class="glass" style="display:flex; align-items:center; gap:1rem; cursor:pointer; padding: 1rem; border-radius: var(--radius-md); transition: all 0.2s; box-shadow: var(--glass-shadow);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="location.hash='#/song/${s.id}'">
+                <div class="song-card" style="background:transparent; border:none; box-shadow:none; padding:0; align-items:center;" onclick="location.hash='#/song/${s.id}'">
                   <div class="${rankClass}" style="font-weight:bold; font-size:1.2rem; ${isTop3 ? '' : 'color:var(--text-light);'} width:20px; text-align:center;">${i + 1}</div>
-                  <div style="flex:1;">
-                    <div style="font-weight:600;">${s.title}</div>
-                    <div style="font-size:0.85rem; color:var(--text-muted);">${s.film} &bull; ${s.language}</div>
+                  <div class="sc-art" style="background: ${grad}; width: 48px; height: 48px; font-size: 1.1rem; flex-shrink: 0;">
+                    ${ini}
+                  </div>
+                  <div class="sc-info" style="flex:1;">
+                    <div class="sc-title">${s.title}</div>
+                    <div class="sc-meta">${s.film} &bull; ${s.language}</div>
                   </div>
                   <div style="display:flex; align-items:center; gap:0.25rem; font-weight:bold; color:var(--accent-gold);">
                     ${s.avg_rating} ${Icons.get('star')}
@@ -616,21 +621,27 @@ window.RasigaPages = {
             </div>
           </div>
 
-          <div style="flex:1; min-width:300px;">
-            <h3 class="section-title" style="margin-bottom:1.5rem;">Most Popular Songs</h3>
+          <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
+            <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Most Popular Songs</h3>
             <div style="display:flex; flex-direction:column; gap:1.25rem;">
-              ${mostPopular.map((s, i) => `
-                <div class="glass" style="display:flex; align-items:center; gap:1rem; cursor:pointer; padding: 1rem; border-radius: var(--radius-md); transition: all 0.2s; box-shadow: var(--glass-shadow);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="location.hash='#/song/${s.id}'">
-                  <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px;">${i + 1}</div>
-                  <div style="flex:1;">
-                    <div style="font-weight:600;">${s.title}</div>
-                    <div style="font-size:0.85rem; color:var(--text-muted);">${s.film}</div>
+              ${mostPopular.map((s, i) => {
+                const grad = RasigaComponents.getGradient(s.title);
+                const ini = RasigaComponents.getInitials(s.title);
+                return `
+                <div class="song-card" style="background:transparent; border:none; box-shadow:none; padding:0; align-items:center;" onclick="location.hash='#/song/${s.id}'">
+                  <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px; text-align:center;">${i + 1}</div>
+                  <div class="sc-art" style="background: ${grad}; width: 48px; height: 48px; font-size: 1.1rem; flex-shrink: 0;">
+                    ${ini}
+                  </div>
+                  <div class="sc-info" style="flex:1;">
+                    <div class="sc-title">${s.title}</div>
+                    <div class="sc-meta">${s.film}</div>
                   </div>
                   <div style="font-weight:bold; color:var(--text-main); font-size:0.9rem;">
                     ${s.total_ratings >= 100 ? (s.total_ratings / 1000).toFixed(1) + 'k' : s.total_ratings || 0} ratings
                   </div>
                 </div>
-              `).join('')}
+              `}).join('')}
             </div>
           </div>
 
