@@ -2198,5 +2198,18 @@ select.custom-select option {
 @media (max-width: 768px) {
   #page-container {
     padding-bottom: 90px;
+    padding-top: calc(var(--nav-height) + 2.5rem);
+  }
+  #nav-logo {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  #nav-title-text {
+    font-size: 1.5rem !important;
+  }
+  .section-title, h2, h3 {
+    font-size: 1.4rem !important;
+    word-break: break-word;
+    white-space: normal !important;
   }
 }
