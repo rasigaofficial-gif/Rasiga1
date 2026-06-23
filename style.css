@@ -2194,3 +2194,9 @@ select.custom-select option {
   flex-direction: column;
   gap: 1rem;
 }
+
+@media (max-width: 768px) {
+  #page-container {
+    padding-bottom: 90px;
+  }
+}

@@ -32,7 +32,7 @@
   </div>
 
   <!-- Background Notes Animation -->
-  <canvas id="music-canvas"></canvas>
+  <canvas id="music-canvas" aria-hidden="true"></canvas>
 
   <!-- Desktop/Tablet Top Navigation -->
   <nav class="top-nav">
@@ -52,7 +52,7 @@
       </div>
       <div style="display:flex; gap:0.5rem; align-items:center;">
         <div class="search-container hide-on-mobile">
-          <input type="text" id="global-search-input" placeholder="Search songs..." oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value)">
+          <input type="text" id="global-search-input" aria-label="Search songs, artists, or movies" placeholder="Search songs..." oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value)">
           <div id="global-search-filter" class="custom-dropdown-container" data-value="all" onclick="this.classList.toggle('open')">
             <div class="custom-dropdown-selected" style="background:transparent; border:none; padding:0 0.5rem;">
               <span class="selected-text">All</span>
@@ -117,11 +117,11 @@
     document.addEventListener('DOMContentLoaded', () => {
       const mn = document.getElementById('mobile-nav-container');
       mn.innerHTML = `
-        <a href="#/" class="bnav-item active">${Icons.get('home')}</a>
-        <a href="#/discover" class="bnav-item">${Icons.get('compass')}</a>
-        <a href="#/charts" class="bnav-item">${Icons.get('barChart')}</a>
-        <a href="#/leaderboards" class="bnav-item">${Icons.get('trophy')}</a>
-        <a href="#/profile" class="bnav-item">${Icons.get('user')}</a>
+        <a href="#/" class="bnav-item active" aria-label="Home">${Icons.get('home')}</a>
+        <a href="#/discover" class="bnav-item" aria-label="Discover">${Icons.get('compass')}</a>
+        <a href="#/charts" class="bnav-item" aria-label="Charts">${Icons.get('barChart')}</a>
+        <a href="#/leaderboards" class="bnav-item" aria-label="Leaderboards">${Icons.get('trophy')}</a>
+        <a href="#/profile" class="bnav-item" aria-label="Profile">${Icons.get('user')}</a>
       `;
       // Call router link update right away
       if (window.RasigaRouter) window.RasigaRouter.updateNavLinks(location.hash || '#/');

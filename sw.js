@@ -35,18 +35,35 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  // Network First, falling back to cache strategy
-  e.respondWith(
-    fetch(e.request).then((networkResponse) => {
-      // If we got a successful response from the network, cache it and return it.
-      if (networkResponse && networkResponse.status === 200) {
-        const clonedResponse = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clonedResponse));
-      }
-      return networkResponse;
-    }).catch(() => {
-      // If the network request fails (offline), fall back to the cache.
-      return caches.match(e.request);
-    })
-  );
+  const url = new URL(e.request.url);
+  const isStaticAsset = url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico)$/) || url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com');
+
+  if (isStaticAsset) {
+    // Cache First, falling back to network
+    e.respondWith(
+      caches.match(e.request).then((cachedResponse) => {
+        if (cachedResponse) return cachedResponse;
+        return fetch(e.request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200 && e.request.method === 'GET') {
+            const clonedResponse = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clonedResponse));
+          }
+          return networkResponse;
+        });
+      })
+    );
+  } else {
+    // Network First, falling back to cache
+    e.respondWith(
+      fetch(e.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && e.request.method === 'GET') {
+          const clonedResponse = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clonedResponse));
+        }
+        return networkResponse;
+      }).catch(() => {
+        return caches.match(e.request);
+      })
+    );
+  }
 });

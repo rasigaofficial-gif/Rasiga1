@@ -2056,7 +2056,15 @@ window.RasigaApp = {
     }
   },
 
+  _searchTimeout: null,
   executeGlobalSearch: function (query, triggerElementId = 'global-search-input') {
+    if (this._searchTimeout) clearTimeout(this._searchTimeout);
+    this._searchTimeout = setTimeout(() => {
+      this._executeGlobalSearchSync(query, triggerElementId);
+    }, 300);
+  },
+
+  _executeGlobalSearchSync: function (query, triggerElementId = 'global-search-input') {
     const resultsContainer = document.getElementById('global-search-results');
     if (!resultsContainer) return;
 
