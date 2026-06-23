@@ -348,6 +348,11 @@ window.RasigaPages = {
           <button class="btn btn-primary" style="width:100%; display:flex; justify-content:center; align-items:center; gap:0.5rem; padding:1rem; font-size:1.1rem; box-shadow:0 8px 24px rgba(249, 115, 22, 0.3); margin-bottom: 1rem;" onclick="RasigaApp.openSuggestSongModal()">
             ${Icons.get('music')} Suggest a Song
           </button>
+          ${user.is_admin ? `
+          <button class="btn btn-primary" style="width:100%; display:flex; justify-content:center; align-items:center; gap:0.5rem; padding:1rem; font-size:1.1rem; background:var(--gradient-brand-alt); border:none; margin-bottom: 1rem;" onclick="location.hash='#/admin'">
+            ${Icons.get('shield')} Admin Panel
+          </button>
+          ` : ''}
           <button class="btn btn-primary" style="width:100%; display:flex; justify-content:center; align-items:center; gap:0.5rem; padding:1rem; font-size:1.1rem; box-shadow:0 8px 24px rgba(249, 115, 22, 0.3);" onclick="location.hash='#/analytics'">
             ${Icons.get('barChart')} View Advanced Analytics
           </button>

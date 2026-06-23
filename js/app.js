@@ -195,21 +195,6 @@ window.RasigaApp = {
         };
         localStorage.setItem('rasiga_user', JSON.stringify(window.RasigaData.demoUser));
 
-        const adminLink = document.getElementById('nav-admin-link');
-        if (adminLink) adminLink.style.display = data.is_admin ? 'inline-block' : 'none';
-
-        const mobileNavContainer = document.getElementById('mobile-nav-container');
-        if (mobileNavContainer && data.is_admin) {
-          if (!document.getElementById('mobile-admin-link')) {
-            const adminIcon = document.createElement('a');
-            adminIcon.href = '#/admin';
-            adminIcon.className = 'bnav-item';
-            adminIcon.id = 'mobile-admin-link';
-            adminIcon.innerHTML = window.Icons ? window.Icons.get('shield') || 'A' : 'A';
-            adminIcon.setAttribute('aria-label', 'Admin');
-            mobileNavContainer.appendChild(adminIcon);
-          }
-        }
 
         // Fetch independent data in parallel
         const [fRes, listRes, badgeRes, ratingsRes, reviewsRes] = await Promise.all([
