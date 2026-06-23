@@ -135,7 +135,7 @@ window.RasigaPages = {
     };
 
     // Existing reviews logic + editable comment logic
-    const reviews = RasigaReviews.filter(r => r.song === song.title);
+    const reviews = RasigaReviews.filter(r => r.song === song.title && r.username !== RasigaData.demoUser?.username);
     let reviewsHTML = '';
 
     if (!RasigaData.userComments) RasigaData.userComments = {};

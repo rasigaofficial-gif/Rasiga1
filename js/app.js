@@ -104,33 +104,36 @@ window.RasigaApp = {
     this.fetchInitialData();
   },
 
-  fetchInitialData: function (silent = false) {
+  fetchInitialData: async function (silent = false) {
     if (!this.supabase) return;
     
-    // Fetch songs
-    this.supabase.from('songs').select('*').order('total_ratings', { ascending: false }).then(({ data, error }) => {
-      if (error) {
-        console.error('Error fetching songs:', error);
+    try {
+      // Fetch songs
+      const songsPromise = this.supabase.from('songs').select('*').order('total_ratings', { ascending: false });
+
+      // Fetch recent reviews for community pulse (join ratings to get actual score)
+      const reviewsPromise = this.supabase.from('reviews').select('*, users!reviews_user_id_fkey(display_name, username, avatar_url), songs(title), ratings(score)').order('created_at', { ascending: false }).limit(6);
+
+      // Fetch suggestions (for admin)
+      const suggestionsPromise = this.supabase.from('song_suggestions').select('*').order('created_at', { ascending: false });
+
+      const [songsRes, reviewsRes, suggestionsRes] = await Promise.all([songsPromise, reviewsPromise, suggestionsPromise]);
+
+      // Process Songs
+      if (songsRes.error) {
+        console.error('Error fetching songs:', songsRes.error);
         window.showToast('Failed to load songs from database! Please check your connection.', 'error');
-        return;
-      }
-      if (data) {
-        window.RasigaSeeds = data;
-        
+      } else if (songsRes.data) {
+        window.RasigaSeeds = songsRes.data;
         // MOCK: Add generated album art to a specific song for demonstration
         const lagJaGale = window.RasigaSeeds.find(s => s.title === 'Lag Ja Gale');
         if (lagJaGale) lagJaGale.album_art_url = 'data/art1.png';
-        
-        // Re-render if we are on a page that needs songs (like home or discover)
-        if (!silent && window.RasigaRouter) window.RasigaRouter.handleRoute();
       }
-    });
 
-    // Fetch recent reviews for community pulse (join ratings to get actual score)
-    this.supabase.from('reviews').select('*, users!reviews_user_id_fkey(display_name, username, avatar_url), songs(title), ratings(score)').order('created_at', { ascending: false }).limit(6).then(({ data, error }) => {
+      // Process Reviews
       window.RasigaReviewsLoaded = true;
-      if (data) {
-        window.RasigaReviews = data.map(r => ({
+      if (reviewsRes.data) {
+        window.RasigaReviews = reviewsRes.data.map(r => ({
           id: r.id,
           name: r.users?.display_name || r.users?.username || 'User',
           username: r.users?.username,
@@ -145,13 +148,10 @@ window.RasigaApp = {
       } else {
         window.RasigaReviews = [];
       }
-      if (!silent && window.RasigaRouter && (location.hash === '#/' || location.hash === '')) window.RasigaRouter.handleRoute();
-    });
 
-    // Fetch suggestions (for admin)
-    this.supabase.from('song_suggestions').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
-      if (data) {
-        window.RasigaSuggestions = data.map(s => ({
+      // Process Suggestions
+      if (suggestionsRes.data) {
+        window.RasigaSuggestions = suggestionsRes.data.map(s => ({
           id: s.id,
           song: s.song_name,
           year: s.year,
@@ -159,10 +159,15 @@ window.RasigaApp = {
           singer: s.singer,
           lyricist: s.lyricist,
           status: s.status,
-          timestamp: new Date(s.created_at).getTime()
+          user_id: s.user_id,
+          created_at: s.created_at
         }));
       }
-    });
+
+      if (!silent && window.RasigaRouter) window.RasigaRouter.handleRoute();
+    } catch (err) {
+      console.error('Error in fetchInitialData:', err);
+    }
   },
 
   _syncUserFromSupabase: async function (authUser) {

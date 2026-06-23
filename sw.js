@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rasiga-v' + Date.now();
+const CACHE_NAME = 'rasiga-v2-' + Date.now();
 const ASSETS = [
   './',
   'index.html',

@@ -1111,6 +1111,23 @@ main {
   color: var(--accent-rose);
 }
 
+.btn-like.anim-heart-fill {
+  color: var(--accent-saffron);
+}
+.btn-like.anim-heart-fill svg {
+  fill: var(--accent-saffron);
+  stroke: var(--accent-saffron);
+}
+
+.btn-dislike.anim-dislike-fill {
+  color: var(--accent-saffron);
+}
+.btn-dislike.anim-dislike-fill svg {
+  fill: var(--accent-saffron);
+  stroke: var(--accent-saffron);
+}
+
+
 /* â”€â”€ Profile â”€â”€ */
 .profile-header {
   display: flex;
