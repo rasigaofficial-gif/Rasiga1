@@ -139,6 +139,7 @@ window.RasigaApp = {
           rating: r.ratings?.score || 0,
           song: r.songs?.title || 'Unknown Song',
           likes: r.likes_count || 0,
+          dislikes: r.dislikes_count || 0,
           time: new Date(r.created_at).toLocaleDateString()
         }));
       } else {

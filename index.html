@@ -36,22 +36,30 @@
 
   <!-- Desktop/Tablet Top Navigation -->
   <nav class="top-nav">
-    <div class="nav-inner">
-      <a href="#/" class="logo" style="display:flex; align-items:center; gap:0.5rem; text-decoration:none;">
+    <div class="nav-inner" style="display:flex; align-items:center; width:100%;">
+      <a href="#/" class="logo" style="display:flex; align-items:center; gap:0.5rem; text-decoration:none; margin-right: 2rem;">
         <div id="nav-logo" style="width: 44px; height: 44px; display:flex; align-items:center; justify-content:center;">
         </div>
         <span id="nav-title-text" style="font-size: 2rem;">RASIGA</span>
       </a>
-      <div class="nav-links">
+      <div class="nav-links" style="display:flex; align-items:center; gap: 0.5rem;">
         <a href="#/discover" class="nav-link">Discover</a>
         <a href="#/charts" class="nav-link">Charts</a>
         <a href="#/leaderboards" class="nav-link">Leaderboards</a>
-        <a href="#/my-reviews" class="nav-link">My Reviews</a>
-        <a href="#/profile" class="nav-link">Profile</a>
-        <a href="#/admin" class="nav-link" id="nav-admin-link" style="display:none; color:var(--accent-teal);">Admin</a>
       </div>
-      <div style="display:flex; gap:0.5rem; align-items:center;">
-        <div class="search-container hide-on-mobile">
+      
+      <div style="flex:1;"></div>
+      
+      <div style="display:flex; gap:1rem; align-items:center;">
+        <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme" title="Toggle Theme"></button>
+        
+        <div class="nav-links hide-on-mobile" style="display:flex; align-items:center; gap: 0.5rem;">
+          <a href="#/my-reviews" class="nav-link">My Reviews</a>
+          <a href="#/profile" class="nav-link">Profile</a>
+          <a href="#/admin" class="nav-link" id="nav-admin-link" style="display:none; color:var(--accent-teal);">Admin</a>
+        </div>
+
+        <div class="search-container hide-on-mobile" style="max-width: 300px; width: 100%;">
           <input type="text" id="global-search-input" aria-label="Search songs, artists, or movies" placeholder="Search songs..." oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value)">
           <div id="global-search-filter" class="custom-dropdown-container" data-value="all" onclick="this.classList.toggle('open')">
             <div class="custom-dropdown-selected" style="background:transparent; border:none; padding:0 0.5rem;">
@@ -65,9 +73,7 @@
             </div>
           </div>
           <div class="search-icon" id="top-search-icon"></div>
-
         </div>
-        <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme" title="Toggle Theme"></button>
       </div>
     </div>
   </nav>

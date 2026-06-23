@@ -1489,8 +1489,8 @@ main {
 }
 
 .anim-heart-fill svg path {
-  fill: var(--accent-rose);
-  color: var(--accent-rose);
+  fill: var(--accent-saffron);
+  stroke: var(--accent-saffron);
 }
 
 @keyframes dislikePop {
@@ -1513,8 +1513,8 @@ main {
 }
 
 .anim-dislike-fill svg path {
-  fill: var(--text-muted);
-  color: var(--text-muted);
+  fill: var(--accent-saffron);
+  stroke: var(--accent-saffron);
 }
 
 @keyframes flyPoop {
