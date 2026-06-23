@@ -1302,6 +1302,7 @@ window.RasigaApp = {
       console.error(err);
       window.showToast('Failed to update suggestion status.', 'error');
     }
+    });
   },
 
   openAdminEditModal: async function(sugId) {
@@ -2303,6 +2304,7 @@ window.RasigaApp = {
       console.error(err);
       window.showToast("Failed to delete list.", 'error');
     }
+    });
   }
 };
 
