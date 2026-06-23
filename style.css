@@ -2120,6 +2120,7 @@ select.custom-select option {
   font-size: 2rem;
   font-weight: 700;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -2133,6 +2134,7 @@ select.custom-select option {
   margin-bottom: 0.3rem;
   font-family: 'Cinzel Decorative', serif;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

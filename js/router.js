@@ -74,6 +74,9 @@ window.RasigaRouter = {
         if (window.RasigaApp && typeof RasigaApp.fetchHomeStats === 'function') {
           RasigaApp.fetchHomeStats();
         }
+        if (window.RasigaApp && typeof RasigaApp.initMarquee === 'function') {
+          RasigaApp.initMarquee();
+        }
       }
 
       // Fetch dynamic reviews for song page

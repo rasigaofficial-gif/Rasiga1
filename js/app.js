@@ -219,8 +219,8 @@ window.RasigaApp = {
           ratingsData.forEach(r => window.RasigaData.userRatings[r.song_id] = r.score);
           window.RasigaData.demoUser.stats.ratings = ratingsData.length;
 
-          let currentDate = new Date();
-          currentDate.setHours(0, 0, 0, 0);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
 
           let uniqueDates = [...new Set(ratingsData.map(r => {
             const d = new Date(r.rated_at);
@@ -228,13 +228,16 @@ window.RasigaApp = {
             return d.getTime();
           }))];
 
-          let expectedTime = currentDate.getTime();
-          if (uniqueDates[0] === expectedTime || uniqueDates[0] === expectedTime - 86400000) {
-            expectedTime = uniqueDates[0];
+          let firstDate = new Date(uniqueDates[0]);
+          let diffDays = Math.round((today - firstDate) / 86400000);
+
+          if (diffDays === 0 || diffDays === 1) {
+            let expectedDate = new Date(firstDate);
             for (let i = 0; i < uniqueDates.length; i++) {
-              if (uniqueDates[i] === expectedTime) {
+              let currDate = new Date(uniqueDates[i]);
+              if (currDate.getTime() === expectedDate.getTime()) {
                 streak++;
-                expectedTime -= 86400000;
+                expectedDate.setDate(expectedDate.getDate() - 1);
               } else {
                 break;
               }
@@ -687,7 +690,7 @@ window.RasigaApp = {
     if (highRatings.length >= 10 && !userBadges.has('summit')) newlyEarned.push('summit');
     
     const hasNightOwl = ratings.some(r => {
-      const h = new Date(r.created_at).getHours();
+      const h = new Date(r.rated_at).getHours();
       return h >= 0 && h < 4;
     });
     if (hasNightOwl && !userBadges.has('night_owl')) newlyEarned.push('night_owl');
@@ -712,6 +715,9 @@ window.RasigaApp = {
     
     if (newlyEarned.length > 0) {
       localStorage.setItem('rasiga_user', JSON.stringify(user));
+      if (location.hash === '#/profile' && window.RasigaRouter) {
+        window.RasigaRouter.handleRoute();
+      }
     }
   },
 
@@ -1786,7 +1792,8 @@ window.RasigaApp = {
   },
 
   setRatingInput: function (id, val) {
-    const rating = parseFloat(val);
+    let rating = parseFloat(val);
+    rating = Math.round(rating * 4) / 4; // Snap to 0.25
     if (!RasigaData.userRatings) RasigaData.userRatings = {};
     RasigaData.userRatings[id] = rating;
 
@@ -1798,6 +1805,7 @@ window.RasigaApp = {
   },
 
   saveRating: async function (id, val) {
+    const isNewRating = !RasigaData.userRatings || !RasigaData.userRatings[id];
     this.setRatingInput(id, val);
     
     const rating = parseFloat(val);
@@ -1814,7 +1822,16 @@ window.RasigaApp = {
         if (rating === 5 && window.RasigaComponents && window.RasigaComponents.fireConfetti) {
           window.RasigaComponents.fireConfetti();
         }
+        
+        if (isNewRating) {
+          await this.addXP(10);
+        }
+        
         await this.fetchInitialData(); // Refresh overall song stats quietly
+        
+        if (isNewRating) {
+          await this.checkAndAwardBadges();
+        }
       }
     } catch(e) {
       console.error('Failed to save rating', e);
@@ -1865,13 +1882,13 @@ window.RasigaApp = {
       if (!RasigaData.userComments) RasigaData.userComments = {};
       RasigaData.userComments[id] = text;
 
-      if (isNewReview) {
-        await this.addXP(30); // 10 for rating, 20 for review
-        await this.checkAndAwardBadges();
-      }
-
       // Re-fetch initial data to get updated community pulse and song stats
       await this.fetchInitialData();
+
+      if (isNewReview) {
+        await this.addXP(20); // 20 for review (10 for rating is handled in saveRating)
+        await this.checkAndAwardBadges();
+      }
 
       RasigaRouter.handleRoute();
     } catch (err) {
@@ -2305,6 +2322,105 @@ window.RasigaApp = {
       window.showToast("Failed to delete list.", 'error');
     }
     });
+  },
+
+  initMarquee: function() {
+    const container = document.getElementById('trending-marquee');
+    const content = document.getElementById('trending-marquee-content');
+    if (!container || !content) return;
+
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+    let autoScrollInterval;
+    let isResetting = false;
+
+    // The content width is half of the total width because the cards are duplicated
+    const halfWidth = content.scrollWidth / 2;
+
+    container.addEventListener('scroll', () => {
+      if (isResetting) return;
+      if (container.scrollLeft >= halfWidth) {
+        isResetting = true;
+        container.scrollLeft -= halfWidth;
+        setTimeout(() => isResetting = false, 10);
+      } else if (container.scrollLeft <= 0) {
+        isResetting = true;
+        container.scrollLeft += halfWidth;
+        setTimeout(() => isResetting = false, 10);
+      }
+    });
+
+    const startAutoScroll = () => {
+      clearInterval(autoScrollInterval);
+      autoScrollInterval = setInterval(() => {
+        container.scrollLeft += 1;
+      }, 20); // 50fps smooth scroll
+    };
+
+    const stopAutoScroll = () => {
+      clearInterval(autoScrollInterval);
+    };
+
+    // Initially start in the middle so dragging left works immediately
+    isResetting = true;
+    container.scrollLeft = halfWidth;
+    setTimeout(() => {
+      isResetting = false;
+      startAutoScroll();
+    }, 50);
+
+    container.addEventListener('mousedown', (e) => {
+      isDown = true;
+      container.style.cursor = 'grabbing';
+      startX = e.pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+      stopAutoScroll();
+    });
+
+    container.addEventListener('mouseleave', () => {
+      if (isDown) {
+        isDown = false;
+        container.style.cursor = 'grab';
+      }
+      startAutoScroll();
+    });
+
+    container.addEventListener('mouseup', () => {
+      isDown = false;
+      container.style.cursor = 'grab';
+      startAutoScroll();
+    });
+
+    container.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const walk = (x - startX) * 1.5; // Drag speed multiplier
+      container.scrollLeft = scrollLeft - walk;
+    });
+
+    // Touch events for mobile
+    container.addEventListener('touchstart', (e) => {
+      isDown = true;
+      startX = e.touches[0].pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+      stopAutoScroll();
+    }, {passive: true});
+    
+    container.addEventListener('touchend', () => {
+      isDown = false;
+      startAutoScroll();
+    });
+    
+    container.addEventListener('touchmove', (e) => {
+      if (!isDown) return;
+      const x = e.touches[0].pageX - container.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      container.scrollLeft = scrollLeft - walk;
+    }, {passive: true});
+
+    container.addEventListener('mouseenter', stopAutoScroll);
   }
 };
 

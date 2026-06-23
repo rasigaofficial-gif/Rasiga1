@@ -8,7 +8,7 @@ window.RasigaPages = {
     } else {
       let cards = '';
       sorted.forEach((s, i) => cards += RasigaComponents.SongCard(s, i));
-      trendingHTML = `<div class="marquee-container"><div class="marquee-content">${cards}${cards}</div></div>`;
+      trendingHTML = `<div class="marquee-container" id="trending-marquee"><div class="marquee-content" id="trending-marquee-content">${cards}${cards}</div></div>`;
     }
 
     let reviewsHTML = '';
@@ -181,10 +181,11 @@ window.RasigaPages = {
     }
 
     if (!RasigaData.userRatings) RasigaData.userRatings = {};
-    const userRating = RasigaData.userRatings[id] || 0;
+    let userRating = RasigaData.userRatings[id] || 0;
+    userRating = Math.round(userRating * 4) / 4; // Snap to 0.25 increments
 
     const starSvgEmpty = window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'none', color: 'currentColor' }) : '';
-    const starSvgFilled = window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'var(--accent-gold)', color: 'var(--accent-gold)' }) : '';
+    const starSvgFilled = window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'var(--accent-gold)', color: 'transparent' }) : '';
 
     let ratingStarsHTML = `
       <div style="position:relative; display:inline-block; width:140px; height:28px;">
