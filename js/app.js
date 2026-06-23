@@ -271,6 +271,11 @@ window.RasigaApp = {
           window.RasigaApp.addXP(expectedXp - currentXp);
         }
 
+        // Retroactively award missed badges
+        if (window.RasigaApp) {
+          window.RasigaApp.checkAndAwardBadges();
+        }
+
         localStorage.setItem('rasiga_user', JSON.stringify(window.RasigaData.demoUser));
         window.RasigaRouter.handleRoute();
 
