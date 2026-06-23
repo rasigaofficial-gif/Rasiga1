@@ -197,7 +197,6 @@ window.RasigaPages = {
         </div>
         <input type="range" min="0" max="5" step="0.25" value="${userRating}" 
                oninput="RasigaApp.setRatingInput('${id}', this.value)" 
-               onchange="RasigaApp.saveRating('${id}', this.value)"
                aria-label="Rate this song from 0 to 5 stars"
                style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; margin:0;" />
       </div>

@@ -104,7 +104,7 @@ window.RasigaApp = {
     this.fetchInitialData();
   },
 
-  fetchInitialData: function () {
+  fetchInitialData: function (silent = false) {
     if (!this.supabase) return;
     
     // Fetch songs
@@ -122,7 +122,7 @@ window.RasigaApp = {
         if (lagJaGale) lagJaGale.album_art_url = 'data/art1.png';
         
         // Re-render if we are on a page that needs songs (like home or discover)
-        if (window.RasigaRouter) window.RasigaRouter.handleRoute();
+        if (!silent && window.RasigaRouter) window.RasigaRouter.handleRoute();
       }
     });
 
@@ -144,7 +144,7 @@ window.RasigaApp = {
       } else {
         window.RasigaReviews = [];
       }
-      if (window.RasigaRouter && (location.hash === '#/' || location.hash === '')) window.RasigaRouter.handleRoute();
+      if (!silent && window.RasigaRouter && (location.hash === '#/' || location.hash === '')) window.RasigaRouter.handleRoute();
     });
 
     // Fetch suggestions (for admin)
@@ -1836,7 +1836,7 @@ window.RasigaApp = {
           await this.addXP(10);
         }
         
-        await this.fetchInitialData(); // Refresh overall song stats quietly
+        await this.fetchInitialData(true); // Refresh overall song stats quietly
         
         if (isNewRating) {
           await this.checkAndAwardBadges();
@@ -1851,24 +1851,21 @@ window.RasigaApp = {
     const textEl = document.getElementById('review-textarea-' + id);
     const text = textEl ? textEl.value.trim() : '';
 
-    if (!text) {
-      window.showToast("Please write a review to submit.", 'error');
-      return;
-    }
-
     const rating = RasigaData.userRatings && RasigaData.userRatings[id];
     if (!rating) {
-      window.showToast("Please select a star rating before submitting your review.", 'error');
+      window.showToast("Please select a star rating first.", 'error');
       return;
     }
 
     const user = RasigaData.demoUser;
     if (!user || !user.id || !this.supabase) {
-      window.showToast("You must be logged in to review.", 'error');
+      window.showToast("You must be logged in.", 'error');
       return;
     }
 
     try {
+      const isNewRating = !RasigaData.persistedRatings || !RasigaData.persistedRatings.has(id);
+      
       // 1. Upsert rating
       const { data: ratingData, error: ratingError } = await this.supabase
         .from('ratings')
@@ -1878,31 +1875,47 @@ window.RasigaApp = {
 
       if (ratingError) throw ratingError;
 
-      // 2. Upsert review
-      const { error: reviewError } = await this.supabase
-        .from('reviews')
-        .upsert({ user_id: user.id, song_id: id, rating_id: ratingData.id, body: text }, { onConflict: 'user_id, song_id' });
+      if (!RasigaData.persistedRatings) RasigaData.persistedRatings = new Set();
+      RasigaData.persistedRatings.add(id);
 
-      if (reviewError) throw reviewError;
+      let isNewReview = false;
 
-      const isNewReview = !RasigaData.userComments[id];
+      // 2. Upsert review ONLY if text exists
+      if (text) {
+        const { error: reviewError } = await this.supabase
+          .from('reviews')
+          .upsert({ user_id: user.id, song_id: id, rating_id: ratingData.id, body: text }, { onConflict: 'user_id, song_id' });
 
-      // 3. Update local state for immediate UI reflection
-      if (!RasigaData.userComments) RasigaData.userComments = {};
-      RasigaData.userComments[id] = text;
+        if (reviewError) throw reviewError;
 
-      // Re-fetch initial data to get updated community pulse and song stats
-      await this.fetchInitialData();
+        isNewReview = !RasigaData.userComments || !RasigaData.userComments[id];
 
-      if (isNewReview) {
-        await this.addXP(20); // 20 for review (10 for rating is handled in saveRating)
-        await this.checkAndAwardBadges();
+        if (!RasigaData.userComments) RasigaData.userComments = {};
+        RasigaData.userComments[id] = text;
       }
 
-      RasigaRouter.handleRoute();
+      // Re-fetch initial data
+      await this.fetchInitialData();
+
+      let xpToAdd = 0;
+      if (isNewRating) xpToAdd += 10;
+      if (isNewReview && text) xpToAdd += 20;
+
+      if (xpToAdd > 0) {
+        await this.addXP(xpToAdd);
+      }
+      await this.checkAndAwardBadges();
+
+      if (rating === 5 && window.RasigaComponents && window.RasigaComponents.fireConfetti) {
+        window.RasigaComponents.fireConfetti();
+      }
+
+      window.showToast(text ? "Review submitted successfully!" : "Rating saved successfully!");
+
+      if (window.RasigaRouter) window.RasigaRouter.handleRoute();
     } catch (err) {
       console.error(err);
-      window.showToast("Error submitting review: " + err.message, 'error');
+      window.showToast("Error submitting: " + err.message, 'error');
     }
   },
 
