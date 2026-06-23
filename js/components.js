@@ -67,7 +67,7 @@ window.RasigaComponents = {
           <div class="lc-meta">
             <span>${songCount} song${songCount !== 1 ? 's' : ''}</span>
             <span>&bull;</span>
-            <span>${list.is_public ? 'Public' : '🔒 Private'}</span>
+            <span>${list.is_public ? 'Public' : `<span style="display:inline-flex;align-items:center;gap:0.2rem;">${Icons.get('lock', {width:12, height:12})} Private</span>`}</span>
           </div>
         </div>
       </div>
@@ -100,15 +100,15 @@ window.RasigaComponents = {
     return `
       <div class="glass review-card page-enter" onclick="location.hash='${link}'">
         <div class="rc-header">
-          <div class="rc-avatar" style="background: ${review.clr}; cursor: pointer;" onclick="if('${review.username}' && '${review.username}' !== 'undefined') { event.stopPropagation(); location.hash='#/user/${review.username}'; }">${review.name[0]}</div>
+          <div class="rc-avatar" style="background: ${review.clr}; cursor: pointer;" onclick="if('${review.username}' && '${review.username}' !== 'undefined') { event.stopPropagation(); location.hash='#/user/${review.username}'; }">${escapeHTML(review.name[0])}</div>
           <div class="rc-user-info">
-            <div class="rc-name" style="cursor: pointer;" onclick="if('${review.username}' && '${review.username}' !== 'undefined') { event.stopPropagation(); location.hash='#/user/${review.username}'; }">${review.name}</div>
-            <div class="rc-meta">Reviewed <b>${review.song}</b> &bull; ${Icons.get('star', {width:12, height:12, fill:'var(--accent-gold)', color:'var(--accent-gold)'})} ${review.rating}</div>
+            <div class="rc-name" style="cursor: pointer;" onclick="if('${review.username}' && '${review.username}' !== 'undefined') { event.stopPropagation(); location.hash='#/user/${review.username}'; }">${escapeHTML(review.name)}</div>
+            <div class="rc-meta">Reviewed <b>${escapeHTML(review.song)}</b> &bull; ${Icons.get('star', {width:12, height:12, fill:'var(--accent-gold)', color:'var(--accent-gold)'})} ${review.rating}</div>
           </div>
         </div>
         <div class="rc-body">
-          ${review.text}
-          ${review.quote ? `<div class="rc-quote">${review.quote}</div>` : ''}
+          ${escapeHTML(review.text)}
+          ${review.quote ? `<div class="rc-quote">${escapeHTML(review.quote)}</div>` : ''}
         </div>
         <div class="rc-actions">
           <button class="btn-react btn-like" onclick="event.stopPropagation(); RasigaApp.toggleLike(this, ${review.likes})">
@@ -138,6 +138,33 @@ window.RasigaComponents = {
         <p class="es-message">${message}</p>
       </div>
     `;
+  },
+
+  confirmAction: function(title, message, onConfirm) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.style.background = 'rgba(0,0,0,0.6)';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.zIndex = '10000';
+    
+    overlay.innerHTML = `
+      <div class="glass" style="max-width:400px; width:90%; padding:2rem; border-radius:var(--radius-lg); text-align:center;">
+        <h3 style="margin-bottom:0.5rem; font-family:'DM Serif Display',serif; font-size:1.5rem;">${escapeHTML(title)}</h3>
+        <p style="color:var(--text-muted); margin-bottom:1.5rem; line-height:1.5;">${escapeHTML(message)}</p>
+        <div style="display:flex; gap:1rem; justify-content:center;">
+          <button class="btn" id="confirm-cancel" style="flex:1;">Cancel</button>
+          <button class="btn btn-primary" id="confirm-ok" style="flex:1;">Confirm</button>
+        </div>
+      </div>`;
+    
+    document.body.appendChild(overlay);
+    
+    overlay.querySelector('#confirm-cancel').onclick = () => overlay.remove();
+    overlay.querySelector('#confirm-ok').onclick = () => { 
+      overlay.remove(); 
+      if (onConfirm) onConfirm(); 
+    };
   },
 
   fireConfetti: function() {

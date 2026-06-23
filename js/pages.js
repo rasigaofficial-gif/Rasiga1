@@ -87,18 +87,18 @@ window.RasigaPages = {
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
               <h3 class="section-title" style="margin: 0; color: var(--text-main);">Search Songs</h3>
             </div>
-            <input type="text" id="discover-search-input" class="glass-input" style="width: 100%;" placeholder="Search songs..." oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value, 'discover-search-input')">
+            <input type="text" id="discover-search-input" class="glass-input" style="width: 100%;" placeholder="Search songs..." aria-label="Search songs" oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value, 'discover-search-input')">
           </div>
 
-          <div id="discover-search-filter" class="custom-dropdown-container page-enter" data-value="all" onclick="this.classList.toggle('open')" style="position: absolute; top: 1.25rem; right: 1.5rem; animation-delay: 0.05s;">
-            <div class="custom-dropdown-selected">
+          <div id="discover-search-filter" class="custom-dropdown-container page-enter" data-value="all" style="position: absolute; top: 1.25rem; right: 1.5rem; animation-delay: 0.05s;">
+            <button class="custom-dropdown-selected custom-dropdown-btn" onclick="this.parentElement.classList.toggle('open')" aria-haspopup="listbox" aria-expanded="false">
               <span class="selected-text">All</span>
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
-            </div>
-            <div class="custom-dropdown-menu">
-              <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('all', 'All', 'discover-search-filter', 'discover-search-input')">All</div>
-              <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('artist', 'Artist', 'discover-search-filter', 'discover-search-input')">Artist</div>
-              <div class="custom-dropdown-item" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('song', 'Song', 'discover-search-filter', 'discover-search-input')">Song</div>
+            </button>
+            <div class="custom-dropdown-menu" role="listbox">
+              <button class="custom-dropdown-item custom-dropdown-opt" role="option" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('all', 'All', 'discover-search-filter', 'discover-search-input'); this.closest('.custom-dropdown-container').classList.remove('open');">All</button>
+              <button class="custom-dropdown-item custom-dropdown-opt" role="option" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('artist', 'Artist', 'discover-search-filter', 'discover-search-input'); this.closest('.custom-dropdown-container').classList.remove('open');">Artist</button>
+              <button class="custom-dropdown-item custom-dropdown-opt" role="option" onclick="event.stopPropagation(); RasigaApp.setSearchFilter('song', 'Song', 'discover-search-filter', 'discover-search-input'); this.closest('.custom-dropdown-container').classList.remove('open');">Song</button>
             </div>
           </div>
         </div>
@@ -130,7 +130,7 @@ window.RasigaPages = {
       if (!artistsStr) return '';
       return artistsStr.split(',').map(a => {
         const name = a.trim();
-        return `<a href="#/artist/${encodeURIComponent(name)}" class="artist-link" style="color:var(--text-main); text-decoration:underline; text-decoration-color:rgba(255,255,255,0.2); text-underline-offset:2px; transition:color 0.2s;" onmouseover="this.style.color='var(--accent-saffron)'" onmouseout="this.style.color='var(--text-main)'">${name}</a>`;
+        return `<a href="#/artist/${encodeURIComponent(name)}" class="artist-link" style="color:var(--text-main); text-decoration:underline; text-decoration-color:rgba(255,255,255,0.2); text-underline-offset:2px; transition:color 0.2s;" onmouseover="this.style.color='var(--accent-saffron)'" onmouseout="this.style.color='var(--text-main)'">${escapeHTML(name)}</a>`;
       }).join(', ');
     };
 
@@ -157,17 +157,17 @@ window.RasigaPages = {
               ${window.Icons ? window.Icons.get('star', { width: 14, height: 14, fill: 'currentColor' }) : ''} ${RasigaData.userRatings && RasigaData.userRatings[id] ? RasigaData.userRatings[id] : 0}
             </div>
           </div>
-          <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">${userComment}</p>
+          <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">${escapeHTML(userComment)}</p>
           <div style="display:flex; align-items:center; gap: 1rem; margin-top: 1rem;">
-            <button class="btn-react btn-like ${userReaction === 'like' ? 'anim-heart-fill' : ''}" onclick="RasigaApp.toggleLike(this, 0, '${id}_user')">
+            <button class="btn-react btn-like ${userReaction === 'like' ? 'anim-heart-fill' : ''}" onclick="RasigaApp.toggleLike(this, 0, '${id}_user')" aria-label="Like this review">
               ${window.Icons ? window.Icons.get('heart', { width: 16, height: 16 }) : ''}
               <span class="like-count" data-base="0" style="font-size:0.8rem;">${userReaction === 'like' ? 1 : 0}</span>
             </button>
-            <button class="btn-react btn-dislike ${userReaction === 'dislike' ? 'anim-dislike-fill' : ''}" onclick="RasigaApp.toggleDislike(this, 0, '${id}_user')">
+            <button class="btn-react btn-dislike ${userReaction === 'dislike' ? 'anim-dislike-fill' : ''}" onclick="RasigaApp.toggleDislike(this, 0, '${id}_user')" aria-label="Dislike this review">
               ${window.Icons ? window.Icons.get('dislike', { width: 16, height: 16 }) : ''}
               <span class="dislike-count" data-base="0" style="font-size:0.8rem;">${userReaction === 'dislike' ? 1 : 0}</span>
             </button>
-            <button class="btn-react" onclick="RasigaApp.shareComment('${id}')">
+            <button class="btn-react" onclick="RasigaApp.shareComment('${id}')" aria-label="Share this review">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
               <span style="font-size:0.8rem;">Share</span>
             </button>
@@ -197,6 +197,7 @@ window.RasigaPages = {
         <input type="range" min="0" max="5" step="0.25" value="${userRating}" 
                oninput="RasigaApp.setRatingInput('${id}', this.value)" 
                onchange="RasigaApp.saveRating('${id}', this.value)"
+               aria-label="Rate this song from 0 to 5 stars"
                style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; margin:0;" />
       </div>
     `;
@@ -223,7 +224,7 @@ window.RasigaPages = {
             <span style="font-size: 0.9rem; color: var(--text-muted);" id="user-rating-text-${id}">${userRating > 0 ? userRating + ' Stars' : 'Tap to rate'}</span>
           </div>
           ${userComment ? `
-             <p class="mb-1" style="font-size:1rem;">${userComment}</p>
+             <p class="mb-1" style="font-size:1rem;">${escapeHTML(userComment)}</p>
              <button onclick="RasigaApp.editComment('${id}')" class="btn" style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Edit</button>
           ` : `
              <textarea id="review-textarea-${id}" class="glass-input mb-1" placeholder="Write your review here... (Optional)" style="height: 100px; resize: vertical;"></textarea>
@@ -317,7 +318,7 @@ window.RasigaPages = {
           </button>
           <div class="ph-avatar vinyl-avatar"><span class="vinyl-text">${user.avatar}</span></div>
           <div class="ph-info">
-            <h2>${user.displayName}</h2>
+            <h2>${escapeHTML(user.displayName)}</h2>
             <p>@${user.username} &bull; Joined ${joinedStr}</p>
             <div style="display:flex; justify-content:center; gap: 1.5rem; margin-top: 0.8rem; font-weight:600; color:var(--text-main);">
               <a href="#/following" style="text-decoration:none; color:inherit;"><span id="profile-following-count">...</span> <span style="color:var(--text-muted); font-weight:normal; font-size:0.85rem;">Following</span></a>
@@ -325,7 +326,7 @@ window.RasigaPages = {
             </div>
             <div class="ph-level mt-2">
               <div class="phl-top">
-                <span class="phl-name text-gradient">${level.name}</span>
+                <span class="phl-name text-gradient" style="display:flex; align-items:center; gap:0.25rem;">${level.id === 6 ? Icons.get('crown', {width:16, height:16, color:'var(--accent-gold)'}) : ''} ${level.name}</span>
                 <span class="phl-xp">${totalXP} XP</span>
               </div>
               <div class="progress-bar"><div class="progress-fill" style="width: ${xpPercent}%"></div></div>
@@ -337,7 +338,7 @@ window.RasigaPages = {
         <div class="profile-stats mt-4">
           <div class="glass stat-box page-enter" style="cursor:pointer; animation-delay: 0.1s;" onclick="location.hash='#/my-reviews'"><h3>${Object.keys(RasigaData.userRatings || {}).length || user.stats?.ratings || 0}</h3><span>Ratings</span></div>
           <div class="glass stat-box page-enter" style="cursor:pointer; animation-delay: 0.15s;" onclick="location.hash='#/my-reviews'"><h3>${Object.keys(RasigaData.userComments || {}).length || user.stats?.reviews || 0}</h3><span>Reviews</span></div>
-          <div class="glass stat-box page-enter" style="animation-delay: 0.2s;"><h3>${user.streak || 1}</h3><span>Day Streak &#128293;</span></div>
+          <div class="glass stat-box page-enter" style="animation-delay: 0.2s;"><h3>${user.streak || 1}</h3><span style="display:flex; align-items:center; gap:0.25rem;">Day Streak ${Icons.get('flame', {width:14, height:14, color:'var(--accent-saffron)'})}</span></div>
         </div>
 
         <div class="mt-4 page-enter" style="animation-delay: 0.15s">
@@ -499,20 +500,20 @@ window.RasigaPages = {
 
     return `
       <div class="page-my-reviews">
-        <div class="page-enter" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+        <div class="page-enter page-header">
           <button class="icon-btn" onclick="history.back()">${Icons.get('close')}</button>
-          <h2 class="section-title" style="margin-bottom:0;">My Ratings & Reviews</h2>
+          <h2 class="section-title page-header-title">My Ratings & Reviews</h2>
         </div>
-        <p class="page-enter" style="color:var(--text-muted); margin-bottom:1.5rem; animation-delay:0.1s;">Click any song to view and edit your review.</p>
+        <p class="page-enter page-header-desc" style="animation-delay:0.1s;">Click any song to view and edit your review.</p>
         <div class="song-grid mt-4 page-enter" style="animation-delay:0.2s;">
           ${gridHTML}
         </div>
 
         <section class="section mt-4 page-enter" style="margin-top: 3rem; animation-delay:0.3s;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-            <h2 class="section-title" style="margin:0;">My Suggestions</h2>
+          <div class="page-header" style="justify-content: space-between; margin-bottom: 1.5rem;">
+            <h2 class="section-title page-header-title">My Suggestions</h2>
           </div>
-          <div id="my-suggestions-container" style="display:flex; flex-direction:column; gap:1rem;">
+          <div id="my-suggestions-container" class="flex-col-gap-1">
             <p style="color:var(--text-muted); text-align:center;">Loading suggestions...</p>
           </div>
         </section>
@@ -523,9 +524,9 @@ window.RasigaPages = {
   renderPublicProfile: function(username) {
     return `
       <div class="page-entity" id="public-profile-container">
-        <div class="page-enter" style="display:flex; align-items:center; gap:1rem; margin-bottom: 2rem;">
+        <div class="page-enter page-header">
           <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
-          <h2 class="section-title" style="margin:0;">Profile</h2>
+          <h2 class="section-title page-header-title">Profile</h2>
         </div>
         <div style="text-align:center; padding: 2rem; color:var(--text-muted);">Loading profile...</div>
       </div>
@@ -535,9 +536,9 @@ window.RasigaPages = {
   renderConnections: function(type) {
     return `
       <div class="page-entity">
-        <div class="page-enter" style="display:flex; align-items:center; gap:1rem; margin-bottom: 2rem;">
+        <div class="page-enter page-header">
           <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
-          <h2 class="section-title" style="margin:0; text-transform:capitalize;">${type}</h2>
+          <h2 class="section-title page-header-title" style="text-transform:capitalize;">${type}</h2>
         </div>
         <div class="glass page-enter" style="padding: 1.5rem; animation-delay:0.1s;" id="connections-container">
           <div style="text-align:center; padding: 2rem; color:var(--text-muted);">Loading connections...</div>
@@ -646,7 +647,7 @@ window.RasigaPages = {
                 const grad = RasigaComponents.getGradient(s.title);
                 const ini = RasigaComponents.getInitials(s.title);
                 return `
-                <div class="song-card" style="background:transparent; border:none; box-shadow:none; padding:0; align-items:center;" onclick="location.hash='#/song/${s.id}'">
+                <a href="#/song/${s.id}" class="song-card" style="background:transparent; border:none; box-shadow:none; padding:0; align-items:center; text-decoration:none;">
                   <div class="${rankClass}" style="font-weight:bold; font-size:1.2rem; ${isTop3 ? '' : 'color:var(--text-light);'} width:20px; text-align:center;">${i + 1}</div>
                   <div class="sc-art" style="background: ${grad};">
                     ${ini}
@@ -658,7 +659,7 @@ window.RasigaPages = {
                   <div style="display:flex; align-items:center; gap:0.25rem; font-weight:bold; color:var(--accent-gold);">
                     ${s.avg_rating} ${Icons.get('star')}
                   </div>
-                </div>
+                </a>
               `}).join('')}
             </div>
           </div>
@@ -670,19 +671,19 @@ window.RasigaPages = {
                 const grad = RasigaComponents.getGradient(s.title);
                 const ini = RasigaComponents.getInitials(s.title);
                 return `
-                <div class="song-card" style="background:transparent; border:none; box-shadow:none; padding:0; align-items:center;" onclick="location.hash='#/song/${s.id}'">
+                <a href="#/song/${s.id}" class="song-card" style="background:transparent; border:none; box-shadow:none; padding:0; align-items:center; text-decoration:none;">
                   <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px; text-align:center;">${i + 1}</div>
                   <div class="sc-art" style="background: ${grad};">
                     ${ini}
                   </div>
                   <div class="sc-info" style="flex:1;">
-                    <div class="sc-title">${s.title}</div>
-                    <div class="sc-meta">${s.film}</div>
+                    <div class="sc-title">${escapeHTML(s.title)}</div>
+                    <div class="sc-meta">${escapeHTML(s.film)}</div>
                   </div>
                   <div style="font-weight:bold; color:var(--text-main); font-size:0.9rem;">
                     ${s.total_ratings >= 100 ? (s.total_ratings / 1000).toFixed(1) + 'k' : s.total_ratings || 0} ratings
                   </div>
-                </div>
+                </a>
               `}).join('')}
             </div>
           </div>
@@ -695,17 +696,17 @@ window.RasigaPages = {
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Top Rated Singers</h3>
             <div class="chart-grid">
               ${topSingersRated.map((a, i) => `
-                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'" onclick="location.hash='#/artist/${encodeURIComponent(a.name)}'">
+                <a href="#/artist/${encodeURIComponent(a.name)}" style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s; text-decoration:none;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
                   <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px;">${i + 1}</div>
                   <div class="ph-avatar vinyl-avatar" style="width:36px; height:36px; font-size:1rem; margin:0;"><span class="vinyl-text">${a.name.charAt(0)}</span></div>
                   <div style="flex:1;">
-                    <div style="font-weight:600;">${a.name}</div>
+                    <div style="font-weight:600;">${escapeHTML(a.name)}</div>
                     <div style="font-size:0.85rem; color:var(--text-muted);">${a.song_count} song${a.song_count > 1 ? 's' : ''}</div>
                   </div>
                   <div style="display:flex; align-items:center; gap:0.25rem; font-weight:bold; color:var(--accent-gold);">
                     ${a.avg_rating} ${Icons.get('star')}
                   </div>
-                </div>
+                </a>
               `).join('')}
             </div>
           </div>
@@ -714,17 +715,17 @@ window.RasigaPages = {
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Most Popular Singers</h3>
             <div class="chart-grid">
               ${topSingersPopular.map((a, i) => `
-                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'" onclick="location.hash='#/artist/${encodeURIComponent(a.name)}'">
+                <a href="#/artist/${encodeURIComponent(a.name)}" style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s; text-decoration:none;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
                   <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px;">${i + 1}</div>
                   <div class="ph-avatar vinyl-avatar" style="width:36px; height:36px; font-size:1rem; margin:0;"><span class="vinyl-text">${a.name.charAt(0)}</span></div>
                   <div style="flex:1;">
-                    <div style="font-weight:600;">${a.name}</div>
+                    <div style="font-weight:600;">${escapeHTML(a.name)}</div>
                     <div style="font-size:0.85rem; color:var(--text-muted);">${a.song_count} song${a.song_count > 1 ? 's' : ''}</div>
                   </div>
                   <div style="font-weight:bold; color:var(--text-main); font-size:0.9rem;">
                     ${a.total_ratings >= 100 ? (a.total_ratings / 1000).toFixed(1) + 'k' : a.total_ratings || 0} ratings
                   </div>
-                </div>
+                </a>
               `).join('')}
             </div>
           </div>
@@ -737,17 +738,17 @@ window.RasigaPages = {
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Top Rated Music Directors</h3>
             <div class="chart-grid">
               ${topComposersRated.map((a, i) => `
-                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'" onclick="location.hash='#/artist/${encodeURIComponent(a.name)}'">
+                <a href="#/artist/${encodeURIComponent(a.name)}" style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s; text-decoration:none;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
                   <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px;">${i + 1}</div>
                   <div class="ph-avatar vinyl-avatar" style="width:36px; height:36px; font-size:1rem; margin:0;"><span class="vinyl-text">${a.name.charAt(0)}</span></div>
                   <div style="flex:1;">
-                    <div style="font-weight:600;">${a.name}</div>
+                    <div style="font-weight:600;">${escapeHTML(a.name)}</div>
                     <div style="font-size:0.85rem; color:var(--text-muted);">${a.song_count} song${a.song_count > 1 ? 's' : ''}</div>
                   </div>
                   <div style="display:flex; align-items:center; gap:0.25rem; font-weight:bold; color:var(--accent-gold);">
                     ${a.avg_rating} ${Icons.get('star')}
                   </div>
-                </div>
+                </a>
               `).join('')}
             </div>
           </div>
@@ -756,17 +757,17 @@ window.RasigaPages = {
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Most Popular Music Directors</h3>
             <div class="chart-grid">
               ${topComposersPopular.map((a, i) => `
-                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'" onclick="location.hash='#/artist/${encodeURIComponent(a.name)}'">
+                <a href="#/artist/${encodeURIComponent(a.name)}" style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s; text-decoration:none;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
                   <div style="font-weight:bold; font-size:1.2rem; color:var(--text-light); width:20px;">${i + 1}</div>
                   <div class="ph-avatar vinyl-avatar" style="width:36px; height:36px; font-size:1rem; margin:0;"><span class="vinyl-text">${a.name.charAt(0)}</span></div>
                   <div style="flex:1;">
-                    <div style="font-weight:600;">${a.name}</div>
+                    <div style="font-weight:600;">${escapeHTML(a.name)}</div>
                     <div style="font-size:0.85rem; color:var(--text-muted);">${a.song_count} song${a.song_count > 1 ? 's' : ''}</div>
                   </div>
                   <div style="font-weight:bold; color:var(--text-main); font-size:0.9rem;">
                     ${a.total_ratings >= 100 ? (a.total_ratings / 1000).toFixed(1) + 'k' : a.total_ratings || 0} ratings
                   </div>
-                </div>
+                </a>
               `).join('')}
             </div>
           </div>
@@ -853,7 +854,7 @@ window.RasigaPages = {
     let colorHTML = '';
     colors.forEach(c => {
       const active = currentColor === c.id ? 'border: 3px solid var(--text-main); transform: scale(1.1);' : 'border: 2px solid transparent;';
-      colorHTML += `<div onclick="RasigaApp.setColorTheme('${c.id}')" style="width: 45px; height: 45px; border-radius: 50%; background: ${c.hex}; cursor: pointer; transition: all 0.2s; ${active}" title="${c.name}"></div>`;
+      colorHTML += `<button onclick="RasigaApp.setColorTheme('${c.id}')" aria-label="Set theme color to ${c.name}" style="width: 45px; height: 45px; border-radius: 50%; background: ${c.hex}; cursor: pointer; transition: all 0.2s; ${active}" title="${c.name}"></button>`;
     });
 
     return `
@@ -864,7 +865,7 @@ window.RasigaPages = {
           <div style="display:flex; flex-direction:column; gap: 1rem;">
             <div>
               <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem;">Display Name</label>
-              <input id="edit-profile-display-name" type="text" value="${user.displayName}" style="width:100%; padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1); color: inherit; outline:none;" />
+              <input id="edit-profile-display-name" type="text" value="${escapeHTML(user.displayName)}" style="width:100%; padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1); color: inherit; outline:none;" />
             </div>
             <div>
               <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem;">Username</label>
@@ -897,7 +898,7 @@ window.RasigaPages = {
             <button onclick="RasigaApp.logout()" class="btn glass" style="justify-content: center; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
               Log Out
             </button>
-            <button onclick="if(confirm('Are you sure? This cannot be undone.')){ RasigaApp.logout(); }" class="btn" style="justify-content: center; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);">
+            <button onclick="RasigaComponents.confirmAction('Delete Account', 'Are you sure? This cannot be undone.', () => RasigaApp.logout())" class="btn" style="justify-content: center; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);">
               Delete Account
             </button>
           </div>
@@ -1388,82 +1389,82 @@ window.RasigaPages = {
         </div>
 
         <!-- STAT CARDS ROW -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:1rem; margin-bottom:2rem;">
-          <div class="glass page-enter" style="padding:1.2rem; text-align:center;">
-            <div style="font-size:2rem; font-weight:700; background:linear-gradient(135deg,#f97316,#ec4899); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"><span class="stat-counter" data-target="${totalSongs}">0</span></div>
-            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;">Songs Rated</div>
+        <div class="stat-card-row">
+          <div class="glass page-enter stat-card">
+            <div class="stat-value bg-grad-orange-pink"><span class="stat-counter" data-target="${totalSongs}">0</span></div>
+            <div class="stat-label">Songs Rated</div>
           </div>
-          <div class="glass page-enter" style="padding:1.2rem; text-align:center;">
-            <div style="font-size:2rem; font-weight:700; background:linear-gradient(135deg,#8b5cf6,#0ea5e9); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"><span class="stat-counter" data-target="${avgRating}">0</span></div>
-            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;">Avg Rating</div>
+          <div class="glass page-enter stat-card">
+            <div class="stat-value bg-grad-purple-blue"><span class="stat-counter" data-target="${avgRating}">0</span></div>
+            <div class="stat-label">Avg Rating</div>
           </div>
-          <div class="glass page-enter" style="padding:1.2rem; text-align:center;">
-            <div style="font-size:2rem; font-weight:700; background:linear-gradient(135deg,#10b981,#0ea5e9); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"><span class="stat-counter" data-target="${uniqueComposers}">0</span></div>
-            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;">Composers</div>
+          <div class="glass page-enter stat-card">
+            <div class="stat-value bg-grad-green-blue"><span class="stat-counter" data-target="${uniqueComposers}">0</span></div>
+            <div class="stat-label">Composers</div>
           </div>
-          <div class="glass page-enter" style="padding:1.2rem; text-align:center;">
-            <div style="font-size:2rem; font-weight:700; background:linear-gradient(135deg,#eab308,#f97316); -webkit-background-clip:text; -webkit-text-fill-color:transparent;"><span class="stat-counter" data-target="${uniqueLangs}">0</span></div>
-            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;">Languages</div>
+          <div class="glass page-enter stat-card">
+            <div class="stat-value bg-grad-yellow-orange"><span class="stat-counter" data-target="${uniqueLangs}">0</span></div>
+            <div class="stat-label">Languages</div>
           </div>
-          <div class="glass page-enter" style="padding:1.2rem; text-align:center;">
-            <div style="font-size:1.6rem; font-weight:700; background:linear-gradient(135deg,#e11d48,#f97316); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">${oldestYear}\u2013${newestYear}</div>
-            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;">Era Span</div>
+          <div class="glass page-enter stat-card">
+            <div class="stat-value bg-grad-red-orange" style="font-size:1.6rem;">${oldestYear}\u2013${newestYear}</div>
+            <div class="stat-label">Era Span</div>
           </div>
         </div>
 
         <!-- ROW 1: Musical DNA + Genre -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:1.5rem; margin-bottom:1.5rem;">
-          <div class="glass page-enter" style="padding:1.5rem;">
-            <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#f97316,#ec4899); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Musical DNA</h3>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Your emotional fingerprint vs. the community.</p>
-            <div style="position:relative; height:300px;"><canvas id="moodChart"></canvas></div>
+        <div class="grid-2">
+          <div class="glass page-enter card-glass">
+            <h3 class="chart-title bg-grad-orange-pink">Musical DNA</h3>
+            <p class="chart-desc">Your emotional fingerprint vs. the community.</p>
+            <div class="chart-container-lg"><canvas id="moodChart"></canvas></div>
           </div>
-          <div class="glass page-enter" style="padding:1.5rem;">
-            <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#10b981,#0ea5e9); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Genre Universe</h3>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">The sonic territory you explore.</p>
-            <div style="position:relative; height:300px;"><canvas id="genreChart"></canvas></div>
+          <div class="glass page-enter card-glass">
+            <h3 class="chart-title bg-grad-green-cyan">Genre Universe</h3>
+            <p class="chart-desc">The sonic territory you explore.</p>
+            <div class="chart-container-lg"><canvas id="genreChart"></canvas></div>
           </div>
         </div>
 
         <!-- ROW 2: Timeline + Regional -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:1.5rem; margin-bottom:1.5rem;">
-          <div class="glass page-enter" style="padding:1.5rem;">
-            <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#f97316,#eab308); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Time Machine</h3>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Songs across the decades.</p>
-            <div style="position:relative; height:250px;"><canvas id="decadeChart"></canvas></div>
+        <div class="grid-2">
+          <div class="glass page-enter card-glass">
+            <h3 class="chart-title bg-grad-yellow-orange">Time Machine</h3>
+            <p class="chart-desc">Songs across the decades.</p>
+            <div class="chart-container"><canvas id="decadeChart"></canvas></div>
           </div>
-          <div class="glass page-enter" style="padding:1.5rem;">
-            <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#f43f5e,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Regional Palette</h3>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Languages you gravitate towards.</p>
-            <div style="position:relative; height:250px;"><canvas id="langChart"></canvas></div>
+          <div class="glass page-enter card-glass">
+            <h3 class="chart-title bg-grad-red-purple">Regional Palette</h3>
+            <p class="chart-desc">Languages you gravitate towards.</p>
+            <div class="chart-container"><canvas id="langChart"></canvas></div>
           </div>
         </div>
 
         <!-- ROW 3: Maestros + Voices -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:1.5rem; margin-bottom:1.5rem;">
-          <div class="glass page-enter" style="padding:1.5rem;">
-            <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#ff6b6b,#feca57); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Top Maestros</h3>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">The music directors who shape your taste.</p>
-            <div style="position:relative; height:250px;"><canvas id="compChart"></canvas></div>
+        <div class="grid-2">
+          <div class="glass page-enter card-glass">
+            <h3 class="chart-title bg-grad-pink-yellow">Top Maestros</h3>
+            <p class="chart-desc">The music directors who shape your taste.</p>
+            <div class="chart-container"><canvas id="compChart"></canvas></div>
           </div>
-          <div class="glass page-enter" style="padding:1.5rem;">
-            <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#818cf8,#e879f9); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Favorite Voices</h3>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">The singers who define your sonic identity.</p>
-            <div style="position:relative; height:280px;"><canvas id="singerChart"></canvas></div>
+          <div class="glass page-enter card-glass">
+            <h3 class="chart-title bg-grad-pink-purple">Favorite Voices</h3>
+            <p class="chart-desc">The singers who define your sonic identity.</p>
+            <div class="chart-container-md"><canvas id="singerChart"></canvas></div>
           </div>
         </div>
 
         <!-- ROW 4: Quality Index + Industry -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px,1fr)); gap:1.5rem; margin-bottom:1.5rem;">
-          <div class="glass page-enter" style="padding:1.5rem;">
-            <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#f43f5e,#fbbf24); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Quality Index</h3>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Average rating by language &mdash; who tops your chart?</p>
-            <div style="position:relative; height:250px;"><canvas id="ratingLangChart"></canvas></div>
+        <div class="grid-2">
+          <div class="glass page-enter card-glass">
+            <h3 class="chart-title bg-grad-red-yellow">Quality Index</h3>
+            <p class="chart-desc">Average rating by language &mdash; who tops your chart?</p>
+            <div class="chart-container"><canvas id="ratingLangChart"></canvas></div>
           </div>
-          <div class="glass page-enter" style="padding:1.5rem;">
-            <h3 style="margin-bottom:0.3rem; font-family:'Cinzel Decorative', serif; background:linear-gradient(135deg,#e11d48,#10b981); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Industry Map</h3>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Your exploration across film industries.</p>
-            <div style="position:relative; height:280px;"><canvas id="industryChart"></canvas></div>
+          <div class="glass page-enter card-glass">
+            <h3 class="chart-title bg-grad-red-green">Industry Map</h3>
+            <p class="chart-desc">Your exploration across film industries.</p>
+            <div class="chart-container-md"><canvas id="industryChart"></canvas></div>
           </div>
         </div>
 
@@ -1481,11 +1482,11 @@ window.RasigaPages = {
 
     return `
       <div class="page-lists page-enter">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <div class="page-header" style="justify-content: space-between; margin-bottom: 1rem;">
           <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
-          <h2 class="section-title" style="margin:0;">My Lists</h2>
+          <h2 class="section-title page-header-title">My Lists</h2>
         </div>
-        <div style="display:flex; flex-direction:column; gap:1rem;">
+        <div class="flex-col-gap-1">
           ${listsHTML}
         </div>
       </div>
@@ -1514,10 +1515,10 @@ window.RasigaPages = {
 
     return `
       <div class="page-list-details">
-        <div class="page-enter" style="display:flex; align-items:center; gap:1rem; margin-bottom:2rem; animation-delay: 0s;">
+        <div class="page-enter page-header" style="animation-delay: 0s;">
           <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
           <div style="flex:1;">
-            <h2 class="section-title" style="margin:0;">${list.name}</h2>
+            <h2 class="section-title page-header-title">${list.name}</h2>
             <div style="font-size:0.9rem; color:var(--text-muted); margin-top:0.2rem;">${list.is_public ? 'Public' : 'Private'} List &bull; ${songsInList.length} songs</div>
           </div>
         </div>
@@ -1545,9 +1546,9 @@ window.RasigaPages = {
     if (artistSongs.length === 0) {
       return `
         <div class="page-list-details">
-          <div class="page-enter" style="display:flex; align-items:center; gap:1rem; margin-bottom:2rem;">
+          <div class="page-enter page-header">
             <button class="icon-btn" onclick="history.back()">${window.Icons ? window.Icons.get('close') : 'X'}</button>
-            <h2 class="section-title" style="margin:0;">${name}</h2>
+            <h2 class="section-title page-header-title">${escapeHTML(name)}</h2>
           </div>
           ${RasigaComponents.EmptyState('user', 'No Songs Found', 'We could not find any songs credited to this artist.')}
         </div>
@@ -1584,7 +1585,7 @@ window.RasigaPages = {
             ${window.Icons ? window.Icons.get('artist', {width: 48, height: 48}) : ''}
           </div>
           <div class="sh-info">
-            <h2 class="sh-title" style="margin-bottom:0.5rem;">${name}</h2>
+            <h2 class="sh-title" style="margin-bottom:0.5rem;">${escapeHTML(name)}</h2>
             <div style="font-size:0.9rem; color:var(--text-light); margin-bottom: 1rem;">
               Artist Profile
             </div>

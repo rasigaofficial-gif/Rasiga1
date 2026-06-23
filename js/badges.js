@@ -7,7 +7,7 @@ window.RasigaData = {
     { id: 3, name: 'Shishya', minXP: 3000 },
     { id: 4, name: 'Vidwan', minXP: 7500 },
     { id: 5, name: 'Ustad', minXP: 15000 },
-    { id: 6, name: '👑 Maestro', minXP: 30000 }
+    { id: 6, name: 'Maestro', minXP: 30000 }
   ],
 
   // ── Badge Definitions ──

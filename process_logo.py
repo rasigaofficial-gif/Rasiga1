@@ -3,7 +3,7 @@ from PIL import Image
 def process_image():
     input_path = r"C:\Users\aroma\.gemini\antigravity-ide\brain\0871d66d-96da-4dc4-a17a-1b1f938f397c\media__1781642257998.jpg"
     img = Image.open(input_path).convert("RGBA")
-    data = img.getdata()
+    data = img.get_flattened_data()
     
     new_data_light = []
     new_data_dark = []

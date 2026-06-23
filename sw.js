@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rasiga-v2';
+const CACHE_NAME = 'rasiga-v' + Date.now();
 const ASSETS = [
   './',
   'index.html',
@@ -9,7 +9,9 @@ const ASSETS = [
   'js/components.js',
   'js/pages.js',
   'js/router.js',
-  'js/app.js'
+  'js/app.js',
+  'copy.js',
+  'js/logo-svg.js'
 ];
 
 self.addEventListener('install', (e) => {

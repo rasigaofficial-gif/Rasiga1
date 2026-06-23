@@ -1,3 +1,11 @@
+// ── XSS Prevention Utility ──
+window.escapeHTML = function(str) {
+  if (str === null || str === undefined) return '';
+  const div = document.createElement('div');
+  div.textContent = String(str);
+  return div.innerHTML;
+};
+
 window.showToast = function(message, type = 'success') {
   let container = document.getElementById('toast-container');
   if (!container) {
@@ -156,11 +164,12 @@ window.RasigaApp = {
     });
   },
 
-  // Sync Supabase auth user with our local RasigaData.demoUser
-  _syncUserFromSupabase: function (authUser) {
+  _syncUserFromSupabase: async function (authUser) {
     if (!this.supabase) return;
 
-    this.supabase.from('users').select('*').eq('id', authUser.id).single().then(({ data, error }) => {
+    try {
+      const { data, error } = await this.supabase.from('users').select('*').eq('id', authUser.id).single();
+
       if (data) {
         // User exists in our users table — fully onboarded
         window.RasigaData.demoUser = {
@@ -178,93 +187,88 @@ window.RasigaApp = {
           stats: { ratings: 0, reviews: 0, languages: 0, daysListened: 1 }
         };
         localStorage.setItem('rasiga_user', JSON.stringify(window.RasigaData.demoUser));
+
+        const adminLink = document.getElementById('nav-admin-link');
+        if (adminLink) adminLink.style.display = data.is_admin ? 'inline-block' : 'none';
+
+        // Fetch independent data in parallel
+        const [fRes, listRes, badgeRes, ratingsRes, reviewsRes] = await Promise.all([
+          this.supabase.from('follows').select('users!follows_following_id_fkey(username)').eq('follower_id', data.id),
+          this.supabase.from('lists').select('*, list_songs(song_id)').eq('user_id', data.id).order('created_at', { ascending: false }),
+          this.supabase.from('user_badges').select('badge_id').eq('user_id', data.id),
+          this.supabase.from('ratings').select('*').eq('user_id', data.id).order('rated_at', { ascending: false }),
+          this.supabase.from('reviews').select('*').eq('user_id', data.id)
+        ]);
+
+        // Process following
+        window.RasigaData.following = {};
+        if (fRes.data) fRes.data.forEach(f => window.RasigaData.following[f.users.username] = true);
+
+        // Process lists
+        window.RasigaLists = listRes.data || [];
+
+        // Process badges
+        if (badgeRes.data) window.RasigaData.demoUser.badges = badgeRes.data.map(b => b.badge_id);
+
+        // Process ratings & streak
+        let streak = 0;
+        if (!window.RasigaData.userRatings) window.RasigaData.userRatings = {};
+        const ratingsData = ratingsRes.data;
         
-        // Fetch following list
-        this.supabase.from('follows').select('users!follows_following_id_fkey(username)').eq('follower_id', data.id).then(({ data: fData }) => {
-          window.RasigaData.following = {};
-          if (fData) {
-            fData.forEach(f => window.RasigaData.following[f.users.username] = true);
-          }
-          const adminLink = document.getElementById('nav-admin-link');
-          if (adminLink) adminLink.style.display = data.is_admin ? 'inline-block' : 'none';
-          
-          // Fetch user's custom lists
-          this.supabase.from('lists').select('*, list_songs(song_id)').eq('user_id', data.id).order('created_at', { ascending: false }).then(({ data: listData }) => {
-            window.RasigaLists = listData || [];
-            
-            // Fetch badges
-            this.supabase.from('user_badges').select('badge_id').eq('user_id', data.id).then(({ data: badgeData }) => {
-              if (badgeData) {
-                window.RasigaData.demoUser.badges = badgeData.map(b => b.badge_id);
+        if (ratingsData && ratingsData.length > 0) {
+          ratingsData.forEach(r => window.RasigaData.userRatings[r.song_id] = r.score);
+          window.RasigaData.demoUser.stats.ratings = ratingsData.length;
+
+          let currentDate = new Date();
+          currentDate.setHours(0, 0, 0, 0);
+
+          let uniqueDates = [...new Set(ratingsData.map(r => {
+            const d = new Date(r.rated_at);
+            d.setHours(0, 0, 0, 0);
+            return d.getTime();
+          }))];
+
+          let expectedTime = currentDate.getTime();
+          if (uniqueDates[0] === expectedTime || uniqueDates[0] === expectedTime - 86400000) {
+            expectedTime = uniqueDates[0];
+            for (let i = 0; i < uniqueDates.length; i++) {
+              if (uniqueDates[i] === expectedTime) {
+                streak++;
+                expectedTime -= 86400000;
+              } else {
+                break;
               }
-              
-              // Calculate streak
-              this.supabase.from('ratings').select('*').eq('user_id', data.id).order('rated_at', { ascending: false }).then(({ data: ratingsData }) => {
-                let streak = 0;
-                if (!window.RasigaData.userRatings) window.RasigaData.userRatings = {};
-                
-                if (ratingsData && ratingsData.length > 0) {
-                  // Populate userRatings map
-                  ratingsData.forEach(r => window.RasigaData.userRatings[r.song_id] = r.score);
-                  window.RasigaData.demoUser.stats.ratings = ratingsData.length;
-                  
-                  // Streak logic
-                  let currentDate = new Date();
-                  currentDate.setHours(0,0,0,0);
-                  
-                  let uniqueDates = [...new Set(ratingsData.map(r => {
-                    const d = new Date(r.rated_at);
-                    d.setHours(0,0,0,0);
-                    return d.getTime();
-                  }))];
-                  
-                  let expectedTime = currentDate.getTime();
-                  if (uniqueDates[0] === expectedTime || uniqueDates[0] === expectedTime - 86400000) {
-                      expectedTime = uniqueDates[0];
-                      for (let i=0; i<uniqueDates.length; i++) {
-                          if (uniqueDates[i] === expectedTime) {
-                              streak++;
-                              expectedTime -= 86400000;
-                          } else {
-                              break;
-                          }
-                      }
-                  }
-                  if (streak === 0) streak = 1;
-                } else {
-                  streak = 1;
-                }
-                
-                window.RasigaData.demoUser.streak = streak;
-                
-                // Fetch reviews
-                this.supabase.from('reviews').select('*').eq('user_id', data.id).then(({ data: reviewsData }) => {
-                  if (!window.RasigaData.userComments) window.RasigaData.userComments = {};
-                  if (reviewsData && reviewsData.length > 0) {
-                    reviewsData.forEach(c => window.RasigaData.userComments[c.song_id] = { text: c.body, id: c.id });
-                    window.RasigaData.demoUser.stats.reviews = reviewsData.length;
-                  }
-                  
-                  // XP Sync/Recovery Logic
-                  let expectedXp = (window.RasigaData.demoUser.stats.ratings || 0) * 10 + (window.RasigaData.demoUser.stats.reviews || 0) * 20;
-                  if (window.RasigaData.demoUser.badges) {
-                    window.RasigaData.demoUser.badges.forEach(b => {
-                      const bDef = Object.values(window.RasigaBadges || {}).find(bd => bd.id === b);
-                      if (bDef && bDef.xp) expectedXp += bDef.xp;
-                    });
-                  }
-                  const currentXp = window.RasigaData.demoUser.xp || 0;
-                  if (currentXp < expectedXp && window.RasigaApp) {
-                    window.RasigaApp.addXP(expectedXp - currentXp);
-                  }
-                  
-                  localStorage.setItem('rasiga_user', JSON.stringify(window.RasigaData.demoUser));
-                  window.RasigaRouter.handleRoute();
-                });
-              });
-            });
+            }
+          }
+          if (streak === 0) streak = 1;
+        } else {
+          streak = 1;
+        }
+        window.RasigaData.demoUser.streak = streak;
+
+        // Process reviews
+        if (!window.RasigaData.userComments) window.RasigaData.userComments = {};
+        const reviewsData = reviewsRes.data;
+        if (reviewsData && reviewsData.length > 0) {
+          reviewsData.forEach(c => window.RasigaData.userComments[c.song_id] = { text: c.body, id: c.id });
+          window.RasigaData.demoUser.stats.reviews = reviewsData.length;
+        }
+
+        // XP Sync/Recovery Logic
+        let expectedXp = (window.RasigaData.demoUser.stats.ratings || 0) * 10 + (window.RasigaData.demoUser.stats.reviews || 0) * 20;
+        if (window.RasigaData.demoUser.badges) {
+          window.RasigaData.demoUser.badges.forEach(b => {
+            const bDef = Object.values(window.RasigaBadges || {}).find(bd => bd.id === b);
+            if (bDef && bDef.xp) expectedXp += bDef.xp;
           });
-        });
+        }
+        const currentXp = window.RasigaData.demoUser.xp || 0;
+        if (currentXp < expectedXp && window.RasigaApp) {
+          window.RasigaApp.addXP(expectedXp - currentXp);
+        }
+
+        localStorage.setItem('rasiga_user', JSON.stringify(window.RasigaData.demoUser));
+        window.RasigaRouter.handleRoute();
 
       } else {
         // User authenticated but NOT in our users table yet — needs onboarding
@@ -281,7 +285,9 @@ window.RasigaApp = {
         localStorage.setItem('rasiga_user', JSON.stringify(window.RasigaData.demoUser));
         window.RasigaRouter.handleRoute();
       }
-    });
+    } catch (err) {
+      console.error("Error syncing user data:", err);
+    }
   },
 
   fetchSongReviews: async function (songId) {
@@ -346,8 +352,8 @@ window.RasigaApp = {
         const clr = '#14b8a6'; // placeholder
         const time = new Date(r.created_at).toLocaleDateString();
         const score = ratingsMap[r.user_id] || '?';
-        const name = r.users?.display_name || r.users?.username || 'Anonymous';
-        const username = r.users?.username || name.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const name = escapeHTML(r.users?.display_name || r.users?.username || 'Anonymous');
+        const username = escapeHTML(r.users?.username || (r.users?.display_name || 'anonymous').toLowerCase().replace(/[^a-z0-9]/g, ''));
         
         // Count likes/dislikes
         const likes = (r.review_likes || []).filter(l => l.reaction_type === 'like').length;
@@ -374,7 +380,7 @@ window.RasigaApp = {
                 ${window.Icons ? window.Icons.get('star', { width: 14, height: 14, fill: 'currentColor' }) : ''} ${score}
               </div>
             </div>
-            <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">${r.body}</p>
+            <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">${escapeHTML(r.body)}</p>
             <div style="display:flex; align-items:center; gap: 1rem; margin-top: 1rem;">
               <button class="btn-react btn-like ${reaction === 'like' ? 'anim-heart-fill' : ''}" onclick="RasigaApp.toggleLike(this, ${likes - (reaction==='like'?1:0)}, '${r.id}')">
                 ${window.Icons ? window.Icons.get('heart', { width: 16, height: 16 }) : ''}
@@ -414,7 +420,7 @@ window.RasigaApp = {
                 </div>
                 <span style="font-size: 0.9rem; color: var(--text-muted);" id="user-rating-text-${songId}">${RasigaData.userRatings[songId]} Stars</span>
               </div>
-              <p style="font-size:1rem; margin-bottom:1rem;">${RasigaData.userComments[songId]}</p>
+              <p style="font-size:1rem; margin-bottom:1rem;">${escapeHTML(RasigaData.userComments[songId])}</p>
               <button onclick="RasigaApp.editComment('${songId}')" class="btn" style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Edit</button>
             `;
           }
@@ -629,24 +635,12 @@ window.RasigaApp = {
     if (!user || !user.onboarded || !this.supabase) return;
     
     try {
-      const { data: currentData, error: fetchError } = await this.supabase
-        .from('users')
-        .select('xp')
-        .eq('id', user.id)
-        .single();
-        
-      if (fetchError) throw fetchError;
-      
-      const newXp = (currentData.xp || 0) + amount;
-      
       const { error: updateError } = await this.supabase
-        .from('users')
-        .update({ xp: newXp })
-        .eq('id', user.id);
+        .rpc('increment_xp', { user_uuid: user.id, amount: amount });
         
       if (updateError) throw updateError;
       
-      user.xp = newXp;
+      user.xp = (user.xp || 0) + amount;
       localStorage.setItem('rasiga_user', JSON.stringify(user));
       
       if (window.RasigaRouter && location.hash === '#/profile') {
@@ -766,7 +760,7 @@ window.RasigaApp = {
   },
 
   deleteSuggestion: async function (id) {
-    if (confirm('Do you want to delete this suggestion?')) {
+    RasigaComponents.confirmAction('Delete Suggestion', 'Do you want to delete this suggestion?', async () => {
       if (!this.supabase) return;
       try {
         const { error } = await this.supabase.from('song_suggestions').delete().eq('id', id);
@@ -780,7 +774,7 @@ window.RasigaApp = {
         console.error(err);
         window.showToast("Failed to delete suggestion.", 'error');
       }
-    }
+    });
   },
 
   mockOfflineError: function () {
@@ -934,9 +928,9 @@ window.RasigaApp = {
 
   toggleFollow: async function(username) {
     if (!window.RasigaData.demoUser || !window.RasigaData.demoUser.onboarded) {
-      if (confirm('Please log in to follow users. Go to Login page?')) {
+      RasigaComponents.confirmAction('Login Required', 'Please log in to follow users. Go to Login page?', () => {
         location.hash = '#/profile';
-      }
+      });
       return;
     }
 
@@ -1019,7 +1013,7 @@ window.RasigaApp = {
               <div style="font-size:0.8rem; color:var(--text-muted);">${time}</div>
               <div style="color:var(--accent-gold); font-size:0.9rem; font-weight:600;">${window.Icons ? window.Icons.get('star', {width:14, height:14, fill:'currentColor'}) : ''} ${score}</div>
             </div>
-            <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">${r.body}</p>
+            <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">${escapeHTML(r.body)}</p>
           </div>
         `;
       });
@@ -1104,8 +1098,8 @@ window.RasigaApp = {
               ${(u.display_name || u.username)[0].toUpperCase()}
             </div>
             <div style="flex: 1;">
-              <div style="font-weight:bold; font-size:1.1rem; font-family:'DM Serif Display',serif;">${u.display_name || u.username}</div>
-              <div style="font-size:0.85rem; color:var(--text-muted);">@${u.username}</div>
+              <div style="font-weight:bold; font-size:1.1rem; font-family:'DM Serif Display',serif;">${escapeHTML(u.display_name || u.username)}</div>
+              <div style="font-size:0.85rem; color:var(--text-muted);">@${escapeHTML(u.username)}</div>
             </div>
             <div style="color:var(--text-muted);">
               ${window.Icons ? window.Icons.get('chevron-right', {width:20, height:20}) : '&rarr;'}
@@ -1171,8 +1165,8 @@ window.RasigaApp = {
                onpointerleave="clearTimeout(this._longPressTimer);"
                onpointercancel="clearTimeout(this._longPressTimer);">
             <div style="flex:1;">
-              <h4 style="font-size:1.1rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif;">${sug.song_name} <span style="font-size:0.8rem; color:var(--text-muted); font-family:'Inter',sans-serif;">(${sug.year})</span>${typeLabel}</h4>
-              <p style="font-size:0.85rem; color:var(--text-muted);">${sug.director} • ${sug.singer}</p>
+              <h4 style="font-size:1.1rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif;">${escapeHTML(sug.song_name)} <span style="font-size:0.8rem; color:var(--text-muted); font-family:'Inter',sans-serif;">(${escapeHTML(sug.year)})</span>${typeLabel}</h4>
+              <p style="font-size:0.85rem; color:var(--text-muted);">${escapeHTML(sug.director)} • ${escapeHTML(sug.singer)}</p>
             </div>
             <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
               <button class="icon-btn" onclick="RasigaApp.deleteSuggestion('${sug.id}')" style="color:var(--text-muted); padding:0.2rem;" aria-label="Delete" title="Delete Suggestion">
@@ -1233,13 +1227,13 @@ window.RasigaApp = {
           <div class="glass" style="padding:1.5rem; border-radius:var(--radius-md); margin-bottom:1rem;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
               <div>
-                <h4 style="font-size:1.2rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif;">${sug.song_name} <span style="font-size:0.9rem; color:var(--text-muted); font-family:'Inter',sans-serif;">(${sug.year})</span>${typeLabel}</h4>
-                <p style="font-size:0.9rem; color:var(--text-muted);">${sug.director} • ${sug.singer}</p>
-                <p style="font-size:0.9rem; color:var(--text-muted);">Lyricist: ${sug.lyricist}</p>
+                <h4 style="font-size:1.2rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif;">${escapeHTML(sug.song_name)} <span style="font-size:0.9rem; color:var(--text-muted); font-family:'Inter',sans-serif;">(${escapeHTML(sug.year)})</span>${typeLabel}</h4>
+                <p style="font-size:0.9rem; color:var(--text-muted);">${escapeHTML(sug.director)} • ${escapeHTML(sug.singer)}</p>
+                <p style="font-size:0.9rem; color:var(--text-muted);">Lyricist: ${escapeHTML(sug.lyricist)}</p>
               </div>
               <div style="text-align:right;">
                 <span style="color:${statusColor}; font-weight:bold; font-size:0.9rem;">${sug.status}</span>
-                <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.2rem;">By: ${userName}</p>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.2rem;">By: ${escapeHTML(userName)}</p>
                 <p style="font-size:0.75rem; color:var(--text-muted);">ID: ${sug.id.substring(0,8)}</p>
               </div>
             </div>
@@ -1257,7 +1251,7 @@ window.RasigaApp = {
     const me = RasigaData.demoUser;
     if (!me || !me.id || !me.is_admin || !this.supabase) return;
 
-    if (!confirm('Are you sure you want to mark this as ' + newStatus + '?')) return;
+    RasigaComponents.confirmAction('Change Status', 'Are you sure you want to mark this as ' + newStatus + '?', async () => {
 
     try {
       // First fetch the suggestion details
@@ -1342,23 +1336,23 @@ window.RasigaApp = {
             <input type="hidden" name="sug_id" value="${sug.id}" />
             <div>
               <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Song Name</label>
-              <input name="song" type="text" required value="${sug.song_name}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+              <input name="song" type="text" required value="${escapeHTML(sug.song_name)}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
             </div>
             <div>
               <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Year</label>
-              <input name="year" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" required value="${sug.year}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+              <input name="year" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" required value="${escapeHTML(sug.year)}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
             </div>
             <div>
               <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Music Director</label>
-              <input name="director" type="text" required value="${sug.director}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+              <input name="director" type="text" required value="${escapeHTML(sug.director)}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
             </div>
             <div>
               <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Singer(s)</label>
-              <input name="singer" type="text" required value="${sug.singer}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+              <input name="singer" type="text" required value="${escapeHTML(sug.singer)}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
             </div>
             <div>
               <label style="display:block; font-size:0.9rem; color:var(--text-muted); margin-bottom:0.3rem;">Lyricist</label>
-              <input name="lyricist" type="text" required value="${sug.lyricist}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
+              <input name="lyricist" type="text" required value="${escapeHTML(sug.lyricist)}" style="width:100%; padding:0.8rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none;" />
             </div>
             <button type="submit" class="btn btn-primary" style="margin-top:1rem; padding:1rem; font-size:1.1rem; justify-content:center; background:var(--accent-teal); border-color:var(--accent-teal);" id="admin-edit-submit-btn">Approve and Save</button>
           </form>
@@ -1494,7 +1488,11 @@ window.RasigaApp = {
       });
     }
 
+    let animating = false;
+    let animFrame = null;
+
     function draw() {
+      if (!animating) return;
       ctx.clearRect(0, 0, W, H);
 
       particles.forEach(p => {
@@ -1526,9 +1524,35 @@ window.RasigaApp = {
 
         ctx.restore();
       });
-      requestAnimationFrame(draw);
+      animFrame = requestAnimationFrame(draw);
     }
-    draw();
+    
+    let isIntersecting = true;
+    const observer = new IntersectionObserver(([entry]) => {
+      isIntersecting = entry.isIntersecting;
+      if (isIntersecting && !document.hidden) {
+        if (!animating) {
+          animating = true;
+          draw();
+        }
+      } else {
+        animating = false;
+        if (animFrame) cancelAnimationFrame(animFrame);
+      }
+    });
+    observer.observe(canvas);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        animating = false;
+        if (animFrame) cancelAnimationFrame(animFrame);
+      } else if (isIntersecting) {
+        if (!animating) {
+          animating = true;
+          draw();
+        }
+      }
+    });
   },
 
   currentFilter: 'all',
@@ -1547,47 +1571,55 @@ window.RasigaApp = {
     }
   },
 
+  _searchTimer: null,
+
+  executeGlobalSearch: function (query, inputId) {
+    clearTimeout(this._searchTimer);
+    this._searchTimer = setTimeout(() => {
+      const sug = document.getElementById('search-suggestions');
+      if (!sug) return;
+      const q = (query || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (q.length < 2) {
+        sug.style.display = 'none';
+        return;
+      }
+      const filter = this.currentFilter || 'all';
+
+      const normalize = str => (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+      let matches = [];
+      RasigaSeeds.forEach(s => {
+        let match = false;
+        const t = normalize(s.title);
+        const si = normalize(s.singer);
+        const c = normalize(s.composer);
+        const f = normalize(s.film);
+
+        if (filter === 'all' || filter === 'singer') match = match || si.includes(q);
+        if (filter === 'all' || filter === 'film') match = match || f.includes(q);
+        if (filter === 'all' || filter === 'composer') match = match || c.includes(q);
+        if (filter === 'all') match = match || t.includes(q);
+
+        if (match && !matches.find(m => m.id === s.id)) matches.push(s);
+      });
+
+      if (matches.length > 0) {
+        sug.innerHTML = matches.slice(0, 5).map(m => `
+          <div style="padding: 0.8rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); cursor:pointer;" onclick="document.getElementById('search-input').value='${escapeHTML(m.title)}'; RasigaApp.executeSearch();">
+            <div style="font-weight:bold; font-size:0.95rem;">${escapeHTML(m.title)}</div>
+            <div style="font-size:0.8rem; color:var(--text-muted);">${escapeHTML(m.singer)} &bull; ${escapeHTML(m.film || 'Indie')}</div>
+          </div>
+        `).join('');
+        sug.style.display = 'flex';
+      } else {
+        sug.innerHTML = '<div style="padding: 0.8rem 1rem; color:var(--text-muted); font-size:0.9rem;">No suggestions...</div>';
+        sug.style.display = 'flex';
+      }
+    }, 250);
+  },
+
   handleSearchInput: function (e) {
-    const rawQ = e.target ? e.target.value.trim() : (e.value || '');
-    const q = rawQ.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const sug = document.getElementById('search-suggestions');
-    if (!sug) return;
-    if (q.length < 2 && rawQ.length < 2) {
-      sug.style.display = 'none';
-      return;
-    }
-    const filter = this.currentFilter || 'all';
-
-    const normalize = str => (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-
-    let matches = [];
-    RasigaSeeds.forEach(s => {
-      let match = false;
-      const t = normalize(s.title);
-      const si = normalize(s.singer);
-      const c = normalize(s.composer);
-      const f = normalize(s.film);
-
-      if (filter === 'all' || filter === 'singer') match = match || si.includes(q);
-      if (filter === 'all' || filter === 'film') match = match || f.includes(q);
-      if (filter === 'all' || filter === 'composer') match = match || c.includes(q);
-      if (filter === 'all') match = match || t.includes(q);
-
-      if (match && !matches.find(m => m.id === s.id)) matches.push(s);
-    });
-
-    if (matches.length > 0) {
-      sug.innerHTML = matches.slice(0, 5).map(m => `
-        <div style="padding: 0.8rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); cursor:pointer;" onclick="document.getElementById('search-input').value='${m.title}'; RasigaApp.executeSearch();">
-          <div style="font-weight:bold; font-size:0.95rem;">${m.title}</div>
-          <div style="font-size:0.8rem; color:var(--text-muted);">${m.singer} &bull; ${m.film || 'Indie'}</div>
-        </div>
-      `).join('');
-      sug.style.display = 'flex';
-    } else {
-      sug.innerHTML = '<div style="padding: 0.8rem 1rem; color:var(--text-muted); font-size:0.9rem;">No suggestions...</div>';
-      sug.style.display = 'flex';
-    }
+    this.executeGlobalSearch(e.target ? e.target.value : e, 'search-input');
   },
 
   executeSearch: function () {
@@ -1625,25 +1657,29 @@ window.RasigaApp = {
     }
   },
 
+  _userSearchTimer: null,
+
   searchUsers: async function (query) {
-    const sug = document.getElementById('user-search-suggestions');
-    if (!sug) return;
-    const q = query.trim();
-    if (q.length < 2) {
-      sug.style.display = 'none';
-      return;
-    }
+    clearTimeout(this._userSearchTimer);
+    this._userSearchTimer = setTimeout(async () => {
+      const sug = document.getElementById('user-search-suggestions');
+      if (!sug) return;
+      const q = query.trim();
+      if (q.length < 2) {
+        sug.style.display = 'none';
+        return;
+      }
 
-    if (!this.supabase) return;
+      if (!this.supabase) return;
 
-    try {
-      const { data, error } = await this.supabase
-        .from('users')
-        .select('username, display_name, avatar_url')
-        .or(`username.ilike.%${q}%,display_name.ilike.%${q}%`)
-        .limit(5);
+      try {
+        const { data, error } = await this.supabase
+          .from('users')
+          .select('username, display_name, avatar_url')
+          .or(`username.ilike.%${q}%,display_name.ilike.%${q}%`)
+          .limit(5);
 
-      if (error) throw error;
+        if (error) throw error;
 
       if (data && data.length > 0) {
         sug.innerHTML = data.map(u => `
@@ -1652,8 +1688,8 @@ window.RasigaApp = {
               ${(u.display_name || u.username)[0].toUpperCase()}
             </div>
             <div>
-              <div style="font-weight:bold; font-size:0.95rem;">${u.display_name || u.username}</div>
-              <div style="font-size:0.8rem; color:var(--text-muted);">@${u.username}</div>
+              <div style="font-weight:bold; font-size:0.95rem;">${escapeHTML(u.display_name || u.username)}</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">@${escapeHTML(u.username)}</div>
             </div>
           </div>
         `).join('');
@@ -1665,6 +1701,7 @@ window.RasigaApp = {
     } catch (err) {
       console.error('User search error:', err);
     }
+    }, 250);
   },
 
   fetchLeaderboards: async function() {
@@ -1720,8 +1757,8 @@ window.RasigaApp = {
                     ${(u.display_name || u.username)[0].toUpperCase()}
                   </div>
                   <div style="flex:1;">
-                    <div style="font-weight:600; font-size:1.1rem; color:var(--text-main);">${u.display_name || u.username}</div>
-                    <div style="font-size:0.85rem; color:var(--text-muted);">@${u.username} &bull; ${rCount} Reviews</div>
+                    <div style="font-weight:600; font-size:1.1rem; color:var(--text-main);">${escapeHTML(u.display_name || u.username)}</div>
+                    <div style="font-size:0.85rem; color:var(--text-muted);">@${escapeHTML(u.username)} &bull; ${rCount} Reviews</div>
                   </div>
                   <div style="font-weight:bold; color:var(--accent-teal); font-size:1.1rem; text-align:right;">
                     ${u.xp || 0} <span style="font-size:0.8rem; font-weight:normal;">XP</span>
@@ -2250,7 +2287,7 @@ window.RasigaApp = {
   },
 
   deleteList: async function(listId) {
-    if (!confirm('Are you sure you want to delete this list?')) return;
+    RasigaComponents.confirmAction('Delete List', 'Are you sure you want to delete this list?', async () => {
     if (!this.supabase) return;
 
     try {

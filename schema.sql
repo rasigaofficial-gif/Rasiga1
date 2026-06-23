@@ -112,6 +112,14 @@ CREATE INDEX idx_diary_user ON diary_entries(user_id, listened_on DESC);
 
 -- FUNCTIONS AND TRIGGERS
 
+-- Increment XP atomically to avoid race conditions
+CREATE OR REPLACE FUNCTION increment_xp(user_uuid UUID, amount INTEGER)
+RETURNS void AS $$
+BEGIN
+  UPDATE users SET xp = COALESCE(xp, 0) + amount WHERE id = user_uuid;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Update song stats function and trigger
 CREATE OR REPLACE FUNCTION update_song_stats()
 RETURNS TRIGGER AS $$
