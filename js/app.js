@@ -217,6 +217,7 @@ window.RasigaApp = {
         
         if (ratingsData && ratingsData.length > 0) {
           ratingsData.forEach(r => window.RasigaData.userRatings[r.song_id] = r.score);
+          window.RasigaData.persistedRatings = new Set(ratingsData.map(r => r.song_id));
           window.RasigaData.demoUser.stats.ratings = ratingsData.length;
 
           const today = new Date();
@@ -1805,7 +1806,10 @@ window.RasigaApp = {
   },
 
   saveRating: async function (id, val) {
-    const isNewRating = !RasigaData.userRatings || !RasigaData.userRatings[id];
+    const isNewRating = !RasigaData.persistedRatings || !RasigaData.persistedRatings.has(id);
+    if (!RasigaData.persistedRatings) RasigaData.persistedRatings = new Set();
+    RasigaData.persistedRatings.add(id);
+
     this.setRatingInput(id, val);
     
     const rating = parseFloat(val);
@@ -1917,7 +1921,7 @@ window.RasigaApp = {
 
     setTimeout(() => {
       if (currentRating > 0) {
-        RasigaApp.setRating(id, currentRating); // visually restore the stars
+        RasigaApp.setRatingInput(id, currentRating); // visually restore the stars
       }
       const ta = document.getElementById('review-textarea-' + id);
       if (ta) {
