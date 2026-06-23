@@ -31,10 +31,10 @@ window.RasigaPages = {
             <button id="cta-btn" class="btn btn-primary" onclick="location.hash='#/discover'">Start Exploring ${Icons.get('compass', { width: 18, height: 18 })}</button>
           </div>
           <div class="hero-stats">
-            <div class="hs-item"><h2 id="home-stat-songs">--</h2><span>Songs</span></div>
-            <div class="hs-item"><h2 id="home-stat-ratings">--</h2><span>Ratings</span></div>
-            <div class="hs-item"><h2 id="home-stat-languages">--</h2><span>Languages</span></div>
-            <div class="hs-item"><h2 id="home-stat-users">--</h2><span>Rasigans</span></div>
+            <div class="hs-item" onclick="location.hash='#/discover'" tabindex="0" role="button" aria-label="View Songs"><h2 id="home-stat-songs">--</h2><span>Songs</span></div>
+            <div class="hs-item" onclick="location.hash='#/charts'" tabindex="0" role="button" aria-label="View Ratings"><h2 id="home-stat-ratings">--</h2><span>Ratings</span></div>
+            <div class="hs-item" onclick="location.hash='#/charts'" tabindex="0" role="button" aria-label="View Languages"><h2 id="home-stat-languages">--</h2><span>Languages</span></div>
+            <div class="hs-item" onclick="location.hash='#/leaderboards'" tabindex="0" role="button" aria-label="View Rasigans"><h2 id="home-stat-users">--</h2><span>Rasigans</span></div>
           </div>
         </header>
 

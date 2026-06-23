@@ -621,6 +621,19 @@ main {
   flex-wrap: wrap;
 }
 
+.hs-item {
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+}
+
+.hs-item:hover, .hs-item:focus {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.05);
+  outline: none;
+}
+
 .hs-item h2 {
   font-family: 'Cinzel Decorative', serif;
   font-size: 2rem;
