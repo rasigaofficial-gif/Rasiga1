@@ -1255,9 +1255,6 @@ window.RasigaApp = {
           `;
         }
 
-        return `
-          <div class="glass" style="padding:1.5rem; border-radius:var(--radius-md); margin-bottom:1rem;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
         let detailsHTML = '';
         if (sug.target_song_id) {
           const orig = (window.RasigaSeeds || []).find(s => s.id === sug.target_song_id);
