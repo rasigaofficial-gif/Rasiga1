@@ -1847,8 +1847,240 @@ main {
 .gs-result-item:hover {
   background: var(--glass-bg-hover);
 }
+  animation: scroll-left 30s linear infinite;
+}
+
+.marquee-content:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* â”€â”€ UI Polish â”€â”€ */
+/* Hide Scrollbars but keep functionality */
+/* ── Minimal Custom Scrollbar ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 100, 100, 0.5);
+}
+
+/* Empty State Animation */
+@keyframes slowPulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+.empty-state svg {
+  animation: slowPulse 3s ease-in-out infinite;
+}
+
+/* â”€â”€ Toast Notifications â”€â”€ */
+#toast-container {
+  position: fixed;
+  bottom: calc(var(--bottom-nav-height) + 20px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--glass-bg-frosted);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  padding: 12px 24px;
+  border-radius: 50px;
+  color: var(--text-main);
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: toastEnter 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  pointer-events: auto;
+  min-width: 200px;
+  max-width: 90vw;
+  text-align: center;
+  justify-content: center;
+}
+
+.toast.toast-error {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
+}
+
+.toast.toast-success {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+}
+
+.toast.toast-fadeout {
+  animation: toastExit 0.3s ease forwards;
+}
+
+@keyframes toastEnter {
+  0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toastExit {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(10px) scale(0.95); }
+}
+
+/* â”€â”€ Search Bar â”€â”€ */
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.08); /* Subtle background for light/dark */
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 0.4rem 1rem;
+  transition: background 0.3s ease;
+}
+
+[data-theme="dark"] .search-container {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.search-container:focus-within {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="dark"] .search-container:focus-within {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+#global-search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.95rem;
+  width: 200px;
+  transition: width 0.3s ease;
+}
+
+#global-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  margin-left: 0.5rem;
+}
+
+#global-search-results {
+  position: fixed;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  padding: 0.5rem;
+  display: none;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 200;
+  
+  /* Border fade color theme using background-clip trick */
+  background: 
+    var(--glass-bg-frosted) padding-box,
+    linear-gradient(135deg, var(--accent-saffron), var(--accent-rose), transparent 70%) border-box;
+  border: 1px solid transparent;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Keep it completely static on hover, preserving the gradient border */
+#global-search-results:hover {
+  background: 
+    var(--glass-bg-frosted) padding-box,
+    linear-gradient(135deg, var(--accent-saffron), var(--accent-rose), transparent 70%) border-box;
+  border-color: transparent;
+}
+#global-search-results:hover::before {
+  animation: none;
+}
+
+#global-search-results.active {
+  display: flex;
+}
+
+.gs-result-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.gs-result-item:hover {
+  background: var(--glass-bg-hover);
+}
 
 @media (max-width: 768px) {
+
+ .flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.custom-dropdown-options {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  width: max-content;
+  min-width: 120px;
+  background: var(--glass-bg-frosted);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1), inset 1px 1px 1px rgba(255, 255, 255, 0.3), inset -1px -1px 1px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-5px);
+  transition: all 0.2s ease;
+}
+
+.custom-dropdown-container.open .custom-dropdown-options {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+@keyframes fadeIn {
+}
+
   #global-search-input {
     width: 120px;
     font-size: 0.85rem;
@@ -1861,7 +2093,7 @@ main {
   }
 }
 
-/* â”€â”€ Form Inputs â”€â”€ */
+/* ── Form Inputs ── */
 .glass-input {
   width: 100%;
   padding: 0.8rem 1rem;
