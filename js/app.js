@@ -184,6 +184,7 @@ window.RasigaApp = {
           email: authUser.email,
           displayName: data.display_name || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'User',
           username: data.username,
+          bio: data.bio || '',
           avatar: data.display_name ? data.display_name[0].toUpperCase() : '?',
           onboarded: true,
           xp: data.xp || 0,
@@ -218,10 +219,19 @@ window.RasigaApp = {
         // Process ratings & streak
         let streak = 0;
         if (!window.RasigaData.userRatings) window.RasigaData.userRatings = {};
+        if (!window.RasigaData.userSubRatings) window.RasigaData.userSubRatings = {};
         const ratingsData = ratingsRes.data;
         
         if (ratingsData && ratingsData.length > 0) {
-          ratingsData.forEach(r => window.RasigaData.userRatings[r.song_id] = r.score);
+          ratingsData.forEach(r => {
+            window.RasigaData.userRatings[r.song_id] = r.score;
+            window.RasigaData.userSubRatings[r.song_id] = {
+              comp_score: r.comp_score || 0,
+              vocal_score: r.vocal_score || 0,
+              lyric_score: r.lyric_score || 0,
+              arr_score: r.arr_score || 0
+            };
+          });
           window.RasigaData.persistedRatings = new Set(ratingsData.map(r => r.song_id));
           window.RasigaData.demoUser.stats.ratings = ratingsData.length;
 
@@ -302,6 +312,47 @@ window.RasigaApp = {
     } catch (err) {
       console.error("Error syncing user data:", err);
     }
+  },  hoverRating: function(event, songId) {
+    const container = event.currentTarget;
+    const rect = container.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    let rating = (x / rect.width) * 5;
+    rating = Math.ceil(rating / 0.25) * 0.25;
+    if (rating > 5) rating = 5;
+    if (rating < 0) rating = 0;
+    const fg = document.getElementById(`stars-fg-${songId}`);
+    if (fg) fg.style.width = `${(rating / 5) * 100}%`;
+  },
+  leaveRating: function(songId) {
+    let rating = RasigaData.userRatings && RasigaData.userRatings[songId] ? RasigaData.userRatings[songId] : 0;
+    const fg = document.getElementById(`stars-fg-${songId}`);
+    if (fg) fg.style.width = `${(rating / 5) * 100}%`;
+  },
+  clickRating: function(event, songId) {
+    const container = event.currentTarget;
+    const rect = container.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    let rating = (x / rect.width) * 5;
+    rating = Math.ceil(rating / 0.25) * 0.25;
+    if (rating > 5) rating = 5;
+    if (rating < 0) rating = 0;
+    this.setRatingInput(songId, rating);
+  },
+  setDirtyRating: function(songId) {
+    const btn = document.getElementById(`submit-review-btn-${songId}`);
+    if (btn) {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+    }
+  },
+  sortReviews: function(songId, sortBy) {
+    window.RasigaData.reviewSortBy = sortBy;
+    this.renderReviewsFromState(songId);
+  },
+  loadMoreReviews: function(songId) {
+    window.RasigaData.reviewLimit = (window.RasigaData.reviewLimit || 5) + 5;
+    this.renderReviewsFromState(songId);
   },
 
   fetchSongReviews: async function (songId) {
@@ -355,64 +406,16 @@ window.RasigaApp = {
         }
       }
 
-      const otherReviews = reviews.filter(r => !user || r.user_id !== user.id);
+      window.RasigaData.currentReviews = reviews.filter(r => !user || r.user_id !== user.id);
+      window.RasigaData.currentRatingsMap = ratingsMap;
+      window.RasigaData.reviewSortBy = 'newest';
+      window.RasigaData.reviewLimit = 5;
 
       if (reviews.length === 0) {
         reviewsContainer.innerHTML = window.RasigaComponents ? window.RasigaComponents.EmptyState('penTool', 'No Reviews Yet', 'Be the first to review this song and share your thoughts with the community!') : '<p style="color:var(--text-muted)">No reviews yet.</p>';
-        return;
+      } else {
+        this.renderReviewsFromState(songId);
       }
-
-      otherReviews.forEach(r => {
-        const clr = '#14b8a6'; // placeholder
-        const time = new Date(r.created_at).toLocaleDateString();
-        const score = ratingsMap[r.user_id] || '?';
-        const name = escapeHTML(r.users?.display_name || r.users?.username || 'Anonymous');
-        const username = escapeHTML(r.users?.username || (r.users?.display_name || 'anonymous').toLowerCase().replace(/[^a-z0-9]/g, ''));
-        
-        // Count likes/dislikes
-        const likes = (r.review_likes || []).filter(l => l.reaction_type === 'like').length;
-        const dislikes = (r.review_likes || []).filter(l => l.reaction_type === 'dislike').length;
-        
-        let reaction = null;
-        if (user && r.review_likes) {
-          const myReaction = r.review_likes.find(l => l.user_id === user.id);
-          if (myReaction) reaction = myReaction.reaction_type;
-          if (reaction) RasigaData.userReactions[r.id] = reaction;
-        }
-
-        reviewsHTML += `
-          <div class="glass" style="padding: 1.2rem; margin-bottom: 1rem;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-              <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom: 0.8rem;">
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: ${clr}; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; cursor: pointer;" onclick="event.stopPropagation(); location.hash='#/user/${username}'">${name[0]}</div>
-                <div>
-                  <a href="#/user/${username}" style="font-weight:600; font-size:0.95rem; text-decoration:none; color:inherit;">${name}</a>
-                  <div style="font-size:0.8rem; color:var(--text-muted);">${time}</div>
-                </div>
-              </div>
-              <div style="display:flex; align-items:center; gap:0.2rem; color:var(--accent-gold); font-size:0.9rem; font-weight:600;">
-                ${window.Icons ? window.Icons.get('star', { width: 14, height: 14, fill: 'currentColor' }) : ''} ${score}
-              </div>
-            </div>
-            <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">${escapeHTML(r.body)}</p>
-            <div style="display:flex; align-items:center; gap: 1rem; margin-top: 1rem;">
-              <button class="btn-react btn-like ${reaction === 'like' ? 'anim-heart-fill' : ''}" onclick="RasigaApp.toggleLike(this, ${likes - (reaction==='like'?1:0)}, '${r.id}')">
-                ${window.Icons ? window.Icons.get('heart', { width: 16, height: 16 }) : ''}
-                <span class="like-count" data-base="${likes - (reaction==='like'?1:0)}" style="font-size:0.8rem;">${likes}</span>
-              </button>
-              <button class="btn-react btn-dislike ${reaction === 'dislike' ? 'anim-dislike-fill' : ''}" onclick="RasigaApp.toggleDislike(this, ${dislikes - (reaction==='dislike'?1:0)}, '${r.id}')">
-                ${window.Icons ? window.Icons.get('dislike', { width: 16, height: 16 }) : ''}
-                <span class="dislike-count" data-base="${dislikes - (reaction==='dislike'?1:0)}" style="font-size:0.8rem;">${dislikes}</span>
-              </button>
-              <button class="btn-react" onclick="RasigaApp.shareComment('${songId}', '${r.id}')">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                <span style="font-size:0.8rem;">Share</span>
-              </button>
-            </div>
-          </div>
-        `;
-      });
-      reviewsContainer.innerHTML = reviewsHTML;
 
       // Update the user's rating section if needed
       if (user && user.onboarded && RasigaData.userRatings[songId]) {
@@ -443,6 +446,90 @@ window.RasigaApp = {
     } catch (err) {
       console.error(err);
       reviewsContainer.innerHTML = '<p style="color:var(--text-muted)">Failed to load reviews.</p>';
+    }
+  },
+
+  renderReviewsFromState: function(songId) {
+    const reviewsContainer = document.getElementById('song-reviews-container');
+    if (!reviewsContainer) return;
+
+    let otherReviews = [...(window.RasigaData.currentReviews || [])];
+    const ratingsMap = window.RasigaData.currentRatingsMap || {};
+    const user = RasigaData.demoUser;
+
+    const sortBy = window.RasigaData.reviewSortBy || 'newest';
+    const limit = window.RasigaData.reviewLimit || 5;
+
+    otherReviews.sort((a, b) => {
+      if (sortBy === 'newest') return new Date(b.created_at) - new Date(a.created_at);
+      if (sortBy === 'oldest') return new Date(a.created_at) - new Date(b.created_at);
+      if (sortBy === 'top_rated') {
+        const likesA = (a.review_likes || []).filter(l => l.reaction_type === 'like').length;
+        const likesB = (b.review_likes || []).filter(l => l.reaction_type === 'like').length;
+        return likesB - likesA;
+      }
+      return 0;
+    });
+
+    const paginatedReviews = otherReviews.slice(0, limit);
+
+    let reviewsHTML = '';
+    paginatedReviews.forEach(r => {
+      const clr = '#14b8a6';
+      const time = new Date(r.created_at).toLocaleDateString();
+      const score = ratingsMap[r.user_id] || '?';
+      const name = escapeHTML(r.users?.display_name || r.users?.username || 'Anonymous');
+      const username = escapeHTML(r.users?.username || (r.users?.display_name || 'anonymous').toLowerCase().replace(/[^a-z0-9]/g, ''));
+      
+      const likes = (r.review_likes || []).filter(l => l.reaction_type === 'like').length;
+      const dislikes = (r.review_likes || []).filter(l => l.reaction_type === 'dislike').length;
+      
+      let reaction = null;
+      if (user && r.review_likes) {
+        const myReaction = r.review_likes.find(l => l.user_id === user.id);
+        if (myReaction) reaction = myReaction.reaction_type;
+        if (reaction) RasigaData.userReactions[r.id] = reaction;
+      }
+
+      reviewsHTML += `
+        <div class="glass" style="padding: 1.2rem; margin-bottom: 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom: 0.8rem;">
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: ${clr}; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; cursor: pointer;" onclick="event.stopPropagation(); location.hash='#/user/${username}'">${name[0]}</div>
+              <div>
+                <a href="#/user/${username}" style="font-weight:600; font-size:0.95rem; text-decoration:none; color:inherit;">${name}</a>
+                <div style="font-size:0.8rem; color:var(--text-muted);">${time}</div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.2rem; color:var(--accent-gold); font-size:0.9rem; font-weight:600;">
+              ${window.Icons ? window.Icons.get('star', { width: 14, height: 14, fill: 'currentColor' }) : ''} ${score}
+            </div>
+          </div>
+          <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">${escapeHTML(r.body)}</p>
+          <div style="display:flex; align-items:center; gap: 1rem; margin-top: 1rem;">
+            <button class="btn-react btn-like ${reaction === 'like' ? 'anim-heart-fill' : ''}" onclick="RasigaApp.toggleLike(this, ${likes - (reaction==='like'?1:0)}, '${r.id}')">
+              ${window.Icons ? window.Icons.get('heart', { width: 16, height: 16 }) : ''}
+              <span class="like-count" data-base="${likes - (reaction==='like'?1:0)}" style="font-size:0.8rem;">${likes}</span>
+            </button>
+            <button class="btn-react btn-dislike ${reaction === 'dislike' ? 'anim-dislike-fill' : ''}" onclick="RasigaApp.toggleDislike(this, ${dislikes - (reaction==='dislike'?1:0)}, '${r.id}')">
+              ${window.Icons ? window.Icons.get('dislike', { width: 16, height: 16 }) : ''}
+              <span class="dislike-count" data-base="${dislikes - (reaction==='dislike'?1:0)}" style="font-size:0.8rem;">${dislikes}</span>
+            </button>
+            <button class="btn-react" onclick="RasigaApp.shareComment('${songId}', '${r.id}')">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              <span style="font-size:0.8rem;">Share</span>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+
+    reviewsContainer.innerHTML = reviewsHTML || '<p style="color:var(--text-muted)">No community reviews yet.</p>';
+
+    const loadMoreBtn = document.getElementById('load-more-reviews-container');
+    if (loadMoreBtn) {
+      if (otherReviews.length > limit) loadMoreBtn.style.display = 'block';
+      else loadMoreBtn.style.display = 'none';
     }
   },
 
@@ -893,6 +980,7 @@ window.RasigaApp = {
 
   saveProfileChanges: function () {
     const displayNameInput = document.getElementById('edit-profile-display-name');
+    const bioInput = document.getElementById('edit-profile-bio');
     
     if (!displayNameInput) return;
 
@@ -900,6 +988,7 @@ window.RasigaApp = {
     if (!user) return;
 
     const newDisplayName = displayNameInput.value.trim();
+    const newBio = bioInput ? bioInput.value.trim() : '';
 
     if (!newDisplayName) {
       window.showToast("Display Name cannot be empty.", 'error');
@@ -909,11 +998,12 @@ window.RasigaApp = {
     // Update locally
     user.displayName = newDisplayName;
     user.avatar = newDisplayName[0].toUpperCase();
+    user.bio = newBio;
     localStorage.setItem('rasiga_user', JSON.stringify(user));
 
     // Update in Supabase
     if (this.supabase && user.id) {
-      this.supabase.from('users').update({ display_name: newDisplayName }).eq('id', user.id).then(({ error }) => {
+      this.supabase.from('users').update({ display_name: newDisplayName, bio: newBio }).eq('id', user.id).then(({ error }) => {
         if (error) console.warn('Profile update error:', error.message);
       });
     }
@@ -1899,12 +1989,24 @@ window.RasigaApp = {
     }
 
     try {
+      const subRatings = {};
+      ['comp_score', 'vocal_score', 'lyric_score', 'arr_score'].forEach(key => {
+        const el = document.getElementById(`input-${key}-${id}`);
+        if (el && parseFloat(el.value) > 0) {
+          subRatings[key] = parseFloat(el.value);
+        }
+      });
+
+      if (!RasigaData.userSubRatings) RasigaData.userSubRatings = {};
+      RasigaData.userSubRatings[id] = subRatings;
+
       const isNewRating = !RasigaData.persistedRatings || !RasigaData.persistedRatings.has(id);
       
       // 1. Upsert rating
+      const ratingPayload = { user_id: user.id, song_id: id, score: rating, ...subRatings };
       const { data: ratingData, error: ratingError } = await this.supabase
         .from('ratings')
-        .upsert({ user_id: user.id, song_id: id, score: rating }, { onConflict: 'user_id, song_id' })
+        .upsert(ratingPayload, { onConflict: 'user_id, song_id' })
         .select('id')
         .single();
 

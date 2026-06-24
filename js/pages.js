@@ -188,7 +188,10 @@ window.RasigaPages = {
     const starSvgFilled = window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'var(--accent-gold)', color: 'transparent' }) : '';
 
     let ratingStarsHTML = `
-      <div style="position:relative; display:inline-block; width:140px; height:28px;">
+      <div style="position:relative; display:inline-block; width:140px; height:28px;" class="interactive-stars" 
+           onmousemove="RasigaApp.hoverRating(event, '${id}')" 
+           onmouseleave="RasigaApp.leaveRating('${id}')" 
+           onclick="RasigaApp.clickRating(event, '${id}')">
         <div style="display:flex; position:absolute; top:0; left:0; pointer-events:none;">
           ${Array(5).fill(0).map(() => `<span style="color:var(--text-muted); opacity:0.5; flex-shrink:0; display:flex;">${starSvgEmpty}</span>`).join('')}
         </div>
@@ -197,6 +200,8 @@ window.RasigaPages = {
         </div>
         <input type="range" min="0" max="5" step="0.25" value="${userRating}" 
                oninput="RasigaApp.setRatingInput('${id}', this.value)" 
+               id="rating-slider-${id}"
+               class="mobile-only-slider"
                aria-label="Rate this song from 0 to 5 stars"
                style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; margin:0;" />
       </div>
@@ -215,6 +220,26 @@ window.RasigaPages = {
         </div>
       `;
     } else {
+      const subComponents = [
+        { key: 'comp_score', label: 'Composition' },
+        { key: 'vocal_score', label: 'Vocals' },
+        { key: 'lyric_score', label: 'Lyrics' },
+        { key: 'arr_score', label: 'Arrangement' }
+      ];
+      let subRatings = (RasigaData.userSubRatings && RasigaData.userSubRatings[id]) ? RasigaData.userSubRatings[id] : {};
+      
+      let subHTML = `<div style="display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:1rem; padding: 1rem; background:rgba(255,255,255,0.02); border-radius:var(--radius-md);">` + subComponents.map(sc => {
+        let val = subRatings[sc.key] || 0;
+        return `
+          <div style="flex:1; min-width:120px;">
+            <label style="font-size:0.8rem; color:var(--text-muted); display:flex; justify-content:space-between;">
+              ${sc.label} <span id="val-${sc.key}-${id}">${val > 0 ? val : '-'}</span>
+            </label>
+            <input type="range" id="input-${sc.key}-${id}" min="0" max="5" step="0.5" value="${val}" style="width:100%; height:4px; accent-color:var(--accent-gold);" oninput="document.getElementById('val-${sc.key}-${id}').innerText = this.value > 0 ? this.value : '-'; RasigaApp.setDirtyRating('${id}');" />
+          </div>
+        `;
+      }).join('') + `</div>`;
+
       userReviewSectionHTML = `
         <div class="card glass page-enter" style="animation-delay: 0.1s;" id="user-review-section">
           <div class="flex-start gap-1 mb-1">
@@ -225,14 +250,29 @@ window.RasigaPages = {
           </div>
           ${userComment ? `
              <p class="mb-1" style="font-size:1rem;">${escapeHTML(userComment)}</p>
+             ${subHTML}
              <button onclick="RasigaApp.editComment('${id}')" class="btn" style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Edit</button>
           ` : `
-             <textarea id="review-textarea-${id}" class="glass-input mb-1" placeholder="Write your review here... (Optional)" style="height: 100px; resize: vertical;"></textarea>
-             <button onclick="RasigaApp.submitComment('${id}')" class="btn btn-primary">Submit Review</button>
+             ${subHTML}
+             <textarea id="review-textarea-${id}" class="glass-input mb-1" placeholder="Write your review here... (Optional)" style="height: 100px; resize: vertical;" oninput="RasigaApp.setDirtyRating('${id}')"></textarea>
+             <button id="submit-review-btn-${id}" onclick="RasigaApp.submitComment('${id}')" class="btn btn-primary" disabled style="opacity:0.5; cursor:not-allowed;">Save Rating</button>
           `}
         </div>
       `;
     }
+
+    let listenLinkHTML = song.spotify_id ? `
+      <div style="margin-top:1.5rem;">
+        <iframe src="https://open.spotify.com/embed/track/${song.spotify_id}?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+      </div>
+    ` : `
+      <div style="margin-top:1.5rem;">
+        <a href="https://open.spotify.com/search/${encodeURIComponent(song.title + ' ' + (song.film || ''))}" target="_blank" class="btn" style="background:#1DB954; color:#fff; border:none; padding:0.5rem 1rem; border-radius:var(--radius-full); font-size:0.85rem; display:inline-flex; align-items:center; gap:0.5rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.24 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.02.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.84.24 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.6.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          Listen on Spotify
+        </a>
+      </div>
+    `;
 
     return `
       <div class="page-entity">
@@ -257,6 +297,7 @@ window.RasigaPages = {
                  </button>
                </div>
             </div>
+            ${listenLinkHTML}
           </div>
           <div class="sh-stats">
              <div class="sh-avg">${song.avg_rating}</div>
@@ -270,9 +311,19 @@ window.RasigaPages = {
             ${userReviewSectionHTML}
           </div>
           <div>
-            <h3 class="mb-1">Community Reviews</h3>
+            <div class="flex-between mb-1">
+              <h3 style="margin:0;">Community Reviews</h3>
+              <select id="review-sort-select" onchange="RasigaApp.sortReviews('${id}', this.value)" class="glass-input" style="padding: 0.3rem 0.5rem; font-size:0.85rem; border-radius:var(--radius-sm); max-width: 150px;">
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="top_rated">Top Rated</option>
+              </select>
+            </div>
             <div>
               ${reviewsHTML}
+            </div>
+            <div id="load-more-reviews-container" class="text-center" style="margin-top:1rem; display:none;">
+              <button class="btn" onclick="RasigaApp.loadMoreReviews('${id}')" style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Load More</button>
             </div>
           </div>
         </div>
@@ -320,6 +371,7 @@ window.RasigaPages = {
           <div class="ph-info">
             <h2>${escapeHTML(user.displayName)}</h2>
             <p>@${user.username} &bull; Joined ${joinedStr}</p>
+            ${user.bio ? `<p style="margin-top:0.5rem; font-size:0.9rem; color:var(--text-main); font-style:italic;">${escapeHTML(user.bio)}</p>` : ''}
             <div style="display:flex; justify-content:center; gap: 1.5rem; margin-top: 0.8rem; font-weight:600; color:var(--text-main);">
               <a href="#/following" style="text-decoration:none; color:inherit;"><span id="profile-following-count">...</span> <span style="color:var(--text-muted); font-weight:normal; font-size:0.85rem;">Following</span></a>
               <a href="#/followers" style="text-decoration:none; color:inherit;"><span id="profile-followers-count">...</span> <span style="color:var(--text-muted); font-weight:normal; font-size:0.85rem;">Followers</span></a>
@@ -871,6 +923,10 @@ window.RasigaPages = {
             <div>
               <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem;">Display Name</label>
               <input id="edit-profile-display-name" type="text" value="${escapeHTML(user.displayName)}" style="width:100%; padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1); color: inherit; outline:none;" />
+            </div>
+            <div>
+              <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem;">Bio / About Me</label>
+              <textarea id="edit-profile-bio" style="width:100%; padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--glass-border); background: rgba(0,0,0,0.1); color: inherit; outline:none; min-height: 80px; resize: vertical;" placeholder="Tell us about your musical taste...">${user.bio ? escapeHTML(user.bio) : ''}</textarea>
             </div>
             <div>
               <label style="display:block; font-size:0.85rem; color:var(--text-muted); margin-bottom:0.3rem;">Username</label>

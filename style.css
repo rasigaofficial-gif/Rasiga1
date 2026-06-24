@@ -2244,3 +2244,26 @@ select.custom-select option {
     white-space: normal !important;
   }
 }
+
+/* Rating UI visibility */
+.mobile-only-slider {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-only-slider {
+    display: block !important;
+  }
+}
+
+/* Interactive SVG stars */
+.interactive-stars {
+  cursor: pointer;
+  touch-action: pan-y;
+}
+.interactive-stars svg {
+  transition: transform 0.1s;
+}
+.interactive-stars:hover svg {
+  transform: scale(1.1);
+}
