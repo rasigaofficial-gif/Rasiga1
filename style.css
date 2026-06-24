@@ -2134,6 +2134,15 @@ main {
 }
 
 .flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.custom-dropdown-options {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
   width: max-content;
   min-width: 120px;
   background: var(--glass-bg-frosted);
@@ -2149,6 +2158,13 @@ main {
   pointer-events: none;
   transform: translateY(-5px);
   transition: all 0.2s ease;
+}
+
+.custom-dropdown-container.open .custom-dropdown-options {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }
