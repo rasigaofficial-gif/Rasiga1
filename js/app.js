@@ -1012,6 +1012,42 @@ window.RasigaApp = {
     window.RasigaRouter.handleRoute();
   },
 
+  deleteAccount: async function () {
+    const user = this.getCurrentUser();
+    if (!user) return;
+    
+    try {
+      if (this.supabase && !user.id.includes('_')) {
+        await this.supabase.from('users').delete().eq('id', user.id);
+        await this.supabase.auth.signOut();
+      }
+    } catch(e) {
+      console.error("Error deleting account:", e);
+    }
+    
+    localStorage.removeItem('rasiga_user');
+    localStorage.removeItem('rasiga_data');
+    localStorage.removeItem('rasiga_theme');
+    localStorage.removeItem('rasiga_color');
+    
+    if (window.RasigaData) {
+      window.RasigaData.demoUser = null;
+      window.RasigaData.userRatings = {};
+      window.RasigaData.userReactions = {};
+      window.RasigaData.userLists = [];
+      window.RasigaData.following = [];
+      window.RasigaData.followers = [];
+      window.RasigaData.userBadges = [];
+    }
+    
+    window.showToast("Account successfully deleted.", "success");
+    const overlay = document.getElementById('settings-overlay');
+    if (overlay) overlay.remove();
+    
+    location.hash = '#/';
+    setTimeout(() => location.reload(), 500);
+  },
+
   logout: function () {
     const hideAdminLink = () => {
       const adminLink = document.getElementById('nav-admin-link');

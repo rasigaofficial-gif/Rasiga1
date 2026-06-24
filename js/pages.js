@@ -899,7 +899,28 @@ window.RasigaPages = {
   },
 
   renderPrivacy: function () {
-    return `<div class="page-placeholder glass page-enter"><h2 class="section-title">Privacy Policy</h2><p>Your data is yours. Privacy policy document coming soon...</p></div>`;
+    return `<div class="glass page-enter" style="padding: 2rem; max-width: 800px; margin: 0 auto; text-align: left; line-height: 1.6;">
+      <h2 class="section-title text-center" style="margin-bottom: 0.5rem;">Privacy Policy</h2>
+      <p style="text-align: center; margin-bottom: 2rem; color: var(--text-muted);">Last updated: June 2026</p>
+      
+      <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--accent-saffron);">1. Information We Collect</h3>
+      <p style="margin-bottom: 1rem;">We collect information you provide directly to us when you create an account, such as your email address, display name, and avatar. We also collect data related to your usage of Rasiga, including song ratings, reviews, list creations, and your interactions with other users.</p>
+      
+      <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--accent-saffron);">2. How We Use Your Information</h3>
+      <p style="margin-bottom: 1rem;">We use the information we collect to provide, maintain, and improve our services. This includes displaying your public reviews, calculating aggregate song ratings, generating your personal analytics, and facilitating social features like leaderboards and following other users.</p>
+      
+      <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--accent-saffron);">3. Information Sharing</h3>
+      <p style="margin-bottom: 1rem;">Rasiga is a public platform. Your profile, display name, ratings, lists, and reviews are publicly visible to other users. We do not sell your personal information to third parties. We may share anonymized, aggregated data for analytical purposes.</p>
+      
+      <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--accent-saffron);">4. Data Security & Retention</h3>
+      <p style="margin-bottom: 1rem;">We take reasonable measures to help protect your personal information from loss, theft, misuse, and unauthorized access. We retain your information as long as your account is active. You may delete your account and associated data at any time via the Settings menu.</p>
+      
+      <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--accent-saffron);">5. Third-Party Services</h3>
+      <p style="margin-bottom: 1rem;">We use Supabase for authentication and database management, and Google/Spotify APIs for certain integrations. Please review their respective privacy policies to understand how they handle your data.</p>
+      
+      <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--accent-saffron);">6. Contact Us</h3>
+      <p style="margin-bottom: 1rem;">If you have any questions about this Privacy Policy, please contact us through the <a href="#/contact" style="color: var(--accent-teal); text-decoration: underline;">Contact</a> page.</p>
+    </div>`;
   },
 
   renderSettingsContent: function () {
@@ -965,7 +986,7 @@ window.RasigaPages = {
             <button onclick="RasigaApp.logout()" class="btn glass" style="justify-content: center; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
               Log Out
             </button>
-            <button onclick="RasigaComponents.confirmAction('Delete Account', 'Are you sure? This cannot be undone.', () => RasigaApp.logout())" class="btn" style="justify-content: center; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);">
+            <button onclick="RasigaComponents.confirmAction('Delete Account', 'Are you sure? This cannot be undone.', () => RasigaApp.deleteAccount())" class="btn" style="justify-content: center; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);">
               Delete Account
             </button>
           </div>

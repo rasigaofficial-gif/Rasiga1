@@ -29,7 +29,7 @@ window.RasigaComponents = {
       : ini;
 
     return `
-      <div class="glass song-card page-enter" style="animation-delay: ${delay}s;" onclick="RasigaApp.openSong('${song.id}')">
+      <div class="glass song-card page-enter" style="animation-delay: ${delay}s;" role="button" tabindex="0" onclick="RasigaApp.openSong('${song.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); RasigaApp.openSong('${song.id}');}">
         <button class="icon-btn sc-add-btn" onclick="event.stopPropagation(); RasigaApp.openListModal('${song.id}')" title="Add to List">
           ${Icons.get('plus', {width: 16, height: 16})}
         </button>
@@ -57,7 +57,7 @@ window.RasigaComponents = {
     const songCount = (list.list_songs || []).length;
     const firstLetters = list.name.substring(0, 2).toUpperCase();
     return `
-      <div class="glass list-card page-enter" style="animation-delay: ${delay}s;" onclick="location.hash='#/list/${list.id}'">
+      <div class="glass list-card page-enter" style="animation-delay: ${delay}s;" role="button" tabindex="0" onclick="location.hash='#/list/${list.id}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); location.hash='#/list/${list.id}';}">
         ${isOwner ? `<button class="icon-btn lc-delete-btn" onclick="event.stopPropagation(); RasigaApp.deleteList('${list.id}')" title="Delete List">${Icons.get('trash', {width: 16, height: 16})}</button>` : ''}
         <div class="lc-art">
           ${firstLetters}
@@ -77,7 +77,7 @@ window.RasigaComponents = {
   BadgeCard: function(badge, isUnlocked) {
     const cls = isUnlocked ? 'unlocked' : 'locked';
     return `
-      <div class="badge-card page-enter ${cls}" onclick="this.classList.toggle('flipped')">
+      <div class="badge-card page-enter ${cls}" role="button" tabindex="0" onclick="this.classList.toggle('flipped')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); this.classList.toggle('flipped');}">
         <div class="bc-inner">
           <div class="bc-front glass">
             <div class="bc-icon">${Icons.get(badge.icon)}</div>
@@ -98,11 +98,11 @@ window.RasigaComponents = {
     const songObj = window.RasigaSeeds ? window.RasigaSeeds.find(s => s.title === review.song) : null;
     const link = songObj ? '#/song/' + songObj.id : '#/discover';
     return `
-      <div class="glass review-card page-enter" onclick="location.hash='${link}'">
+      <div class="glass review-card page-enter" role="button" tabindex="0" onclick="location.hash='${link}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); location.hash='${link}';}">
         <div class="rc-header">
-          <div class="rc-avatar" style="background: ${review.clr}; cursor: pointer;" onclick="if('${review.username}' && '${review.username}' !== 'undefined') { event.stopPropagation(); location.hash='#/user/${review.username}'; }">${escapeHTML(review.name[0])}</div>
+          <div class="rc-avatar" style="background: ${review.clr}; cursor: pointer;" role="button" tabindex="0" onclick="if('${review.username}' && '${review.username}' !== 'undefined') { event.stopPropagation(); location.hash='#/user/${review.username}'; }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); if('${review.username}' && '${review.username}' !== 'undefined') { event.stopPropagation(); location.hash='#/user/${review.username}'; }}">${escapeHTML(review.name[0])}</div>
           <div class="rc-user-info">
-            <div class="rc-name" style="cursor: pointer;" onclick="if('${review.username}' && '${review.username}' !== 'undefined') { event.stopPropagation(); location.hash='#/user/${review.username}'; }">${escapeHTML(review.name)}</div>
+            <div class="rc-name" style="cursor: pointer;" role="button" tabindex="0" onclick="if('${review.username}' && '${review.username}' !== 'undefined') { event.stopPropagation(); location.hash='#/user/${review.username}'; }" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); if('${review.username}' && '${review.username}' !== 'undefined') { event.stopPropagation(); location.hash='#/user/${review.username}'; }}">${escapeHTML(review.name)}</div>
             <div class="rc-meta">Reviewed <b>${escapeHTML(review.song)}</b> &bull; ${Icons.get('star', {width:12, height:12, fill:'var(--accent-gold)', color:'var(--accent-gold)'})} ${review.rating}</div>
           </div>
         </div>
@@ -111,11 +111,11 @@ window.RasigaComponents = {
           ${review.quote ? `<div class="rc-quote">${escapeHTML(review.quote)}</div>` : ''}
         </div>
         <div class="rc-actions">
-          <button class="btn-react btn-like" onclick="event.stopPropagation(); RasigaApp.toggleLike(this, ${review.likes})">
+          <button class="btn-react btn-like" onclick="event.stopPropagation(); RasigaApp.toggleLike(this, ${review.likes}, '${review.id}')">
             ${Icons.get('heart', {width: 16, height: 16})}
             <span class="like-count" data-base="${review.likes}" style="font-size:0.8rem;">${review.likes}</span>
           </button>
-          <button class="btn-react btn-dislike" onclick="event.stopPropagation(); RasigaApp.toggleDislike(this, ${review.dislikes || 0})">
+          <button class="btn-react btn-dislike" onclick="event.stopPropagation(); RasigaApp.toggleDislike(this, ${review.dislikes || 0}, '${review.id}')">
             ${Icons.get('dislike', {width: 16, height: 16})}
             <span class="dislike-count" data-base="${review.dislikes || 0}" style="font-size:0.8rem;">${review.dislikes || 0}</span>
           </button>
