@@ -420,28 +420,7 @@ window.RasigaApp = {
       // Update the user's rating section if needed
       if (user && user.onboarded && RasigaData.userRatings[songId]) {
         RasigaApp.setRatingInput(songId, RasigaData.userRatings[songId]);
-        if (RasigaData.userComments[songId]) {
-          const urSection = document.getElementById('user-review-section');
-          if (urSection) {
-            urSection.innerHTML = `
-              <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
-                <div style="display:flex; align-items:center;">
-                  <div style="position:relative; display:inline-block; width:140px; height:28px;">
-                    <div style="display:flex; position:absolute; top:0; left:0; pointer-events:none;">
-                      ${Array(5).fill(0).map(() => `<span style="color:var(--text-muted); opacity:0.5; flex-shrink:0; display:flex;">${window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'none', color: 'currentColor' }) : ''}</span>`).join('')}
-                    </div>
-                    <div id="stars-fg-${songId}" style="display:flex; position:absolute; top:0; left:0; width:${(RasigaData.userRatings[songId] / 5) * 100}%; overflow:hidden; pointer-events:none; white-space:nowrap;">
-                      ${Array(5).fill(0).map(() => `<span style="color:var(--accent-gold); flex-shrink:0; display:flex;">${window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'var(--accent-gold)', color: 'var(--accent-gold)' }) : ''}</span>`).join('')}
-                    </div>
-                  </div>
-                </div>
-                <span style="font-size: 0.9rem; color: var(--text-muted);" id="user-rating-text-${songId}">${RasigaData.userRatings[songId]} Stars</span>
-              </div>
-              <p style="font-size:1rem; margin-bottom:1rem;">${escapeHTML(RasigaData.userComments[songId])}</p>
-              <button onclick="RasigaApp.editComment('${songId}')" class="btn" style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Edit</button>
-            `;
-          }
-        }
+
       }
     } catch (err) {
       console.error(err);
