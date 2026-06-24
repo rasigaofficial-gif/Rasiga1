@@ -90,7 +90,7 @@ window.RasigaPages = {
             <input type="text" id="discover-search-input" class="glass-input" style="width: 100%;" placeholder="Search songs..." aria-label="Search songs" oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value, 'discover-search-input')">
           </div>
 
-          <div id="discover-search-filter" class="custom-dropdown-container page-enter" data-value="all" style="position: absolute; top: 1.25rem; right: 1.5rem; animation-delay: 0.05s;">
+          <div id="discover-search-filter" class="custom-dropdown-container page-enter" data-value="all" style="position: absolute; top: 1.25rem; right: 1.5rem; z-index: 100; animation-delay: 0.05s;">
             <button class="custom-dropdown-selected custom-dropdown-btn" onclick="this.parentElement.classList.toggle('open')" aria-haspopup="listbox" aria-expanded="false">
               <span class="selected-text">All</span>
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"></path></svg>
