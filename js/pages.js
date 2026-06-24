@@ -184,26 +184,27 @@ window.RasigaPages = {
     let userRating = RasigaData.userRatings[id] || 0;
     userRating = Math.round(userRating * 4) / 4; // Snap to 0.25 increments
 
+    const isEditing = window.RasigaData.editingReview === id;
+    const canEdit = isEditing || (!userComment && userRating === 0);
+
     const starSvgEmpty = window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'none', color: 'currentColor' }) : '';
     const starSvgFilled = window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'var(--accent-gold)', color: 'transparent' }) : '';
 
     let ratingStarsHTML = `
       <div style="position:relative; display:inline-block; width:140px; height:28px;" class="interactive-stars" 
-           onmousemove="RasigaApp.hoverRating(event, '${id}')" 
-           onmouseleave="RasigaApp.leaveRating('${id}')" 
-           onclick="RasigaApp.clickRating(event, '${id}')">
+           ${canEdit ? `onmousemove="RasigaApp.hoverRating(event, '${id}')" onmouseleave="RasigaApp.leaveRating('${id}')" onclick="RasigaApp.clickRating(event, '${id}')"` : ''}>
         <div style="display:flex; position:absolute; top:0; left:0; pointer-events:none;">
           ${Array(5).fill(0).map(() => `<span style="color:var(--text-muted); opacity:0.5; flex-shrink:0; display:flex;">${starSvgEmpty}</span>`).join('')}
         </div>
         <div id="stars-fg-${id}" style="display:flex; position:absolute; top:0; left:0; width:${(userRating / 5) * 100}%; overflow:hidden; pointer-events:none; white-space:nowrap;">
           ${Array(5).fill(0).map(() => `<span style="color:var(--accent-gold); flex-shrink:0; display:flex;">${starSvgFilled}</span>`).join('')}
         </div>
-        <input type="range" min="0" max="5" step="0.25" value="${userRating}" 
+        ${canEdit ? `<input type="range" min="0" max="5" step="0.25" value="${userRating}" 
                oninput="RasigaApp.setRatingInput('${id}', this.value)" 
                id="rating-slider-${id}"
                class="mobile-only-slider"
                aria-label="Rate this song from 0 to 5 stars"
-               style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; margin:0;" />
+               style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; margin:0;" />` : ''}
       </div>
     `;
 
@@ -240,7 +241,6 @@ window.RasigaPages = {
         `;
       }).join('') + `</div>`;
 
-      const isEditing = window.RasigaData.editingReview === id;
       userReviewSectionHTML = `
         <div class="card glass page-enter" style="animation-delay: 0.1s;" id="user-review-section">
           <div class="flex-start gap-1 mb-1">
@@ -249,10 +249,10 @@ window.RasigaPages = {
             </div>
             <span style="font-size: 0.9rem; color: var(--text-muted);" id="user-rating-text-${id}">${userRating > 0 ? userRating + ' Stars' : 'Tap to rate'}</span>
           </div>
-          ${userComment && !isEditing ? `
-             <p class="mb-1" style="font-size:1rem;">${escapeHTML(userComment)}</p>
+          ${(userComment || userRating > 0) && !isEditing ? `
+             ${userComment ? `<p class="mb-1" style="font-size:1rem;">${escapeHTML(userComment)}</p>` : `<p class="mb-1 text-muted" style="font-style:italic;">No written review.</p>`}
              ${subHTML}
-             <button onclick="RasigaApp.editComment('${id}')" class="btn" style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Edit</button>
+             <button onclick="RasigaApp.editComment('${id}')" class="btn" style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Edit Rating & Review</button>
           ` : `
              ${subHTML}
              <textarea id="review-textarea-${id}" class="glass-input mb-1" placeholder="Write your review here... (Optional)" style="height: 100px; resize: vertical;" oninput="RasigaApp.setDirtyRating('${id}')">${isEditing && userComment ? escapeHTML(userComment) : ''}</textarea>

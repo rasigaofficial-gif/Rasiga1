@@ -1933,6 +1933,7 @@ window.RasigaApp = {
 
     const txt = document.getElementById(`user-rating-text-${id}`);
     if (txt) txt.textContent = rating > 0 ? rating + ' Stars' : 'Tap to rate';
+    this.setDirtyRating(id);
   },
 
   saveRating: async function (id, val) {
@@ -2017,7 +2018,7 @@ window.RasigaApp = {
 
       let isNewReview = false;
 
-      // 2. Upsert review ONLY if text exists
+      // 2. Upsert review ONLY if text exists, otherwise delete it
       if (text) {
         const { error: reviewError } = await this.supabase
           .from('reviews')
@@ -2029,6 +2030,10 @@ window.RasigaApp = {
 
         if (!RasigaData.userComments) RasigaData.userComments = {};
         RasigaData.userComments[id] = text;
+      } else {
+        // If text is empty, they are deleting their comment
+        await this.supabase.from('reviews').delete().match({ user_id: user.id, song_id: id });
+        if (RasigaData.userComments) delete RasigaData.userComments[id];
       }
 
       // Re-fetch initial data
