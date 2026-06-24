@@ -562,10 +562,6 @@ main {
   margin-top: 1rem;
 }
 
-  justify-content: space-between;
-  align-items: center;
-}
-
 .nav-links {
   display: flex;
   gap: 0.5rem;
