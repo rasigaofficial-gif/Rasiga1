@@ -1335,7 +1335,7 @@ window.RasigaApp = {
           const orig = (window.RasigaSeeds || []).find(s => s.id === sug.target_song_id);
           if (orig) {
             detailsHTML = `
-              <div style="flex:1; min-width:0;">
+              <div style="flex: 1 1 250px; min-width:0;">
                 <h4 style="font-size:1.2rem; margin-bottom:0.5rem; font-family:'DM Serif Display',serif; white-space:normal; word-break:break-word;">Edit Request for: ${escapeHTML(orig.title)}${typeLabel}</h4>
                 <div style="font-size:0.85rem; background:rgba(255,255,255,0.05); padding:1rem; border-radius:var(--radius-sm); width:100%; overflow-x:auto;">
                   <div style="display:grid; grid-template-columns: 80px 1fr 1fr; gap:0.5rem; margin-bottom:0.5rem; border-bottom:1px solid var(--glass-border); padding-bottom:0.5rem; font-weight:bold;">
@@ -1343,20 +1343,20 @@ window.RasigaApp = {
                     <div style="color:var(--accent-rose);">Current</div>
                     <div style="color:var(--accent-teal);">Suggested</div>
                   </div>
-                  ${orig.title !== sug.song_name ? `<div style="display:grid; grid-template-columns: 80px 1fr 1fr; gap:0.5rem; margin-bottom:0.3rem;"><div>Title</div><div style="color:var(--text-muted); text-decoration:line-through;">${escapeHTML(orig.title)}</div><div style="color:var(--text-main);">${escapeHTML(sug.song_name)}</div></div>` : ''}
-                  ${String(orig.year) !== String(sug.year) ? `<div style="display:grid; grid-template-columns: 80px 1fr 1fr; gap:0.5rem; margin-bottom:0.3rem;"><div>Year</div><div style="color:var(--text-muted); text-decoration:line-through;">${escapeHTML(orig.year)}</div><div style="color:var(--text-main);">${escapeHTML(sug.year)}</div></div>` : ''}
-                  ${orig.composer !== sug.director ? `<div style="display:grid; grid-template-columns: 80px 1fr 1fr; gap:0.5rem; margin-bottom:0.3rem;"><div>Music</div><div style="color:var(--text-muted); text-decoration:line-through;">${escapeHTML(orig.composer)}</div><div style="color:var(--text-main);">${escapeHTML(sug.director)}</div></div>` : ''}
-                  ${orig.singer !== sug.singer ? `<div style="display:grid; grid-template-columns: 80px 1fr 1fr; gap:0.5rem; margin-bottom:0.3rem;"><div>Singer</div><div style="color:var(--text-muted); text-decoration:line-through;">${escapeHTML(orig.singer)}</div><div style="color:var(--text-main);">${escapeHTML(sug.singer)}</div></div>` : ''}
-                  ${(orig.lyricist||'') !== (sug.lyricist||'') ? `<div style="display:grid; grid-template-columns: 80px 1fr 1fr; gap:0.5rem; margin-bottom:0.3rem;"><div>Lyricist</div><div style="color:var(--text-muted); text-decoration:line-through;">${escapeHTML(orig.lyricist||'-')}</div><div style="color:var(--text-main);">${escapeHTML(sug.lyricist||'-')}</div></div>` : ''}
+                  ${orig.title !== sug.song_name ? `<div style="display:grid; grid-template-columns: 80px 1fr 1fr; gap:0.5rem; margin-bottom:0.3rem;"><div>Title</div><div style="color:var(--text-muted); text-decoration:line-through; word-break:break-word;">${escapeHTML(orig.title)}</div><div style="color:var(--text-main); word-break:break-word;">${escapeHTML(sug.song_name)}</div></div>` : ''}
+                  ${String(orig.year) !== String(sug.year) ? `<div style="display:grid; grid-template-columns: 80px 1fr 1fr; gap:0.5rem; margin-bottom:0.3rem;"><div>Year</div><div style="color:var(--text-muted); text-decoration:line-through; word-break:break-word;">${escapeHTML(orig.year)}</div><div style="color:var(--text-main); word-break:break-word;">${escapeHTML(sug.year)}</div></div>` : ''}
+                  ${orig.composer !== sug.director ? `<div style="display:grid; grid-template-columns: 80px 1fr 1fr; gap:0.5rem; margin-bottom:0.3rem;"><div>Music</div><div style="color:var(--text-muted); text-decoration:line-through; word-break:break-word;">${escapeHTML(orig.composer)}</div><div style="color:var(--text-main); word-break:break-word;">${escapeHTML(sug.director)}</div></div>` : ''}
+                  ${orig.singer !== sug.singer ? `<div style="display:grid; grid-template-columns: 80px 1fr 1fr; gap:0.5rem; margin-bottom:0.3rem;"><div>Singer</div><div style="color:var(--text-muted); text-decoration:line-through; word-break:break-word;">${escapeHTML(orig.singer)}</div><div style="color:var(--text-main); word-break:break-word;">${escapeHTML(sug.singer)}</div></div>` : ''}
+                  ${(orig.lyricist||'') !== (sug.lyricist||'') ? `<div style="display:grid; grid-template-columns: 80px 1fr 1fr; gap:0.5rem; margin-bottom:0.3rem;"><div>Lyricist</div><div style="color:var(--text-muted); text-decoration:line-through; word-break:break-word;">${escapeHTML(orig.lyricist||'-')}</div><div style="color:var(--text-main); word-break:break-word;">${escapeHTML(sug.lyricist||'-')}</div></div>` : ''}
                 </div>
               </div>
             `;
           } else {
-             detailsHTML = `<div style="flex:1; min-width:0;"><h4 style="font-size:1.2rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif; white-space:normal; word-break:break-word;">${escapeHTML(sug.song_name)}${typeLabel}</h4><p style="font-size:0.9rem; color:var(--accent-rose);">Error: Original song not found.</p></div>`;
+             detailsHTML = `<div style="flex: 1 1 250px; min-width:0;"><h4 style="font-size:1.2rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif; white-space:normal; word-break:break-word;">${escapeHTML(sug.song_name)}${typeLabel}</h4><p style="font-size:0.9rem; color:var(--accent-rose);">Error: Original song not found.</p></div>`;
           }
         } else {
           detailsHTML = `
-            <div style="flex:1; min-width:0;">
+            <div style="flex: 1 1 250px; min-width:0;">
               <h4 style="font-size:1.2rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif; white-space:normal; word-break:break-word;">${escapeHTML(sug.song_name)} <span style="font-size:0.9rem; color:var(--text-muted); font-family:'Inter',sans-serif;">(${escapeHTML(sug.year)})</span>${typeLabel}</h4>
               <p style="font-size:0.9rem; color:var(--text-muted);">${escapeHTML(sug.director)} • ${escapeHTML(sug.singer)}</p>
               <p style="font-size:0.9rem; color:var(--text-muted);">Lyricist: ${escapeHTML(sug.lyricist)}</p>
@@ -1368,7 +1368,7 @@ window.RasigaApp = {
           <div class="glass" style="padding:1rem; border-radius:var(--radius-md); margin-bottom:1rem;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; gap:1rem; flex-wrap:wrap;">
               ${detailsHTML}
-              <div style="text-align:right;">
+              <div style="text-align:right; margin-left:auto;">
                 <span style="color:${statusColor}; font-weight:bold; font-size:0.9rem;">${sug.status}</span>
                 <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.2rem;">By: ${escapeHTML(userName)}</p>
                 <p style="font-size:0.75rem; color:var(--text-muted);">ID: ${sug.id.substring(0,8)}</p>
