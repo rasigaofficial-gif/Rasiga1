@@ -1321,7 +1321,7 @@ window.RasigaApp = {
         let actionButtons = '';
         if (sug.status === 'Pending') {
           actionButtons = `
-            <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+            <div style="display:flex; gap:0.5rem; margin-top:1rem; flex-wrap:wrap;">
               <button class="btn btn-primary" onclick="RasigaApp.updateSuggestionStatus('${sug.id}', 'Approved')" style="padding:0.4rem 0.8rem; font-size:0.8rem;">Approve</button>
               <button class="btn" onclick="RasigaApp.openAdminEditModal('${sug.id}')" style="padding:0.4rem 0.8rem; font-size:0.8rem; background:var(--accent-gold); border-color:var(--accent-gold); color:#000;">Edit More</button>
               <button class="btn" onclick="RasigaApp.updateSuggestionStatus('${sug.id}', 'Rejected - Duplicate')" style="padding:0.4rem 0.8rem; font-size:0.8rem; background:var(--accent-rose); border-color:var(--accent-rose);">Duplicate</button>
@@ -1335,9 +1335,9 @@ window.RasigaApp = {
           const orig = (window.RasigaSeeds || []).find(s => s.id === sug.target_song_id);
           if (orig) {
             detailsHTML = `
-              <div style="width:100%;">
-                <h4 style="font-size:1.2rem; margin-bottom:0.5rem; font-family:'DM Serif Display',serif;">Edit Request for: ${escapeHTML(orig.title)}${typeLabel}</h4>
-                <div style="font-size:0.85rem; background:rgba(255,255,255,0.05); padding:1rem; border-radius:var(--radius-sm); width:100%;">
+              <div style="flex:1; min-width:0;">
+                <h4 style="font-size:1.2rem; margin-bottom:0.5rem; font-family:'DM Serif Display',serif; white-space:normal; word-break:break-word;">Edit Request for: ${escapeHTML(orig.title)}${typeLabel}</h4>
+                <div style="font-size:0.85rem; background:rgba(255,255,255,0.05); padding:1rem; border-radius:var(--radius-sm); width:100%; overflow-x:auto;">
                   <div style="display:grid; grid-template-columns: 80px 1fr 1fr; gap:0.5rem; margin-bottom:0.5rem; border-bottom:1px solid var(--glass-border); padding-bottom:0.5rem; font-weight:bold;">
                     <div>Field</div>
                     <div style="color:var(--accent-rose);">Current</div>
@@ -1352,12 +1352,12 @@ window.RasigaApp = {
               </div>
             `;
           } else {
-             detailsHTML = `<div><h4 style="font-size:1.2rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif;">${escapeHTML(sug.song_name)}${typeLabel}</h4><p style="font-size:0.9rem; color:var(--accent-rose);">Error: Original song not found.</p></div>`;
+             detailsHTML = `<div style="flex:1; min-width:0;"><h4 style="font-size:1.2rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif; white-space:normal; word-break:break-word;">${escapeHTML(sug.song_name)}${typeLabel}</h4><p style="font-size:0.9rem; color:var(--accent-rose);">Error: Original song not found.</p></div>`;
           }
         } else {
           detailsHTML = `
-            <div>
-              <h4 style="font-size:1.2rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif;">${escapeHTML(sug.song_name)} <span style="font-size:0.9rem; color:var(--text-muted); font-family:'Inter',sans-serif;">(${escapeHTML(sug.year)})</span>${typeLabel}</h4>
+            <div style="flex:1; min-width:0;">
+              <h4 style="font-size:1.2rem; margin-bottom:0.2rem; font-family:'DM Serif Display',serif; white-space:normal; word-break:break-word;">${escapeHTML(sug.song_name)} <span style="font-size:0.9rem; color:var(--text-muted); font-family:'Inter',sans-serif;">(${escapeHTML(sug.year)})</span>${typeLabel}</h4>
               <p style="font-size:0.9rem; color:var(--text-muted);">${escapeHTML(sug.director)} • ${escapeHTML(sug.singer)}</p>
               <p style="font-size:0.9rem; color:var(--text-muted);">Lyricist: ${escapeHTML(sug.lyricist)}</p>
             </div>

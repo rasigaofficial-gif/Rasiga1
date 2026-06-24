@@ -438,9 +438,9 @@ window.RasigaPages = {
     }
 
     return `
-      <div class="page-discover">
+      <div class="page-discover" style="padding: 2rem 5%; max-width: 1200px; margin: 0 auto; width: 100%;">
         <h2 class="section-title page-enter" style="animation-delay: 0s;">Admin Panel</h2>
-        <div class="glass page-enter" style="padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem; animation-delay: 0.1s;">
+        <div class="glass page-enter" style="padding: 2rem; border-radius: var(--radius-lg); margin-bottom: 2rem; animation-delay: 0.1s; overflow-x: auto;">
           <h3 style="margin-bottom: 1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Song Suggestions</h3>
           <div id="admin-suggestions-container" style="display:flex; flex-direction:column; gap:1rem;">
             <p style="color:var(--text-muted); text-align:center;">Loading suggestions...</p>
