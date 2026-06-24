@@ -2105,7 +2105,7 @@ main {
 .custom-dropdown-menu {
   position: absolute;
   top: calc(100% + 0.5rem);
-  left: 0;
+  right: 0;
   width: max-content;
   min-width: 120px;
   background: var(--glass-bg-frosted);

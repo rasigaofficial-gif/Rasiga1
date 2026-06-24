@@ -191,20 +191,22 @@ window.RasigaPages = {
     const starSvgFilled = window.Icons ? window.Icons.get('star', { width: 28, height: 28, viewBox: "2 1.5 20 20", fill: 'var(--accent-gold)', color: 'transparent' }) : '';
 
     let ratingStarsHTML = `
-      <div style="position:relative; display:inline-block; width:140px; height:28px;" class="interactive-stars" 
-           ${canEdit ? `onmousemove="RasigaApp.hoverRating(event, '${id}')" onmouseleave="RasigaApp.leaveRating('${id}')" onclick="RasigaApp.clickRating(event, '${id}')"` : ''}>
-        <div style="display:flex; position:absolute; top:0; left:0; pointer-events:none;">
-          ${Array(5).fill(0).map(() => `<span style="color:var(--text-muted); opacity:0.5; flex-shrink:0; display:flex;">${starSvgEmpty}</span>`).join('')}
-        </div>
-        <div id="stars-fg-${id}" style="display:flex; position:absolute; top:0; left:0; width:${(userRating / 5) * 100}%; overflow:hidden; pointer-events:none; white-space:nowrap;">
-          ${Array(5).fill(0).map(() => `<span style="color:var(--accent-gold); flex-shrink:0; display:flex;">${starSvgFilled}</span>`).join('')}
+      <div style="display: flex; flex-direction: column; align-items: flex-start; width: 100%;">
+        <div style="position:relative; display:inline-block; width:140px; height:28px;" class="interactive-stars" 
+             ${canEdit ? `onmousemove="RasigaApp.hoverRating(event, '${id}')" onmouseleave="RasigaApp.leaveRating('${id}')" onclick="RasigaApp.clickRating(event, '${id}')"` : ''}>
+          <div style="display:flex; position:absolute; top:0; left:0; pointer-events:none;">
+            ${Array(5).fill(0).map(() => `<span style="color:var(--text-muted); opacity:0.5; flex-shrink:0; display:flex;">${starSvgEmpty}</span>`).join('')}
+          </div>
+          <div id="stars-fg-${id}" style="display:flex; position:absolute; top:0; left:0; width:${(userRating / 5) * 100}%; overflow:hidden; pointer-events:none; white-space:nowrap;">
+            ${Array(5).fill(0).map(() => `<span style="color:var(--accent-gold); flex-shrink:0; display:flex;">${starSvgFilled}</span>`).join('')}
+          </div>
         </div>
         ${canEdit ? `<input type="range" min="0" max="5" step="0.25" value="${userRating}" 
                oninput="RasigaApp.setRatingInput('${id}', this.value)" 
                id="rating-slider-${id}"
                class="mobile-only-slider"
                aria-label="Rate this song from 0 to 5 stars"
-               style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer; margin:0;" />` : ''}
+               style="width:140px; margin-top: 0.8rem; cursor:pointer;" />` : ''}
       </div>
     `;
 
