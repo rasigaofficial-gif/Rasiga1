@@ -2048,6 +2048,7 @@ window.RasigaApp = {
       }
 
       window.showToast(text ? "Review submitted successfully!" : "Rating saved successfully!");
+      window.RasigaData.editingReview = null;
 
       if (window.RasigaRouter) window.RasigaRouter.handleRoute();
     } catch (err) {
@@ -2057,33 +2058,13 @@ window.RasigaApp = {
   },
 
   editComment: function (id) {
-    const hasText = RasigaData.userComments && RasigaData.userComments[id];
-    const hasRating = RasigaData.userRatings && RasigaData.userRatings[id];
-    if (!hasText && !hasRating) return;
+    window.RasigaData.editingReview = id;
+    if (window.RasigaRouter) window.RasigaRouter.handleRoute();
+  },
 
-    const currentText = hasText ? RasigaData.userComments[id] : '';
-
-    if (hasText) delete RasigaData.userComments[id];
-    if (hasRating) delete RasigaData.userRatings[id]; // Optionally delete rating to force re-rating, or leave it. Let's leave rating intact so they can just edit text. Wait, if we want them to re-edit, they might want to change rating. The stars are always clickable anyway. But we must delete userComments so the textarea shows up!
-
-    // Wait, if we delete userComments but KEEP userRatings, the UI will still think it's "submitted" because of `userComment || userRating` in pages.js!
-    // So we must temporarily store the rating and delete it from data, OR add an `isEditing` state.
-    // It's easier to just delete both and let them re-submit both.
-    const currentRating = hasRating ? RasigaData.userRatings[id] : 0;
-    if (hasRating) delete RasigaData.userRatings[id];
-
-    RasigaRouter.handleRoute();
-
-    setTimeout(() => {
-      if (currentRating > 0) {
-        RasigaApp.setRatingInput(id, currentRating); // visually restore the stars
-      }
-      const ta = document.getElementById('review-textarea-' + id);
-      if (ta) {
-        ta.value = currentText;
-        ta.focus();
-      }
-    }, 200);
+  cancelEdit: function (id) {
+    window.RasigaData.editingReview = null;
+    if (window.RasigaRouter) window.RasigaRouter.handleRoute();
   },
 
   toggleLike: async function (btn, baseCount, reviewId) {

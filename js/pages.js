@@ -240,6 +240,7 @@ window.RasigaPages = {
         `;
       }).join('') + `</div>`;
 
+      const isEditing = window.RasigaData.editingReview === id;
       userReviewSectionHTML = `
         <div class="card glass page-enter" style="animation-delay: 0.1s;" id="user-review-section">
           <div class="flex-start gap-1 mb-1">
@@ -248,14 +249,17 @@ window.RasigaPages = {
             </div>
             <span style="font-size: 0.9rem; color: var(--text-muted);" id="user-rating-text-${id}">${userRating > 0 ? userRating + ' Stars' : 'Tap to rate'}</span>
           </div>
-          ${userComment ? `
+          ${userComment && !isEditing ? `
              <p class="mb-1" style="font-size:1rem;">${escapeHTML(userComment)}</p>
              ${subHTML}
              <button onclick="RasigaApp.editComment('${id}')" class="btn" style="background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Edit</button>
           ` : `
              ${subHTML}
-             <textarea id="review-textarea-${id}" class="glass-input mb-1" placeholder="Write your review here... (Optional)" style="height: 100px; resize: vertical;" oninput="RasigaApp.setDirtyRating('${id}')"></textarea>
-             <button id="submit-review-btn-${id}" onclick="RasigaApp.submitComment('${id}')" class="btn btn-primary" disabled style="opacity:0.5; cursor:not-allowed;">Save Rating</button>
+             <textarea id="review-textarea-${id}" class="glass-input mb-1" placeholder="Write your review here... (Optional)" style="height: 100px; resize: vertical;" oninput="RasigaApp.setDirtyRating('${id}')">${isEditing && userComment ? escapeHTML(userComment) : ''}</textarea>
+             <div style="display:flex; gap:0.5rem; align-items:center;">
+               <button id="submit-review-btn-${id}" onclick="RasigaApp.submitComment('${id}')" class="btn btn-primary" ${isEditing ? '' : 'disabled style="opacity:0.5; cursor:not-allowed;"'}>${isEditing ? 'Save Changes' : 'Save Rating'}</button>
+               ${isEditing ? `<button onclick="RasigaApp.cancelEdit('${id}')" class="btn" style="background:rgba(255,255,255,0.1); border: 1px solid var(--glass-border);">Cancel</button>` : ''}
+             </div>
           `}
         </div>
       `;
