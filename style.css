@@ -1885,29 +1885,6 @@ main {
 }
 
 [data-theme="dark"] .glass-input:focus {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Custom Select Dropdown Styling */
-select.custom-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%23f97316" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>');
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1rem;
-  padding-right: 2.2rem;
-  cursor: pointer;
-}
-
-select.custom-select:focus {
-  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
-}
-
-select.custom-select option {
-  background: var(--bg-color);
-  color: var(--text-main);
   padding: 10px;
 }
 
@@ -1925,62 +1902,6 @@ select.custom-select option {
 }
 
 .flex-between {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.flex-start {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.gap-1 { gap: 1rem; }
-.gap-05 { gap: 0.5rem; }
-.mb-1 { margin-bottom: 1rem; }
-.mb-2 { margin-bottom: 2rem; }
-.text-center { text-align: center; }
-
-/* Custom Dropdown Component */
-.custom-dropdown-container {
-  position: relative;
-  display: inline-block;
-  user-select: none;
-}
-.custom-dropdown-container.open .custom-dropdown-selected svg {
-  transform: rotate(180deg);
-}
-.custom-dropdown-container.open .custom-dropdown-menu {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-.custom-dropdown-selected {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 1rem;
-  border-radius: var(--radius-full);
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  color: var(--text-main);
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  list-style: none;
-}
-.custom-dropdown-selected:hover {
-  background: var(--glass-bg-hover);
-}
-.custom-dropdown-selected svg {
-  transition: transform 0.2s ease;
-}
-.custom-dropdown-menu {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  right: 0;
   width: max-content;
   min-width: 120px;
   background: var(--glass-bg-frosted);

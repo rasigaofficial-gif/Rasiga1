@@ -1365,8 +1365,8 @@ window.RasigaApp = {
         }
 
         return `
-          <div class="glass" style="padding:1.5rem; border-radius:var(--radius-md); margin-bottom:1rem;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; gap:1rem;">
+          <div class="glass" style="padding:1rem; border-radius:var(--radius-md); margin-bottom:1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; gap:1rem; flex-wrap:wrap;">
               ${detailsHTML}
               <div style="text-align:right;">
                 <span style="color:${statusColor}; font-weight:bold; font-size:0.9rem;">${sug.status}</span>
