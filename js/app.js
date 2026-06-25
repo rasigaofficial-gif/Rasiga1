@@ -916,23 +916,52 @@ window.RasigaApp = {
       }).then(({ error }) => {
         if (error) window.showToast('Google login failed: ' + error.message, 'error');
       });
-    } else if (provider === 'email') {
-      const emailInput = document.getElementById('login-email-input');
-      const email = emailInput ? emailInput.value.trim() : '';
-      if (!email) { window.showToast('Please enter your email address.', 'error'); return; }
 
-      this.supabase.auth.signInWithOtp({
-        email: email,
-        options: {
-          emailRedirectTo: window.location.origin + '/#/profile'
-        }
-      }).then(({ error }) => {
-        if (error) {
-          window.showToast('Login failed: ' + error.message, 'error');
-        } else {
-          window.showToast('Check your email! We sent you a magic login link.', 'success');
-        }
-      });
+    } else if (provider === 'login' || provider === 'signup') {
+      const emailInput = document.getElementById('login-email-input');
+      const passwordInput = document.getElementById('login-password-input');
+      const email = emailInput ? emailInput.value.trim() : '';
+      const password = passwordInput ? passwordInput.value : '';
+      
+      if (!email || !password) { 
+        window.showToast('Please enter both email and password.', 'error'); 
+        return; 
+      }
+
+      if (provider === 'signup') {
+        this.supabase.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            emailRedirectTo: window.location.origin + '/#/profile'
+          }
+        }).then(({ data, error }) => {
+          if (error) {
+            window.showToast('Sign up failed: ' + error.message, 'error');
+          } else {
+            if (data.user && data.user.identities && data.user.identities.length === 0) {
+              window.showToast('This email is already registered. Please log in.', 'error');
+            } else if (data.session) {
+              window.showToast('Sign up successful!', 'success');
+              window.location.hash = '/profile';
+            } else {
+              window.showToast('Check your email to confirm your account.', 'success');
+            }
+          }
+        });
+      } else {
+        this.supabase.auth.signInWithPassword({
+          email: email,
+          password: password
+        }).then(({ data, error }) => {
+          if (error) {
+            window.showToast('Login failed: ' + error.message, 'error');
+          } else {
+            window.showToast('Logged in successfully!', 'success');
+            window.location.hash = '/profile';
+          }
+        });
+      }
     }
   },
 

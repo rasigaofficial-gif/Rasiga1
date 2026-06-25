@@ -486,10 +486,16 @@ window.RasigaPages = {
             <div style="flex:1; height:1px; background:var(--glass-border);"></div>
           </div>
 
-          <input id="login-email-input" type="email" placeholder="Enter your email" style="width:100%; padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none; font-size:1rem;" />
-          <button class="btn btn-primary" style="display:flex; align-items:center; justify-content:center; gap:0.5rem; font-weight:600; padding:1rem;" onclick="RasigaApp.loginWith('email')">
-            ${Icons.get('mail')} Send Magic Link
-          </button>
+          <input id="login-email-input" type="email" placeholder="Email" style="width:100%; padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none; font-size:1rem;" />
+          <input id="login-password-input" type="password" placeholder="Password" style="width:100%; padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(0,0,0,0.1); color:inherit; outline:none; font-size:1rem;" />
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-primary" style="flex:1; display:flex; align-items:center; justify-content:center; font-weight:600; padding:1rem;" onclick="RasigaApp.loginWith('login')">
+              Log In
+            </button>
+            <button class="btn" style="flex:1; display:flex; align-items:center; justify-content:center; font-weight:600; padding:1rem; background:rgba(255,255,255,0.1);" onclick="RasigaApp.loginWith('signup')">
+              Sign Up
+            </button>
+          </div>
         </div>
       </div>
     `;
