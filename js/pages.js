@@ -288,7 +288,7 @@ window.RasigaPages = {
         </a>
         <div class="glass song-header page-enter" style="animation-delay: 0s;">
           <div class="sh-art" style="background: ${song.album_art_url ? '#1e293b' : grad}; position:relative; overflow:hidden;">
-             ${song.album_art_url ? `<img src="${song.album_art_url}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:0;" alt="Cover" />` : ini}
+             ${song.album_art_url ? `<img src="${song.album_art_url}" style="width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; z-index:0;" alt="Cover" />` : '<div style="display:flex; justify-content:center; align-items:center; width:100%; height:100%; opacity:0.6; color:#fff;">' + (window.Icons ? window.Icons.get("music", {width:32, height:32}) : "<svg></svg>") + '</div>'}
           </div>
           <div class="sh-info">
             <h2 class="sh-title">${song.title}</h2>

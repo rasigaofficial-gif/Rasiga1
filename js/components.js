@@ -26,7 +26,7 @@ window.RasigaComponents = {
     
     const artHTML = song.album_art_url 
       ? `<img src="${song.album_art_url}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit; position:absolute; top:0; left:0; z-index:0;" loading="lazy" alt="${song.title} Cover" />` 
-      : ini;
+      : '<div style="display:flex; justify-content:center; align-items:center; width:100%; height:100%; opacity:0.6; color:#fff;">' + (window.Icons ? window.Icons.get("music", {width:32, height:32}) : "<svg></svg>") + '</div>';
 
     return `
       <div class="glass song-card page-enter" style="animation-delay: ${delay}s;" role="button" tabindex="0" onclick="RasigaApp.openSong('${song.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); RasigaApp.openSong('${song.id}');}">
