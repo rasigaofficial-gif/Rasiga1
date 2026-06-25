@@ -321,6 +321,7 @@ button {
 }
 
 /* â”€â”€ Buttons â”€â”€ */
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -348,7 +349,7 @@ button {
   width: 100%;
 }
 
-/* â”€â”€ Top Navbar â”€â”€ */
+/* -- Top Navbar -- */
 .top-nav {
   position: fixed;
   top: 0;
@@ -377,6 +378,33 @@ button {
 .nav-links {
   display: flex;
   gap: 0.5rem;
+}
+
+#nav-logo {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#nav-title-text {
+  font-size: 2.6rem;
+  font-family: 'Cinzel Decorative', serif;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (min-width: 768px) {
+  #nav-logo {
+    width: 48px;
+    height: 48px;
+  }
+  #nav-title-text {
+    font-size: 2.2rem;
+  }
 }
 
 .nav-link {
@@ -419,8 +447,8 @@ button {
   }
 }
 
-/* â”€â”€ Bottom Navbar â”€â”€ */
-.bottom-nav {
+/* -- Bottom Navbar -- */
+
   display: none;
   position: fixed;
   bottom: calc(1rem + env(safe-area-inset-bottom));
