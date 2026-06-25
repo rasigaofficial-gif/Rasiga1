@@ -1963,7 +1963,7 @@ window.RasigaApp = {
                     <div style="font-weight:600; font-size:1.1rem; color:var(--text-main);">${escapeHTML(u.display_name || u.username)}</div>
                     <div style="font-size:0.85rem; color:var(--text-muted);">@${escapeHTML(u.username)} &bull; ${rCount} Reviews</div>
                   </div>
-                  <div style="font-weight:bold; color:var(--accent-teal); font-size:1.1rem; text-align:right;">
+                  <div style="font-weight:bold; color:var(--accent-saffron); font-size:1.1rem; text-align:right;">
                     ${u.xp || 0} <span style="font-size:0.8rem; font-weight:normal;">XP</span>
                   </div>
                 </a>
