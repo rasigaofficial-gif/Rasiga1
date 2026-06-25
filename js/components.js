@@ -60,7 +60,7 @@ window.RasigaComponents = {
       <div class="glass list-card page-enter" style="animation-delay: ${delay}s;" role="button" tabindex="0" onclick="location.hash='#/list/${list.id}'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); location.hash='#/list/${list.id}';}">
         ${isOwner ? `<button class="icon-btn lc-delete-btn" onclick="event.stopPropagation(); RasigaApp.deleteList('${list.id}')" title="Delete List">${Icons.get('trash', {width: 16, height: 16})}</button>` : ''}
         <div class="lc-art">
-          ${firstLetters}
+          ${window.Icons ? window.Icons.get("list", {width: 24, height: 24}) : firstLetters}
         </div>
         <div class="lc-info">
           <h3 class="lc-title">${list.name}</h3>
