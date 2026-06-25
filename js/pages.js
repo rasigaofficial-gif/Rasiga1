@@ -111,7 +111,7 @@ window.RasigaPages = {
             <h3 class="section-title page-enter" style="color: var(--accent-saffron); font-size:1.8rem; font-family:'Cinzel Decorative', serif; animation-delay: 0.2s;">Highest Rated</h3>
             ${topRatedHTML}
             
-            <h3 class="section-title page-enter" style="color: var(--text-main); font-size:1.8rem; font-family:'Cinzel Decorative', serif; animation-delay: 0.3s;">Recently Added</h3>
+            <h3 class="section-title page-enter" style="color: var(--accent-saffron); font-size:1.8rem; font-family:'Cinzel Decorative', serif; animation-delay: 0.3s;">Recently Added</h3>
             ${recentHTML}
           </div>
         </div>
@@ -280,6 +280,32 @@ window.RasigaPages = {
       </div>
     `;
 
+    
+    const allSongs = window.RasigaSeeds || [];
+    const sortedByRated = [...allSongs].sort((a, b) => Number(b.avg_rating || 0) - Number(a.avg_rating || 0) || Number(b.total_ratings || 0) - Number(a.total_ratings || 0));
+    const ratedRank = sortedByRated.findIndex(s => s.id === id) + 1;
+    
+    const sortedByPopular = [...allSongs].sort((a, b) => Number(b.total_ratings || 0) - Number(a.total_ratings || 0) || Number(b.avg_rating || 0) - Number(a.avg_rating || 0));
+    const popularRank = sortedByPopular.findIndex(s => s.id === id) + 1;
+    
+    const regionalSongs = allSongs.filter(s => s.language === song.language);
+    const sortedByRegional = [...regionalSongs].sort((a, b) => Number(b.avg_rating || 0) - Number(a.avg_rating || 0) || Number(b.total_ratings || 0) - Number(a.total_ratings || 0));
+    const regionalRank = sortedByRegional.findIndex(s => s.id === id) + 1;
+
+    const rankBadgesHTML = `
+      <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem;">
+        <div style="background:rgba(255,255,255,0.1); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.75rem; font-weight:600; color:var(--text-main); display:inline-flex; align-items:center; gap:0.3rem; border:1px solid rgba(255,255,255,0.05);">
+          <span style="color:var(--accent-gold);">#${ratedRank}</span> Highest Rated
+        </div>
+        <div style="background:rgba(255,255,255,0.1); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.75rem; font-weight:600; color:var(--text-main); display:inline-flex; align-items:center; gap:0.3rem; border:1px solid rgba(255,255,255,0.05);">
+          <span style="color:var(--accent-saffron);">#${popularRank}</span> Most Popular
+        </div>
+        <div style="background:rgba(255,255,255,0.1); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.75rem; font-weight:600; color:var(--text-main); display:inline-flex; align-items:center; gap:0.3rem; border:1px solid rgba(255,255,255,0.05);">
+          <span style="color:var(--accent-rose);">#${regionalRank}</span> in ${song.language}
+        </div>
+      </div>
+    `;
+
     return `
       <div class="page-entity">
         <a href="#/discover" class="breadcrumb" onclick="window.history.back(); return false;">
@@ -297,13 +323,17 @@ window.RasigaPages = {
                Singer: <span>${createArtistLinks(song.singer)}</span><br>
                Music: <span>${createArtistLinks(song.composer)}</span>
                ${song.lyricist ? `<br>Lyricist: <span>${createArtistLinks(song.lyricist)}</span>` : ''}
-               <div style="margin-top: 0.6rem;">
+               <div style="margin-top: 0.6rem; display:flex; gap:1rem;">
                  <button onclick="RasigaApp.openSuggestSongModal('${song.id}')" style="background:none; border:none; color:var(--text-muted); font-size:0.8rem; display:inline-flex; align-items:center; gap:0.3rem; padding:0; cursor:pointer; font-family:inherit;">
                    ${window.Icons ? window.Icons.get('edit', {width: 12, height: 12}) : '✎'} Suggest Edit
+                 </button>
+                 <button onclick="RasigaApp.shareSong('${song.id}')" style="background:none; border:none; color:var(--text-muted); font-size:0.8rem; display:inline-flex; align-items:center; gap:0.3rem; padding:0; cursor:pointer; font-family:inherit;">
+                   ${window.Icons ? window.Icons.get('share', {width: 12, height: 12}) : '🔗'} Share Song
                  </button>
                </div>
             </div>
             ${listenLinkHTML}
+            ${rankBadgesHTML}
           </div>
           <div class="sh-stats">
              <div class="sh-avg">${song.avg_rating}</div>
@@ -366,6 +396,9 @@ window.RasigaPages = {
       return `${getOrd(d.getDate())} ${mos[d.getMonth()]} ${d.getFullYear()}`;
     };
     const joinedStr = formatDate(user.joinedAt);
+    const todayStr = new Date().toISOString().split('T')[0];
+    const hasShared = localStorage.getItem('task_share_' + todayStr) === 'true';
+    const hasRated = localStorage.getItem('task_rate_' + todayStr) === 'true';
 
     return `
       <div class="page-profile">
@@ -398,6 +431,41 @@ window.RasigaPages = {
           <a href="#/my-reviews" class="glass stat-box page-enter" style="cursor:pointer; animation-delay: 0.15s; text-decoration: none; color: inherit;"><h3>${Object.keys(RasigaData.userComments || {}).length || user.stats?.reviews || 0}</h3><span>Reviews</span></a>
         </div>
         <div class="glass stat-box page-enter" style="animation-delay: 0.2s;"><h3>${user.streak || 1}</h3><span style="display:flex; align-items:center; gap:0.25rem;">Day Streak ${Icons.get('flame', {width:14, height:14, color:'var(--accent-saffron)'})}</span></div>
+
+        
+
+        <div class="glass page-enter" style="padding: 1.5rem; border-radius: var(--radius-lg); margin-top: 2rem; animation-delay: 0.15s;">
+          <h3 style="margin-bottom: 1rem; display:flex; align-items:center; gap:0.5rem; color:var(--accent-saffron);">
+            ${Icons.get('target', {width:20, height:20})} Daily Tasks
+          </h3>
+          <div style="display:flex; flex-direction:column; gap:0.8rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:1rem; border-radius:var(--radius-md);">
+              <div style="display:flex; align-items:center; gap:0.8rem;">
+                <div style="color:${hasShared ? 'var(--accent-saffron)' : 'var(--glass-border)'};">
+                  ${Icons.get('checkCircle', {width:24, height:24})}
+                </div>
+                <div>
+                  <div style="font-weight:600; text-decoration:${hasShared ? 'line-through' : 'none'}; opacity:${hasShared ? '0.5' : '1'};">Share a Song</div>
+                  <div style="font-size:0.8rem; color:var(--accent-gold);">+20 XP</div>
+                </div>
+              </div>
+              ${hasShared ? '<span style="color:var(--accent-saffron); font-size:0.85rem; font-weight:600;">Completed!</span>' : '<button class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="location.hash=&#39;#/discover&#39;">Go</button>'}
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:1rem; border-radius:var(--radius-md);">
+              <div style="display:flex; align-items:center; gap:0.8rem;">
+                <div style="color:${hasRated ? 'var(--accent-saffron)' : 'var(--glass-border)'};">
+                  ${Icons.get('checkCircle', {width:24, height:24})}
+                </div>
+                <div>
+                  <div style="font-weight:600; text-decoration:${hasRated ? 'line-through' : 'none'}; opacity:${hasRated ? '0.5' : '1'};">Rate or Review 1 Song</div>
+                  <div style="font-size:0.8rem; color:var(--accent-gold);">+20 XP</div>
+                </div>
+              </div>
+              ${hasRated ? '<span style="color:var(--accent-saffron); font-size:0.85rem; font-weight:600;">Completed!</span>' : '<button class="btn btn-outline" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="location.hash=&#39;#/discover&#39;">Go</button>'}
+            </div>
+          </div>
+        </div>
 
         <div class="mt-4 page-enter" style="animation-delay: 0.15s">
           <button class="btn btn-primary" style="width:100%; display:flex; justify-content:center; align-items:center; gap:0.5rem; padding:1rem; font-size:1.1rem; box-shadow:0 8px 24px rgba(249, 115, 22, 0.3); margin-bottom: 1rem;" onclick="location.hash='#/my-lists'">
@@ -603,6 +671,32 @@ window.RasigaPages = {
   },
 
   renderConnections: function(type) {
+    
+    const allSongs = window.RasigaSeeds || [];
+    const sortedByRated = [...allSongs].sort((a, b) => Number(b.avg_rating || 0) - Number(a.avg_rating || 0) || Number(b.total_ratings || 0) - Number(a.total_ratings || 0));
+    const ratedRank = sortedByRated.findIndex(s => s.id === id) + 1;
+    
+    const sortedByPopular = [...allSongs].sort((a, b) => Number(b.total_ratings || 0) - Number(a.total_ratings || 0) || Number(b.avg_rating || 0) - Number(a.avg_rating || 0));
+    const popularRank = sortedByPopular.findIndex(s => s.id === id) + 1;
+    
+    const regionalSongs = allSongs.filter(s => s.language === song.language);
+    const sortedByRegional = [...regionalSongs].sort((a, b) => Number(b.avg_rating || 0) - Number(a.avg_rating || 0) || Number(b.total_ratings || 0) - Number(a.total_ratings || 0));
+    const regionalRank = sortedByRegional.findIndex(s => s.id === id) + 1;
+
+    const rankBadgesHTML = `
+      <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem;">
+        <div style="background:rgba(255,255,255,0.1); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.75rem; font-weight:600; color:var(--text-main); display:inline-flex; align-items:center; gap:0.3rem; border:1px solid rgba(255,255,255,0.05);">
+          <span style="color:var(--accent-gold);">#${ratedRank}</span> Highest Rated
+        </div>
+        <div style="background:rgba(255,255,255,0.1); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.75rem; font-weight:600; color:var(--text-main); display:inline-flex; align-items:center; gap:0.3rem; border:1px solid rgba(255,255,255,0.05);">
+          <span style="color:var(--accent-saffron);">#${popularRank}</span> Most Popular
+        </div>
+        <div style="background:rgba(255,255,255,0.1); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.75rem; font-weight:600; color:var(--text-main); display:inline-flex; align-items:center; gap:0.3rem; border:1px solid rgba(255,255,255,0.05);">
+          <span style="color:var(--accent-rose);">#${regionalRank}</span> in ${song.language}
+        </div>
+      </div>
+    `;
+
     return `
       <div class="page-entity">
         <div class="page-enter page-header">
@@ -629,10 +723,12 @@ window.RasigaPages = {
     }
 
     // Top 5 Highest Rated
-    const topRated = [...songs].sort((a, b) => Number(b.avg_rating || 0) - Number(a.avg_rating || 0)).slice(0, 5);
+    const isExpandedTR = window.RasigaData.chartsExpanded && window.RasigaData.chartsExpanded.topRated;
+    const topRated = [...songs].sort((a, b) => Number(b.avg_rating || 0) - Number(a.avg_rating || 0)).slice(0, isExpandedTR ? 100 : 5);
 
     // Top 5 Most Popular
-    const mostPopular = [...songs].sort((a, b) => Number(b.total_ratings || 0) - Number(a.total_ratings || 0)).slice(0, 5);
+    const isExpandedMP = window.RasigaData.chartsExpanded && window.RasigaData.chartsExpanded.mostPopular;
+    const mostPopular = [...songs].sort((a, b) => Number(b.total_ratings || 0) - Number(a.total_ratings || 0)).slice(0, isExpandedMP ? 100 : 5);
 
     // Compute Singer and Composer Stats based on filtered songs
     const singerStats = {};
@@ -709,15 +805,12 @@ window.RasigaPages = {
             <div class="chart-grid">
               ${topRated.map((s, i) => {
                 const isTop3 = i < 3;
-                let rankClass = '';
-                if (i === 0) { rankClass = 'text-gradient-gold'; }
-                if (i === 1) { rankClass = 'text-gradient-silver'; }
-                if (i === 2) { rankClass = 'text-gradient-bronze'; }
+                
                 const grad = RasigaComponents.getGradient(s.title);
                 const ini = RasigaComponents.getInitials(s.title);
                 return `
                 <a href="#/song/${s.id}" class="song-card" style="background:transparent; border:none; box-shadow:none; padding:0; align-items:center; text-decoration:none;">
-                  <div class="${rankClass}" style="font-weight:bold; font-size:1.2rem; ${isTop3 ? '' : 'color:var(--text-light);'} width:20px; text-align:center;">${i + 1}</div>
+                  <div style="font-weight:bold; font-size:1.2rem; color:var(--accent-saffron); width:20px; text-align:center;">${i + 1}</div>
                   <div class="sc-art" style="background: ${grad};">
                     ${ini}
                   </div>
@@ -731,9 +824,12 @@ window.RasigaPages = {
                 </a>
               `}).join('')}
             </div>
-          </div>
+            <div style="text-align:center; margin-top:1rem;"><button class="btn btn-outline" onclick="if(!window.RasigaData.chartsExpanded) window.RasigaData.chartsExpanded = {}; window.RasigaData.chartsExpanded.topRated = !(window.RasigaData.chartsExpanded.topRated); RasigaApp.handleRoute()">${isExpandedTR ? "Show Less" : "Show Top 100"}</button></div>
 
-          <div class="glass page-enter" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg); animation-delay:0.3s;">
+            </div>
+
+
+            <div class="glass page-enter" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg); animation-delay:0.3s;">
             <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Most Popular Songs</h3>
             <div class="chart-grid">
               ${mostPopular.map((s, i) => {
@@ -870,6 +966,22 @@ window.RasigaPages = {
             </div>
             <div id="user-search-suggestions" class="glass" style="display:none; position:absolute; top: 100%; left:0; right:0; max-height: 250px; overflow-y:auto; z-index:999; flex-direction:column; margin-top: 0.5rem; background: var(--glass-bg-frosted); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
             </div>
+          </div>
+        </div>
+
+        
+        <div class="flex-between mb-2 page-enter" style="animation-delay: 0.1s;">
+          <h3 style="font-family:'Cinzel Decorative', serif;">Leaderboards</h3>
+          <div style="display:flex; gap:1rem;">
+            <select id="lb-timeframe" class="glass-input" style="width:auto; padding:0.5rem;" onchange="RasigaApp.fetchLeaderboards()">
+              <option value="all">All-Time</option>
+              <option value="month">This Month</option>
+              <option value="week">This Week</option>
+            </select>
+            <select id="lb-language" class="glass-input" style="width:auto; padding:0.5rem;" onchange="RasigaApp.fetchLeaderboards()">
+              <option value="all">All Languages</option>
+              ${(window.RasigaSeeds ? [...new Set(window.RasigaSeeds.map(s => s.language))].filter(Boolean) : ['Tamil', 'Telugu', 'Hindi', 'Malayalam', 'Kannada']).map(l => `<option value="${l}">${l}</option>`).join('')}
+            </select>
           </div>
         </div>
 
