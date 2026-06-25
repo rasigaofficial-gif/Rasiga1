@@ -381,15 +381,15 @@ button {
 }
 
 #nav-logo {
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 #nav-title-text {
-  font-size: 2.6rem;
+  font-size: 2.2rem;
   font-family: 'Cinzel Decorative', serif;
   background: var(--gradient-brand);
   -webkit-background-clip: text;
@@ -399,11 +399,11 @@ button {
 
 @media (min-width: 768px) {
   #nav-logo {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
   }
   #nav-title-text {
-    font-size: 2.2rem;
+    font-size: 2rem;
   }
 }
 
