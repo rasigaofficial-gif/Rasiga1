@@ -1997,11 +1997,11 @@ window.RasigaApp = {
                 let rankColor = 'var(--accent-saffron)';
                 const rCount = u.reviewCount || 0;
                 
-                return \`
+                return `
                 <a href="#/user/${u.username}" style="display:flex; align-items:center; gap:1rem; text-decoration:none; color:inherit; padding:0.5rem; border-radius:var(--radius-sm); transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
                   <div style="font-weight:bold; font-size:1.5rem; color:var(--accent-saffron); width:30px; text-align:center;">${i + 1}</div>
                   <div style="width: 40px; height: 40px; border-radius: 50%; background: ${rankColor}; display:flex; align-items:center; justify-content:center; color:${isTop3?'#000':'#fff'}; font-weight:bold;">
-                    ${u.avatar_url ? \`<img src="${u.avatar_url}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">\` : (u.display_name || 'U')[0].toUpperCase()}
+                    ${u.avatar_url ? `<img src="${u.avatar_url}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">` : (u.display_name || 'U')[0].toUpperCase()}
                   </div>
                   <div style="flex:1;">
                     <div style="font-weight:600;">${u.display_name || u.username}</div>
@@ -2011,7 +2011,7 @@ window.RasigaApp = {
                     ${u.calcXp} <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">XP</span>
                   </div>
                 </a>
-              \`}).join('')}
+              `}).join('')}
             </div>
           </div>
         `;
