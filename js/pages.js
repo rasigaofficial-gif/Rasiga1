@@ -859,7 +859,7 @@ window.RasigaPages = {
       <div class="page-leaderboards">
         <h2 class="section-title page-enter">Leaderboards & Community</h2>
         
-        <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-lg); z-index: 100; position:relative; animation-delay: 0.1s;">
+        <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-lg); z-index: 100; position:relative; animation-delay: 0.1s; overflow: visible;">
           <h3 style="margin-bottom: 1rem;">Find Rasigans</h3>
           <div style="display:flex; gap:0.5rem; position:relative;">
             <input type="text" id="user-search-input" class="glass-input" placeholder="Search users by name or username..." autocomplete="off" oninput="RasigaApp.searchUsers(this.value)" />

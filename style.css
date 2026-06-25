@@ -469,7 +469,7 @@ button {
 }
 
 /* -- Bottom Navbar -- */
-
+.bottom-nav {
   display: none;
   position: fixed;
   bottom: calc(1rem + env(safe-area-inset-bottom));
