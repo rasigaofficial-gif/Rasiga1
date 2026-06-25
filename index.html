@@ -57,7 +57,10 @@
         </div>
 
         <div class="search-container hide-on-mobile" style="max-width: 300px; width: 100%;">
-          <input type="text" id="global-search-input" aria-label="Search songs, artists, or movies" placeholder="Search songs..." oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value)">
+          <input type="text" id="global-search-input" aria-label="Search songs, artists, or movies" placeholder="Search songs..." style="flex: 1;" oninput="if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(this.value); document.getElementById('global-clear-btn').style.display = this.value ? 'flex' : 'none';">
+          <button id="global-clear-btn" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: none; padding: 0 8px; align-items: center; justify-content: center;" onclick="document.getElementById('global-search-input').value=''; if(window.RasigaApp && RasigaApp.executeGlobalSearch) RasigaApp.executeGlobalSearch(''); this.style.display='none';" aria-label="Clear search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
           <div id="global-search-filter" class="custom-dropdown-container" data-value="all" onclick="this.classList.toggle('open')">
             <div class="custom-dropdown-selected" style="background:transparent; border:none; padding:0 0.5rem;">
               <span class="selected-text">All</span>

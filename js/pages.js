@@ -862,7 +862,12 @@ window.RasigaPages = {
         <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-lg); z-index: 100; position:relative; animation-delay: 0.1s; overflow: visible;">
           <h3 style="margin-bottom: 1rem;">Find Rasigans</h3>
           <div style="display:flex; gap:0.5rem; position:relative;">
-            <input type="text" id="user-search-input" class="glass-input" placeholder="Search users by name or username..." autocomplete="off" oninput="RasigaApp.searchUsers(this.value)" />
+            <div style="position: relative; flex: 1; display: flex; width: 100%;">
+              <input type="text" id="user-search-input" class="glass-input" style="padding-right: 2.5rem;" placeholder="Search users by name or username..." autocomplete="off" oninput="RasigaApp.searchUsers(this.value); document.getElementById('clear-search-btn').style.display = this.value ? 'block' : 'none';" />
+              <button id="clear-search-btn" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: none; padding: 0;" onclick="document.getElementById('user-search-input').value=''; RasigaApp.searchUsers(''); this.style.display='none';" aria-label="Clear search">
+                ${window.Icons ? window.Icons.get('x', { width: 18, height: 18 }) : '✕'}
+              </button>
+            </div>
             <div id="user-search-suggestions" class="glass" style="display:none; position:absolute; top: 100%; left:0; right:0; max-height: 250px; overflow-y:auto; z-index:999; flex-direction:column; margin-top: 0.5rem; background: var(--glass-bg-frosted); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
             </div>
           </div>
