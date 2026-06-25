@@ -486,8 +486,8 @@ window.RasigaPages = {
             <div style="flex:1; height:1px; background:var(--glass-border);"></div>
           </div>
 
-          <input id="login-email-input" type="email" placeholder="Email" style="width:100%; padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(255,255,255,0.08); color:inherit; outline:none; font-size:1rem;" />
-          <input id="login-password-input" type="password" placeholder="Password" style="width:100%; padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:rgba(255,255,255,0.08); color:inherit; outline:none; font-size:1rem;" />
+          <input id="login-email-input" type="email" placeholder="Email" style="width:100%; padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:var(--input-bg); color:inherit; outline:none; font-size:1rem;" />
+          <input id="login-password-input" type="password" placeholder="Password" style="width:100%; padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--glass-border); background:var(--input-bg); color:inherit; outline:none; font-size:1rem;" />
           <div style="display:flex; gap:0.5rem;">
             <button class="btn btn-primary" style="flex:1; display:flex; align-items:center; justify-content:center; font-weight:600; padding:1rem;" onclick="RasigaApp.loginWith('login')">
               Log In

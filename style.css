@@ -21,6 +21,7 @@
   --glass-border: rgba(255, 255, 255, 0.25);
   --glass-border-hover: rgba(249, 115, 22, 0.4);
   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+  --input-bg: rgba(0, 0, 0, 0.05);
 
   /* Colorful Accents (Vibrant) */
   --accent-saffron: #f97316;
@@ -81,6 +82,7 @@
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-border-hover: rgba(249, 115, 22, 0.4);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  --input-bg: rgba(255, 255, 255, 0.08);
 
   --accent-teal: #14b8a6;
   --nav-theme-bg: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), var(--gradient-brand);
