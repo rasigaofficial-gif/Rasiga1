@@ -239,9 +239,12 @@ window.RasigaComponents = {
             <div style="display: flex; gap: 0.5rem;">
               ${slides.map((_, i) => `<div style="width: 8px; height: 8px; border-radius: 50%; background: ${i === currentSlide ? 'var(--accent-saffron)' : 'var(--glass-border)'}; transition: background 0.3s;"></div>`).join('')}
             </div>
-            <button id="carousel-next-btn" class="btn btn-primary" style="padding: 0.6rem 1.5rem;">
-              ${currentSlide === slides.length - 1 ? 'Get Started' : 'Next'}
-            </button>
+            <div style="display:flex; gap:0.5rem;">
+              ${currentSlide < slides.length - 1 ? `<button id="carousel-skip-btn" class="btn" style="padding: 0.6rem 1.5rem; background:transparent; border:1px solid var(--glass-border); color:var(--text-light);">Skip</button>` : ''}
+              <button id="carousel-next-btn" class="btn btn-primary" style="padding: 0.6rem 1.5rem;">
+                ${currentSlide === slides.length - 1 ? 'Get Started' : 'Next'}
+              </button>
+            </div>
           </div>
         </div>
       `;
@@ -266,6 +269,14 @@ window.RasigaComponents = {
             overlay.style.opacity = '0';
             setTimeout(() => overlay.remove(), 400);
           }
+        };
+      }
+      const skipBtn = overlay.querySelector('#carousel-skip-btn');
+      if (skipBtn) {
+        skipBtn.onclick = () => {
+          localStorage.setItem('rasiga_onboarded_carousel', 'true');
+          overlay.style.opacity = '0';
+          setTimeout(() => overlay.remove(), 400);
         };
       }
     };

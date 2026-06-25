@@ -31,10 +31,10 @@ window.RasigaPages = {
             <button id="cta-btn" class="btn btn-primary" onclick="location.hash='#/discover'">Start Exploring ${Icons.get('compass', { width: 18, height: 18 })}</button>
           </div>
           <div class="hero-stats">
-            <div class="hs-item" onclick="location.hash='#/discover'" tabindex="0" role="button" aria-label="View Songs"><h2 id="home-stat-songs">--</h2><span>Songs</span></div>
-            <div class="hs-item" onclick="location.hash='#/charts'" tabindex="0" role="button" aria-label="View Ratings"><h2 id="home-stat-ratings">--</h2><span>Ratings</span></div>
-            <div class="hs-item" onclick="location.hash='#/charts'" tabindex="0" role="button" aria-label="View Languages"><h2 id="home-stat-languages">--</h2><span>Languages</span></div>
-            <div class="hs-item" onclick="location.hash='#/leaderboards'" tabindex="0" role="button" aria-label="View Rasigans"><h2 id="home-stat-users">--</h2><span>Rasigans</span></div>
+            <a href="#/discover" class="hs-item" style="text-decoration: none; color: inherit;"><h2 id="home-stat-songs">--</h2><span>Songs</span></a>
+            <a href="#/charts" class="hs-item" style="text-decoration: none; color: inherit;"><h2 id="home-stat-ratings">--</h2><span>Ratings</span></a>
+            <a href="#/charts" class="hs-item" style="text-decoration: none; color: inherit;"><h2 id="home-stat-languages">--</h2><span>Languages</span></a>
+            <a href="#/leaderboards" class="hs-item" style="text-decoration: none; color: inherit;"><h2 id="home-stat-users">--</h2><span>Rasigans</span></a>
           </div>
         </header>
 
@@ -393,11 +393,11 @@ window.RasigaPages = {
           </div>
         </div>
 
-        <div class="profile-stats mt-4">
-          <div class="glass stat-box page-enter" style="cursor:pointer; animation-delay: 0.1s;" onclick="location.hash='#/my-reviews'"><h3>${Object.keys(RasigaData.userRatings || {}).length || user.stats?.ratings || 0}</h3><span>Ratings</span></div>
-          <div class="glass stat-box page-enter" style="cursor:pointer; animation-delay: 0.15s;" onclick="location.hash='#/my-reviews'"><h3>${Object.keys(RasigaData.userComments || {}).length || user.stats?.reviews || 0}</h3><span>Reviews</span></div>
-          <div class="glass stat-box page-enter" style="animation-delay: 0.2s;"><h3>${user.streak || 1}</h3><span style="display:flex; align-items:center; gap:0.25rem;">Day Streak ${Icons.get('flame', {width:14, height:14, color:'var(--accent-saffron)'})}</span></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:2rem;">
+          <a href="#/my-reviews" class="glass stat-box page-enter" style="cursor:pointer; animation-delay: 0.1s; text-decoration: none; color: inherit;"><h3>${Object.keys(RasigaData.userRatings || {}).length || user.stats?.ratings || 0}</h3><span>Ratings</span></a>
+          <a href="#/my-reviews" class="glass stat-box page-enter" style="cursor:pointer; animation-delay: 0.15s; text-decoration: none; color: inherit;"><h3>${Object.keys(RasigaData.userComments || {}).length || user.stats?.reviews || 0}</h3><span>Reviews</span></a>
         </div>
+        <div class="glass stat-box page-enter" style="animation-delay: 0.2s;"><h3>${user.streak || 1}</h3><span style="display:flex; align-items:center; gap:0.25rem;">Day Streak ${Icons.get('flame', {width:14, height:14, color:'var(--accent-saffron)'})}</span></div>
 
         <div class="mt-4 page-enter" style="animation-delay: 0.15s">
           <button class="btn btn-primary" style="width:100%; display:flex; justify-content:center; align-items:center; gap:0.5rem; padding:1rem; font-size:1.1rem; box-shadow:0 8px 24px rgba(249, 115, 22, 0.3); margin-bottom: 1rem;" onclick="location.hash='#/my-lists'">

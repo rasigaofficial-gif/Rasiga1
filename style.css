@@ -144,16 +144,17 @@ html {
 
 .skip-link {
   position: absolute;
-  top: -40px;
+  top: 0;
   left: 0;
+  transform: translateY(-100%);
   padding: 0.5rem 1rem;
   background: var(--accent-saffron);
   color: #fff;
   z-index: 100000;
-  transition: top 0.2s;
+  transition: transform 0.2s;
 }
 .skip-link:focus {
-  top: 0;
+  transform: translateY(0);
 }
 
 /* ── Custom Scrollbar ── */

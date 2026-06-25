@@ -144,42 +144,45 @@ window.RasigaRouter = {
 
     // Mobile Nav
     const mNav = document.getElementById('mobile-nav-container');
-    if (mNav && !document.getElementById('m-dynamic-nav')) {
-      const children = Array.from(mNav.children);
-      const insertIdx = Math.floor(children.length / 2);
-      const link = document.createElement('a');
-      link.href = hash;
-      link.id = 'm-dynamic-nav';
-      link.className = 'bnav-item';
-      link.innerHTML = `${Icons.get(iconName)}`;
-      mNav.insertBefore(link, mNav.children[insertIdx]);
-    } else if (document.getElementById('m-dynamic-nav')) {
-      const link = document.getElementById('m-dynamic-nav');
-      link.href = hash;
-      link.innerHTML = `${Icons.get(iconName)}`;
+    if (mNav && mNav.children.length >= 3) {
+      const centerNav = mNav.children[2];
+      
+      if (!centerNav.hasAttribute('data-original-href')) {
+        centerNav.setAttribute('data-original-href', centerNav.getAttribute('href') || '');
+        centerNav.setAttribute('data-original-html', centerNav.innerHTML);
+      }
+      
+      centerNav.setAttribute('href', hash);
+      centerNav.innerHTML = `${Icons.get(iconName)}`;
+      centerNav.id = 'm-dynamic-nav'; // mark it as dynamic so updateNavLinks can style it
     }
 
     // Desktop Nav
     const dNav = document.querySelector('.nav-links');
-    if (dNav && !document.getElementById('d-dynamic-nav')) {
-      const children = Array.from(dNav.children);
-      const insertIdx = Math.floor(children.length / 2);
-      const link = document.createElement('a');
-      link.href = hash;
-      link.id = 'd-dynamic-nav';
-      link.className = 'nav-link';
-      link.innerHTML = `${Icons.get(iconName, {width: 16, height: 16, style: 'margin-right:4px; vertical-align:text-bottom;'})}`;
-      dNav.insertBefore(link, dNav.children[insertIdx]);
-    } else if (document.getElementById('d-dynamic-nav')) {
-      const link = document.getElementById('d-dynamic-nav');
-      link.href = hash;
-      link.innerHTML = `${Icons.get(iconName, {width: 16, height: 16, style: 'margin-right:4px; vertical-align:text-bottom;'})}`;
+    if (dNav) {
+      let dynNavD = document.getElementById('d-dynamic-nav');
+      if (!dynNavD) {
+        dynNavD = document.createElement('a');
+        dynNavD.id = 'd-dynamic-nav';
+        dynNavD.className = 'nav-link';
+        dNav.appendChild(dynNavD);
+      }
+      dynNavD.href = hash;
+      dynNavD.innerHTML = `${Icons.get(iconName, { width: 18, height: 18 })} ${title}`;
+      dynNavD.style.display = '';
     }
   },
 
   removeDynamicNavIcon: function() {
-    const mLink = document.getElementById('m-dynamic-nav');
-    if (mLink) mLink.remove();
+    const mNav = document.getElementById('mobile-nav-container');
+    if (mNav && mNav.children.length >= 3) {
+      const centerNav = mNav.children[2];
+      if (centerNav.hasAttribute('data-original-href')) {
+        centerNav.setAttribute('href', centerNav.getAttribute('data-original-href'));
+        centerNav.innerHTML = centerNav.getAttribute('data-original-html');
+        centerNav.removeAttribute('id'); // remove dynamic marker
+      }
+    }
     const dLink = document.getElementById('d-dynamic-nav');
     if (dLink) dLink.remove();
   }

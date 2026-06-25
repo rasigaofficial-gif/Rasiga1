@@ -1954,7 +1954,7 @@ window.RasigaApp = {
                 const rCount = reviewCounts[u.id] || 0;
                 
                 return `
-                <div style="display:flex; align-items:center; gap:1rem; cursor:pointer; padding: 0.5rem; border-radius: var(--radius-md); transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'" onclick="location.hash='#/user/${u.username}'">
+                <a href="#/user/${u.username}" style="display:flex; align-items:center; gap:1rem; cursor:pointer; padding: 0.5rem; border-radius: var(--radius-md); transition: background 0.2s; text-decoration: none; color: inherit;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
                   <div class="${rankClass}" style="font-weight:bold; font-size:1.5rem; ${isTop3 ? '' : 'color:var(--text-light);'} width:30px; text-align:center;">${i + 1}</div>
                   <div style="width: 40px; height: 40px; border-radius: 50%; background: ${rankColor}; display:flex; align-items:center; justify-content:center; color:${i<3?'#000':'#fff'}; font-weight:bold; font-size:1.2rem;">
                     ${(u.display_name || u.username)[0].toUpperCase()}
@@ -1966,7 +1966,7 @@ window.RasigaApp = {
                   <div style="font-weight:bold; color:var(--accent-teal); font-size:1.1rem; text-align:right;">
                     ${u.xp || 0} <span style="font-size:0.8rem; font-weight:normal;">XP</span>
                   </div>
-                </div>
+                </a>
               `}).join('')}
             </div>
           </div>
@@ -2345,7 +2345,7 @@ window.RasigaApp = {
       
       if (matchingArtists.length > 0) {
         resultsHTML += matchingArtists.map(artist => `
-          <div class="gs-result-item" onclick="location.hash='#/artist/${encodeURIComponent(artist)}'; document.getElementById('global-search-results').classList.remove('active'); document.getElementById('global-search-input').value='';">
+          <a href="#/artist/${encodeURIComponent(artist)}" class="gs-result-item" style="text-decoration: none; color: inherit; display: flex;" onclick="document.getElementById('global-search-results').classList.remove('active'); document.getElementById('global-search-input').value='';">
             <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--gradient-brand); display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0;">
               ${Icons.get('artist', {width: 20, height: 20})}
             </div>
@@ -2353,7 +2353,7 @@ window.RasigaApp = {
               <div style="font-weight:600; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${artist}</div>
               <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:2px;">Artist Profile</div>
             </div>
-          </div>
+          </a>
         `).join('');
       }
     }
@@ -2363,7 +2363,7 @@ window.RasigaApp = {
         const grad = window.RasigaComponents ? window.RasigaComponents.getGradient(song.title) : 'var(--gradient-brand)';
         const ini = window.RasigaComponents ? window.RasigaComponents.getInitials(song.title) : song.title[0];
         return `
-        <div class="gs-result-item" onclick="location.hash='#/song/${song.id}'; document.getElementById('global-search-results').classList.remove('active'); document.getElementById('global-search-input').value='';">
+        <a href="#/song/${song.id}" class="gs-result-item" style="text-decoration: none; color: inherit; display: flex;" onclick="document.getElementById('global-search-results').classList.remove('active'); document.getElementById('global-search-input').value='';">
           <div style="width: 40px; height: 40px; border-radius: 8px; background: ${grad}; display:flex; align-items:center; justify-content:center; color:#fff; font-family:'DM Serif Display',serif; flex-shrink:0;">
             ${ini}
           </div>
