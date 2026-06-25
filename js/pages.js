@@ -955,11 +955,14 @@ window.RasigaPages = {
       <div class="page-leaderboards">
         <h2 class="section-title page-enter">Leaderboards & Community</h2>
         
-        <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-lg); z-index: 100; position:relative; animation-delay: 0.1s; overflow: visible;">
+        <div class="glass page-enter" style="padding: 1.5rem; margin-bottom: 2rem; border-radius: var(--radius-lg); z-index: 10; position:relative; animation-delay: 0.1s; overflow: visible;">
           <h3 style="margin-bottom: 1rem;">Find Rasigans</h3>
           <div style="display:flex; gap:0.5rem; position:relative;">
-            <div style="position: relative; flex: 1; display: flex; width: 100%;">
-              <input type="text" id="user-search-input" class="glass-input" style="padding-right: 2.5rem;" placeholder="Search users by name or username..." autocomplete="off" oninput="RasigaApp.searchUsers(this.value); document.getElementById('clear-search-btn').style.display = this.value ? 'block' : 'none';" />
+            <div style="position: relative; flex: 1; display: flex; width: 100%; align-items:center;">
+              <div style="position: absolute; left: 12px; color: var(--text-muted); display:flex; align-items:center;">
+                ${window.Icons ? window.Icons.get('search', { width: 18, height: 18 }) : '🔍'}
+              </div>
+              <input type="text" id="user-search-input" class="glass-input" style="padding-left: 2.5rem; padding-right: 2.5rem; width: 100%;" placeholder="Search users by name or username..." autocomplete="off" oninput="RasigaApp.searchUsers(this.value); document.getElementById('clear-search-btn').style.display = this.value ? 'block' : 'none';" />
               <button id="clear-search-btn" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); cursor: pointer; display: none; padding: 0;" onclick="document.getElementById('user-search-input').value=''; RasigaApp.searchUsers(''); this.style.display='none';" aria-label="Clear search">
                 ${window.Icons ? window.Icons.get('x', { width: 18, height: 18 }) : '✕'}
               </button>
