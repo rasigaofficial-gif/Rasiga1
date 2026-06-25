@@ -108,7 +108,7 @@ window.RasigaPages = {
             <h3 class="section-title page-enter" style="color: var(--accent-saffron); font-size:1.8rem; font-family:'Cinzel Decorative', serif; animation-delay: 0.1s;">Browse by Language</h3>
             ${languageHTML}
 
-            <h3 class="section-title page-enter" style="color: var(--accent-teal); font-size:1.8rem; font-family:'Cinzel Decorative', serif; animation-delay: 0.2s;">Highest Rated</h3>
+            <h3 class="section-title page-enter" style="color: var(--accent-saffron); font-size:1.8rem; font-family:'Cinzel Decorative', serif; animation-delay: 0.2s;">Highest Rated</h3>
             ${topRatedHTML}
             
             <h3 class="section-title page-enter" style="color: var(--text-main); font-size:1.8rem; font-family:'Cinzel Decorative', serif; animation-delay: 0.3s;">Recently Added</h3>
@@ -443,7 +443,7 @@ window.RasigaPages = {
       <div class="page-discover" style="padding: 1rem 5%; max-width: 1200px; margin: 0 auto; width: 100%;">
         <h2 class="section-title page-enter" style="animation-delay: 0s;">Admin Panel</h2>
         <div class="glass page-enter" style="padding: 1rem; border-radius: var(--radius-lg); margin-bottom: 2rem; animation-delay: 0.1s; overflow-x: hidden;">
-          <h3 style="margin-bottom: 1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Song Suggestions</h3>
+          <h3 style="margin-bottom: 1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Song Suggestions</h3>
           <div id="admin-suggestions-container" style="display:flex; flex-direction:column; gap:1rem;">
             <p style="color:var(--text-muted); text-align:center;">Loading suggestions...</p>
           </div>
@@ -734,7 +734,7 @@ window.RasigaPages = {
           </div>
 
           <div class="glass page-enter" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg); animation-delay:0.3s;">
-            <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Most Popular Songs</h3>
+            <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Most Popular Songs</h3>
             <div class="chart-grid">
               ${mostPopular.map((s, i) => {
                 const grad = RasigaComponents.getGradient(s.title);
@@ -781,7 +781,7 @@ window.RasigaPages = {
           </div>
 
           <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
-            <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Most Popular Singers</h3>
+            <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Most Popular Singers</h3>
             <div class="chart-grid">
               ${topSingersPopular.map((a, i) => `
                 <a href="#/artist/${encodeURIComponent(a.name)}" style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s; text-decoration:none;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
@@ -823,7 +823,7 @@ window.RasigaPages = {
           </div>
 
           <div class="glass" style="flex:1; min-width:300px; padding:1.5rem; border-radius:var(--radius-lg);">
-            <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-teal);">Most Popular Music Directors</h3>
+            <h3 style="margin-bottom:1.5rem; font-family:'Cinzel Decorative', serif; color:var(--accent-saffron);">Most Popular Music Directors</h3>
             <div class="chart-grid">
               ${topComposersPopular.map((a, i) => `
                 <a href="#/artist/${encodeURIComponent(a.name)}" style="display:flex; align-items:center; gap:1rem; cursor:pointer; transition: transform 0.2s; text-decoration:none;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
@@ -930,7 +930,7 @@ window.RasigaPages = {
       <p style="margin-bottom: 1rem;">We use Supabase for authentication and database management, and Google/Spotify APIs for certain integrations. Please review their respective privacy policies to understand how they handle your data.</p>
       
       <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--accent-saffron);">6. Contact Us</h3>
-      <p style="margin-bottom: 1rem;">If you have any questions about this Privacy Policy, please contact us through the <a href="#/contact" style="color: var(--accent-teal); text-decoration: underline;">Contact</a> page.</p>
+      <p style="margin-bottom: 1rem;">If you have any questions about this Privacy Policy, please contact us through the <a href="#/contact" style="color: var(--accent-saffron); text-decoration: underline;">Contact</a> page.</p>
     </div>`;
   },
 

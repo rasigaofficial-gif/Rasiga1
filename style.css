@@ -5,9 +5,10 @@
 :root {
   /* LIGHT THEME (Default) */
   --bg-color: #e2e8f0;
-  --bg-gradient: radial-gradient(circle at 15% 50%, rgba(236, 72, 153, 0.25), transparent 40%),
-    radial-gradient(circle at 85% 30%, rgba(249, 115, 22, 0.25), transparent 40%),
-    radial-gradient(circle at 50% 80%, rgba(13, 148, 136, 0.2), transparent 40%);
+  --theme-bg-color: 249, 115, 22;
+  --bg-gradient: radial-gradient(circle at 15% 50%, rgba(var(--theme-bg-color), 0.25), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(13, 148, 136, 0.15), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.2), transparent 40%);
 
   --text-main: #0f172a;
   --text-muted: #334155;
@@ -66,9 +67,9 @@
 [data-theme='dark'] {
   /* DARK THEME */
   --bg-color: #020617;
-  --bg-gradient: radial-gradient(circle at 15% 50%, rgba(236, 72, 153, 0.2), transparent 40%),
-    radial-gradient(circle at 85% 30%, rgba(249, 115, 22, 0.2), transparent 40%),
-    radial-gradient(circle at 50% 80%, rgba(20, 184, 166, 0.15), transparent 40%);
+  --bg-gradient: radial-gradient(circle at 15% 50%, rgba(var(--theme-bg-color), 0.2), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(20, 184, 166, 0.1), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.15), transparent 40%);
 
   --text-main: #f8fafc;
   --text-muted: #cbd5e1;
@@ -97,21 +98,25 @@
 [data-theme-color='red'] {
   --accent-saffron: #ef4444;
   --accent-rose: #b91c1c;
+  --theme-bg-color: 239, 68, 68;
 }
 
 [data-theme-color='green'] {
   --accent-saffron: #10b981;
   --accent-rose: #047857;
+  --theme-bg-color: 16, 185, 129;
 }
 
 [data-theme-color='blue'] {
   --accent-saffron: #3b82f6;
   --accent-rose: #1d4ed8;
+  --theme-bg-color: 59, 130, 246;
 }
 
 [data-theme-color='yellow'] {
   --accent-saffron: #eab308;
   --accent-rose: #a16207;
+  --theme-bg-color: 234, 179, 8;
 }
 
 * {
