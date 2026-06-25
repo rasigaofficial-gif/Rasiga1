@@ -2407,8 +2407,8 @@ window.RasigaApp = {
         const ini = window.RasigaComponents ? window.RasigaComponents.getInitials(song.title) : song.title[0];
         return `
         <a href="#/song/${song.id}" class="gs-result-item" style="text-decoration: none; color: inherit; display: flex;" onclick="document.getElementById('global-search-results').classList.remove('active'); document.getElementById('global-search-input').value='';">
-          <div style="width: 40px; height: 40px; border-radius: 8px; background: ${grad}; display:flex; align-items:center; justify-content:center; color:#fff; font-family:'DM Serif Display',serif; flex-shrink:0;">
-            ${ini}
+          <div style="width: 40px; height: 40px; border-radius: 8px; background: ${grad}; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0;">
+            ${window.Icons ? window.Icons.get('music', {width: 20, height: 20}) : ini}
           </div>
           <div style="flex:1; min-width:0;">
             <div style="font-weight:600; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${song.title}</div>
@@ -2418,7 +2418,7 @@ window.RasigaApp = {
               <span style="display:flex; align-items:center; gap:0.2rem;" title="Music Director">${Icons.get('music', {width:10, height:10})} ${song.composer || 'Unknown'}</span>
             </div>
           </div>
-        </div>
+        </a>
         `}).join('');
     }
     

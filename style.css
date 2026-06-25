@@ -361,7 +361,7 @@ button {
   left: 0;
   width: 100%;
   height: var(--nav-height);
-  z-index: 100;
+  z-index: 2000;
   background: var(--glass-bg-tinted);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(20px);
@@ -481,7 +481,7 @@ button {
   left: 1rem;
   width: calc(100% - 2rem);
   height: var(--bottom-nav-height);
-  z-index: 100;
+  z-index: 2000;
   background: var(--nav-theme-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -672,7 +672,7 @@ main {
   left: 1rem;
   width: calc(100% - 2rem);
   height: var(--bottom-nav-height);
-  z-index: 100;
+  z-index: 2000;
   background: var(--nav-theme-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
